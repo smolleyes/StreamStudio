@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Ht5streamer
+Comment=desktop streaming for youtube and dailymotion
+Exec=ht5streamer
+Icon=ht5streamer
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Categories=AudioVideo;
+Name[fr_FR]=ht5streamer

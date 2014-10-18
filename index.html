@@ -1,0 +1,117 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>StreamStudio</title>
+<!-- libs -->
+<script src="js/jquery.js"></script>
+<script src="js/mustache.js"></script>
+<!--<script src="js/jquery-ui-1.10.4.custom.min.js"></script>-->
+<script src="js/DOMEventsLevel3.shim.min.js"></script>
+<script src="js/tiptip/jquery.tipTip.js"></script>
+<script src="js/pagination/jquery.simplePagination.js"></script>
+<!--<script src="js/split-pane.js"></script>-->
+<script src='js/jstree/jquery.jstree.js'></script>
+<script src="js/expand.js"></script>
+<script src="js/x2js/xml2json.js"></script>
+<script src="js/jquery.notif.min.js"></script>
+<script src="js/mobile-detect.js"></script>
+<script src="js/base64.js"></script>
+<script src="js/jquery.msgbox.min.js"></script>
+<script src="js/jquery.nanoscroller.min.js"></script>
+<script src="js/Filesaver.js"></script>
+<script src="js/jquery.qtip.min.js"></script>
+<script src='js/bongo.min.js'></script>
+<script src='js/bootstrap.min.js'></script>
+<script src='js/bootstrap-select.js'></script>
+<!-- <msdropdown> -->
+<script src="js/jquery.dd.min.js"></script>
+<!-- ht5 files-->
+<script src="js/globals.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/config.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/update.js"></script>
+<!-- css -->
+<!--<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.4.custom.css" />-->
+<!--<link rel="stylesheet" href="css/jquery.mobile.squareui.css" />-->
+<link rel="stylesheet" href="css/main.css" />
+<!--<link rel="stylesheet" href="css/split-pane.css" />-->
+<link rel="stylesheet" href="js/tiptip/tipTip.css" />
+<link rel="stylesheet" href="js/mediaelement/build/mediaelementplayer.css" />
+<link rel="stylesheet" href="css/tabs.css" />
+<link rel="stylesheet" href="js/pagination/simplePagination.css" />
+<link rel="stylesheet" href="css/notif.css" />
+<link rel="stylesheet" href="css/pictogram-button.css" />
+<link rel="stylesheet" href="css/jquery.qtip.min.css" />
+<link rel="stylesheet" href="css/nanoscroller.css" />
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<link rel="stylesheet" href="css/bootstrap-select.css" />
+<!-- <msdropdown> -->
+<link rel="stylesheet" type="text/css" href="css/flags/dd.css">
+<link rel="stylesheet" type="text/css" href="css/flags/flags.css">
+
+</head>
+<body>
+	<div id='playerTopBar' style="display:none;"><a id="closePlayer" href="#">X</a></div>
+	<div id="playerContainer" style="display:none;">
+		<video class="mejs-ted" id="videoPlayer" width="100%" height="100%" src="t.mp4" controls></video>
+	</div>
+    <input style="display:none;" id="fileDialog" type="file" nwdirectory />
+    <div class="container-fluid" style="margin-left:10px;padding-left:0;">
+        <nav class="navbar-fixed-top" id="navBar" style="display:none;">
+			<div class="navbar-header">
+			  <div id="tab" class="btn-group" data-toggle="buttons-radio" style="float:left;margin-top:5px;">
+				  <a href="#tabpage_1" id="homeToggle" class="btn btn-default active" data-toggle="tab" style="border-radius: 4px 0 0 4px;">Home</a>
+				  <a href="#tabpage_2" class="btn btn-default" data-toggle="tab">Bookmarks</a>
+				  <a href="#tabpage_3" class="btn btn-default" data-toggle="tab">Local files</a>
+				  <a href="#tabpage_4" id="downloads_tab" class="btn btn-default"  data-toggle="tab">Downloads</a>
+				  <a href="#tabpage_5" class="btn btn-default"  data-toggle="tab">Upnp</a>
+				  <a id="playerToggle" href="#playerContainer" class="btn btn-default"  data-toggle="tab" style="border-radius: 0 4px 4px 0;">Player</a>
+				  <a id="settingsToggle" href="#tabpage_7" class="btn btn-default"  data-toggle="tab" style="display:none;"></a>
+			  </div>
+			</div>
+		</nav>
+		<div id="settingsContainer" style="display:none;">
+			<a id="config_btn" href="#">
+				<img src="images/config.png" height="28" width="28" /> 
+			</a> 
+			<form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank"> 
+				<input type="hidden" name="cmd" value="_s-xclick">
+				<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7----- ">
+				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+				<img alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1"> 
+			</form> 
+		</div>
+		<div id="main" >
+		</div>
+		<div id="loadingApp" style="font-weight:bold;display:none;top:48%;position:absolute;left:50%;width:250px;margin-left:-125px;">
+			<div id="spinner1" style="float:left;margin-right:10px;"></div><p style="position:relative;top:5px;"></p>
+		</div>
+		<input style="display:none;" id="export_file" type="file" nwsaveas style="display:none" nwworkingdir=""/>
+		<div id="fbxMsg" style="display:none;"></div>
+</body>
+<script src="js/canvas.js"></script>
+<script src="js/spinner.js"></script>
+<script src="js/main.js"></script>
+<script src="js/youtube-dailym.js"></script>
+<script src="js/player.js"></script>
+<script src="js/mediaelement/build/mediaelement-and-player.js"></script>
+<script src="js/contextmenu.js"></script>
+<script src="js/ht5db.js"></script>
+<script src='js/ht5playlist.js'></script>
+<script src="js/ht5localdb.js"></script>
+<script src="js/flix.js"></script>
+<script src="js/plug.js"></script>
+<script src="js/plug.upnp_contentdirectory.js"></script>
+<script src="js/plug.upnp_avtransport.js"></script>
+<script src="js/update.js"></script>
+<script src="js/window.js"></script>
+<script src="js/upnpserver.js"></script>
+<script src="js/fileserver.js"></script>
+<script src="js/ht5server.js"></script>
+<script src="js/megaFunctions.js"></script>
+<script src="js/ht5pagination.js"></script>
+<script src="js/upnpclient.js"></script>
+<script src="js/airmedia.js"></script>
+</html>

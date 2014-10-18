@@ -1,0 +1,104 @@
+V 1.9.2
+ * fix songza engine
+ * fix external players
+
+V 1.9.1
+  * fix plugins
+
+V 1.9.0
+  * big code refactoring
+  * fix keyboard shortcuts
+  * rewrited settings
+  * others fix
+
+V 1.8.5
+  * gui fix
+ 
+V 1.8.4
+  * fix
+
+V 1.8.3
+  * fix windows version
+
+V 1.8.2
+  * add external player choice
+
+V 1.8.1
+  * add kickass torrent engine
+  * fix
+
+V 1.8.0
+  * add t411 engine
+  * add scrollbar in item list
+
+V 1.7.5 
+  * add italian and greek translation
+  * small fixes
+
+V 1.7.4
+  * show/hide cursor in fullscreen
+V 1.7.3
+  * add download on freebox for french users
+
+V 1.7.2
+  * server changes
+
+V 1.7.1
+  * fix windows youtube
+
+V 1.7
+  * fix youtube/dailymotion requests
+
+V 1.6
+  * add option to enable/disable transcoding
+  * startPlay methods rewritted
+  * fix...
+ 
+V 1.5.2
+  * fix some upnp bugs
+  * add loop / playlist and play/stop mode
+
+V 1.5.1 
+ * bug fix
+
+V 1.5 
+  * introduce upnp client and mediarenderer
+
+V 1.4.2
+  * add admin/sudo check for update system in linux/osx
+
+V 1.4.1
+  * add save dialog on completed torrent
+  * bug fix
+
+V 1.3.4
+  * fix resize gui
+
+V 1.3.2
+  * fix mp3 convert
+  * fix fullscreen return
+  * bug fixes
+
+V 1.3
+  * add omgtorrent engine
+  * fix double events in plugins
+
+V 1.2
+  * add download torrents
+  * bug fix
+
+V 1.1
+  * add Piratebay engine
+  * fix many bugs
+
+V 0.5.0
+  * Add local file browsing and sharing support
+  * Add vimeo engine
+  * New plugin system
+  * fix vevo videos for youtube
+  * others small fixes
+
+V 0.1.1
+  * add suggested videos for dailymotion
+  * add local playlist system with web storage
+  * bug fixes
