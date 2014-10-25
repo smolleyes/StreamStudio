@@ -1,7 +1,7 @@
 /** initial setup **/
 .nano {
   position : relative;
-  width    : calc(100% - 15px);
+  width    : calc(100% - 5px);
   overflow : hidden;
   height: calc(100% - 150px);
   overflow: hidden;

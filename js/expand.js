@@ -25,16 +25,16 @@ $(document).ready(function() {
 	});
 	
 	$(document).on('click','.toggle-control-link', function(e) {
+		console.log($(this).parent().position().top, $(this).parent().position().left)
 		e.preventDefault();
 		var pos = $(this).position()['top'] - 100;
 		var vid = $(this).attr('alt').split('::')[0];
 		var engine = $(this).attr('alt').split('::')[1];
-		var content = $(this).parent().find('.toggle-content').first();
+		var content = $('#subList');
 		if (content.hasClass('toggled') === true) {
 			if (content.hasClass('opened') === true) {
 				content.removeClass('opened').addClass('closed');
 				content.slideToggle();
-				$(window).scrollTop(pos+17);
 				var text = '';
 				if($(this).text().indexOf('-') === -1) {
 					var t = $(this).text();
@@ -46,7 +46,6 @@ $(document).ready(function() {
 			} else {
 				content.removeClass('closed').addClass('opened');
 				content.slideToggle();
-				$(window).scrollTop(pos+17);
 				var text = '';
 				if($(this).text().indexOf('+') === -1) {
 					var t = $(this).text();

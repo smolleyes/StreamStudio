@@ -1,13 +1,13 @@
 var engines = [];
-var excludedPlugins = ['mega', 'mega-files', 'vimeo'];
+var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search'];
 var pluginsDir;
-var pluginsList = ['grooveshark','mega-search','songza','cpasbien','thepiratebay','omgtorrent','t411','kickass'];
+var pluginsList = ['grooveshark','songza','cpasbien','thepiratebay','omgtorrent','t411','kickass'];
 
 function initPlugins() {
 	console.log(confDir)
-    pluginsDir = confDir + '/plugins/StreamStudio-plugins-master/';
+    pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
     chdir(confDir, function() {
-        $.get('https://github.com/smolleyes/ht5streamer-plugins/commits/master.atom', function(res) {
+        $.get('https://github.com/smolleyes/streamstudio-plugins/commits/master.atom', function(res) {
             var lastRev;
             try {
                 lastRev = $($.find('link', res)[2]).attr('href').split('/').pop();
@@ -32,7 +32,6 @@ function initPlugins() {
 }
 
 function loadApp() {
-	console.log("LOADAPPPP " + pluginsDir)
     wrench.readdirRecursive(pluginsDir, function(error, files) {
         try {
             $.each(files, function(index, file) {
@@ -43,8 +42,7 @@ function loadApp() {
                 if (name == 'main.js') {
                     try {
                         var eng = require(pluginsDir + file);
-                        console.log(eng.name)
-                        if (in_array(eng.engine_name.toLowerCase(), excludedPlugins)) {
+                        if (excludedPlugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
                             return true;
                         }
                         if (pluginsList.indexOf(eng.engine_name.toLowerCase()) == -1 || settings.plugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
@@ -144,7 +142,7 @@ function writeRevFile(lastRev) {
     }, function(err) {
         if (err) return console.log(err);
         console.log(lastRev + ' > rev.txt');
-        updatePlugins('https://github.com/smolleyes/ht5streamer-plugins/archive/master.zip');
+        updatePlugins('https://github.com/smolleyes/streamstudio-plugins/archive/master.zip');
     });
 }
 

@@ -23,6 +23,7 @@
 <script src='js/bongo.min.js'></script>
 <script src='js/bootstrap.min.js'></script>
 <script src='js/bootstrap-select.js'></script>
+<script src='js/jquery-ajax-progress'></script>
 <!-- <msdropdown> -->
 <script src="js/jquery.dd.min.js"></script>
 <!-- ht5 files-->
@@ -59,14 +60,15 @@
 	</div>
     <input style="display:none;" id="fileDialog" type="file" nwdirectory />
     <div class="container-fluid" style="margin-left:10px;padding-left:0;">
+		<h3 class="myBrand" style="display:none;">StreamStudio</h3>
         <nav class="navbar-fixed-top" id="navBar" style="display:none;">
 			<div class="navbar-header">
 			  <div id="tab" class="btn-group" data-toggle="buttons-radio" style="float:left;margin-top:5px;">
 				  <a href="#tabpage_1" id="homeToggle" class="btn btn-default active" data-toggle="tab" style="border-radius: 4px 0 0 4px;">Home</a>
-				  <a href="#tabpage_2" class="btn btn-default" data-toggle="tab">Bookmarks</a>
-				  <a href="#tabpage_3" class="btn btn-default" data-toggle="tab">Local files</a>
+				  <a href="#tabpage_2" id="webLibToggle"class="btn btn-default" data-toggle="tab">Bookmarks</a>
+				  <a href="#tabpage_3" id="localFilesToggle"class="btn btn-default" data-toggle="tab">Local files</a>
 				  <a href="#tabpage_4" id="downloads_tab" class="btn btn-default"  data-toggle="tab">Downloads</a>
-				  <a href="#tabpage_5" class="btn btn-default"  data-toggle="tab">Upnp</a>
+				  <a href="#tabpage_5" id="upnpToggle" class="btn btn-default"  data-toggle="tab">Upnp</a>
 				  <a id="playerToggle" href="#playerContainer" class="btn btn-default"  data-toggle="tab" style="border-radius: 0 4px 4px 0;">Player</a>
 				  <a id="settingsToggle" href="#tabpage_7" class="btn btn-default"  data-toggle="tab" style="display:none;"></a>
 			  </div>
@@ -90,6 +92,9 @@
 		</div>
 		<input style="display:none;" id="export_file" type="file" nwsaveas style="display:none" nwworkingdir=""/>
 		<div id="fbxMsg" style="display:none;"></div>
+		<div id="subList" class="container" style="display:none;">
+		
+		</div>
 </body>
 <script src="js/canvas.js"></script>
 <script src="js/spinner.js"></script>

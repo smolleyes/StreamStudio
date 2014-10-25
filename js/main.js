@@ -46,7 +46,6 @@ var ht5Server;
 var currentMedia;
 var currentAirMedia = {};
 var fn;
-var excludedPlugins = ['mega', 'mega-files', 'vimeo'];
 var loadedTimeout;
 var playlistMode = 'normal';
 
@@ -120,7 +119,7 @@ var htmlStr = '<div class="row"> \
 	</div> \
 </div> \
 <div class="panel panel-default" id="subPlayer">\
-  <div class="panel-heading">'+_("Current Media:")+'</div> \
+  <div class="panel-heading">'+_("Playing:")+'</div> \
   <div class="panel-body" style="text-align:center;"> \
 		<img id="subPlayer-img" src="images/play-overlay.png" />  \
 		<div id="subPlayer-controls"> \
@@ -178,7 +177,12 @@ var htmlStr = '<div class="row"> \
 				</div> \
 			</div> \
 			<div class="tab-pane" id="tabpage_7"> \
-					<div style="height:36px;"> \
+				<div class="container" style="margin-left:0;width:calc(100% - 15px);padding-top:10px;"> \
+					<div class="row"> \
+						<legend><h3>StreamStudio Settings <span style="font-size:12px;float:right;margin-top:10px;"><b>(V'+settings.version+')</b></span>:</h3></legend> \
+						<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 160px);"> \
+				<form role="form" class="nano-content" style="padding-top:10px;"> \
+					<div class="form-group"> \
 						<label>'+_("Language:")+'</label> \
 						<select name="countries" id="countries" style="width:300px;"> \
 						  <option value="en" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gb" data-title="England">English</option> \
@@ -188,26 +192,32 @@ var htmlStr = '<div class="row"> \
 						  <option value="it" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag it" data-title="Italia">Italia</option> \
 						</select> \
 					</div> \
-					<div style="height:36px;"> \
+					<div class="form-group"> \
 					  <label>'+_("Maximum resolution:")+'</label> \
-					  <select id="resolutions_select"> \
+					  <div id="resolutions_select_cont" > \
+					  <select id="resolutions_select" class="selectpicker"> \
 							<option value = "1080p">1080p</option> \
 							<option value = "720p">720p</option> \
 							<option value = "480p">480p</option> \
 							<option value = "360p">360p</option> \
 					  </select> \
+					  </div> \
 					</div> \
-					<div style="height:36px;"> \
+					<div class="form-group"> \
 					  <label>'+_("Download directory:")+'</label> \
-					  <input type="text" id="download_path"></input><button id="choose_download_dir">'+_("Select")+'</button> \
+					  <div> \
+							<div class="input-group" style="margin-left:-5px;"> \
+								<input type="text" id="download_path"></input><button class="btn btn-default btn-sm" id="choose_download_dir" class="input-group-addon">'+_("Select")+'</button> \
+							</div> \
+						</div> \
 					</div> \
-					<div> \
+					<div class="form-group"> \
 					  <p> \
 						<b><u>'+_("Plugins choice:")+'</u></b> \
 						<br> \
 						'+_("Please read the disclaimer here : <u><a id='disclaimer' style='color:red;' href='#'>disclaimer</a></u>")+' \
 					  </p> \
-					  <div style="border: 1px solid black;height:34px;"> \
+					  <div class="input-group well" style="display: table !important;"> \
 						<!--<div class="ItemCheckbox left">\
 						  <label for="vimeo">Vimeo</label>\
 						  <input class="pluginCheckBox" type="checkbox" id="vimeo" name="vimeo">\
@@ -219,10 +229,6 @@ var htmlStr = '<div class="row"> \
 						<div class="ItemCheckbox left">\
 						  <label for="grooveshark">Grooveshark</label>\
 						  <input class="pluginCheckBox" type="checkbox" id="grooveshark" name="grooveshark">\
-						</div>\
-						<div class="ItemCheckbox">\
-						  <label for="mega-search">Mega-search.ws</label>\
-						  <input class="pluginCheckBox" type="checkbox" id="mega-search" name="mega-search">\
 						</div>\
 						<div class="ItemCheckbox left">\
 						  <label for="omgtorrent">Cpasbien</label>\
@@ -247,24 +253,36 @@ var htmlStr = '<div class="row"> \
 					  </div>\
 					  <div style="clear:both;"></div> \
 					</div> \
-					<p><u><b>'+_("Default player:")+'</b></u></p> \
-					<div id="externalPlayers"> \
-						<select id="playerSelect"></select> \
-					</div> \
-					<div style="height:240px;margin-top:30px;"> \
-							<p>'+_("Add or remove directories to scan for your local library:")+'</p> \
-							<select id="shared_dir_select" multiple name="shared_dir"> \
-							</select> \
+					<div class="form-group"> \
+						<p><u><b>'+_("Default player:")+'</b></u></p> \
+						<div id="externalPlayers"> \
+							<select id="playerSelect" class="selectpicker"></select> \
 						</div> \
-						<div id="shared_dir_controls"> \
-								<button id="add_shared_dir">'+_("Add")+'</button> \
-								<button id="remove_shared_dir" >'+_("Remove")+'</button> \
-						</div>\
-					<br\><br\> \
-					<button id="valid_config">'+_("Save")+'</button> \
-					<p id="version" style="position:absolute;bottom:-12px;width:100%;" class="list-divider">V '+settings.version+'</p> \
+					</div> \
+					<div class="form-group"> \
+						<div style="height:240px;margin-top:30px;"> \
+							<p><u><b>'+_("Add or remove directories to scan for your local library:")+'</b></u></p> \
+							<select id="shared_dir_select" multiple name="shared_dir" class="well"></select> \
+							<div id="shared_dir_controls"> \
+								<div style="width:125px;"> \
+									<button class="btn btn-success btn-sm" id="add_shared_dir">'+_("Add")+'</button> \
+								</div> \
+								<div style="width:125px;margin-top:5px;"> \
+									<button class="btn btn-danger btn-sm" id="remove_shared_dir" >'+_("Remove")+'</button> \
+								</div> \
+							</div>\
+						</div> \
+					</div> \
+					<hr> \
+					<div class="form-group"> \
+						<button id="valid_config" class="btn btn-success">'+_("Save")+'</button> \
+					</div> \
 					<input style="display:none;" id="fileDialog" type="file" nwdirectory /> \
 					<input style="display:none;" id="sharedDirDialog" type="file" nwdirectory /> \
+							</form> \
+							</div> \
+						</div> \
+					</div> \
 			</div> \
 	</div> \
     <div id="custom-menu"> \
@@ -305,43 +323,41 @@ try {
 
 $(document).ready(function() {
     $('#main').append(htmlStr).hide();
-    //TODOOOOOOOOOOOOOOOOO
-    //setTimeout(function(){
-		//if(settings.init === false) {
-			//loadConfig();
-		//}
-	//},1000);
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
     $('#loadingApp').show();
     // load plugins
     initPlugins();
-    setResolution();
 });
 
 function main() {
-    $('#loadingApp').remove();
-    new imageLoader(cImageSrc, 'startAnimation()');
-    $('#main').show();
-    $("#navBar").show();
-	$("#settingsContainer").show();
-	if(settings.init) {
-		checkUpdates();
-		checkFreebox();
-	}
+    // update navbar text
+    $('#homeToggle').text(_("Home"));
+    $('#webLibToggle').text(_("Web library"));
+    $('#localFilesToggle').text(_("Local files"));
+    $('#downloads_tab').text(_("Downloads"));
+    $('#upnpToggle').text(_("Upnp"));
+    $('#playerToggle').text(_("Player"));
+    
     // load and hide catgories
     getCategories();
     // start keyevent listener
     fn = function(e) {
         onKeyPress(e);
     };
-    // nvaigation setup
-    $(document).on("click", ".btn", function(e){
-	  $('.btn.active').removeClass('active');
+    // navigation setup
+    $(document).on("click", "#tab .btn", function(e){
+	  try {
+		  var id = $(this).attr('href').split('_')[1];
+		  if (id) {
+			activeTab = parseInt(id);
+		  }
+	  } catch(err) {}
+	  $('#tab .btn.active').removeClass('active');
 		setTimeout(function() {
 			$(this).addClass('active');
-			if($('.btn.active').attr('id') !== "playerToggle") {
+			if($('#tab .btn.active').attr('id') !== "playerToggle" && $('#tab .btn.active').attr('id') !== "settingsToggle") {
 				$('#playerContainer').hide();
-				$('#playerTopBar').hide();	
+				$('#playerTopBar').hide();
 			}
 		},100);
 	});
@@ -368,10 +384,7 @@ function main() {
     player = MediaElementPlayer('#videoPlayer', {
         features: ['playpause', 'progress', 'current', 'duration', 'stop', 'volume', 'fullscreen']
     });
-    //set player height
-    //var h = window.innerHeight;
-    //$('#mep_0').attr('style', 'height:'+h+'px;');
-    // search form
+
     $('#video_search').bind('submit', function(e) {
         e.preventDefault();
         query = $('#video_search_query').val();
@@ -425,30 +438,11 @@ function main() {
             //$('#main').addClass('fullscreen');
         }
     });
-    // click on tab1 get focus
-    $(document).on('click', '#tabHeader_1', function(e) {
-        try {
-            if ((search_engine === 'youtube') || (search_engine === 'dailymotion')) {
-                var p = $('.highlight').position().top;
-                $('#left-component').scrollTop(p - 45);
-            } else {
-                var p = $('.highlight').position().top;
-                $('#left-component').scrollTop(p + 13);
-            }
-        } catch (err) {}
-    });
+    
     // next signal and callback
     $(document).on('click', '.mejs-next-btn', function(e) {
-        e.preventDefault();
-        if ($('.tabActiveHeader').attr('id') === 'tabHeader_1' || $('.tabActiveHeader').attr('id') === 'tabHeader_3' || $('.tabActiveHeader').attr('id') === 'tabHeader_5') {
-            try {
-                engine.play_next();
-            } catch (err) {
-                getNext();
-            }
-        } else {
-            on_media_finished();
-        }
+		e.preventDefault();
+        getNext();
     });
     // stop button
     $(document).on('click', '#stopBtn', function(e) {
@@ -458,6 +452,9 @@ function main() {
 			mediaRenderer.stop();
 		} catch(err) {}
         initPlayer();
+        $('#playerContainer').hide();
+        $('#playerTopBar').hide();
+        $('#homeToggle')[0].click();
     });
     // pause/stop button
     $('.mejs-playpause-button').click(function(e) {
@@ -522,8 +519,9 @@ function main() {
     // start video by clicking title
     $(document).on('click', '.start_video', function(e) {
         e.preventDefault();
+        $(this).closest('.youtube_item').addClass('highlight well');
         try {
-            $('#' + current_song).closest('.youtube_item').toggleClass('highlight', 'false');
+            $('.highlight.well').removeClass('highlight well');
         } catch (err) {}
         // save current song/page and search for back btn
         try {
@@ -533,31 +531,27 @@ function main() {
         }
         current_song_page = current_page;
         var title = $(this)[0].innerText;
-        current_song = $(this).parent().closest('.youtube_item').find('div')[4].id;
-        $('#' + current_song).closest('.youtube_item').toggleClass('highlight', 'true');
+        current_song = $(this).closest('.youtube_item').find('.downloads_container').attr('id');
         startVideo(current_song, title);
     });
+    
     // load video signal and callback
     $(document).on('click', '.video_link', function(e) {
         e.preventDefault();
         playFromfile = false;
         try {
-            $('#' + current_song).closest('.youtube_item').toggleClass('highlight', 'false');
+            $('#' + current_song).closest('.youtube_item').removeClass('highlight well');
         } catch (err) {
             console.log(err);
         }
         current_song_page = current_page;
-        current_song = $(this).parent().closest('.youtube_item').find('div')[4].id;
-        $('#' + current_song).closest('.youtube_item').toggleClass('highlight', 'true');
+        current_song = $(this).parent().closest('.youtube_item').find('.downloads_container').attr('id');
         var video = {};
         video.link = $(this).attr('href');
-        video.title = $('#' + current_song).parent().find('b')[0].innerText;
+        video.title = $(this).parent().closest('.youtube_item').find('b')[0].innerText;
         video.next = next_vid;
         $('video').trigger('loadPlayer', video);
-        if ($('.tabActiveHeader').attr('id') === 'tabHeader_1') {
-            var p = $('.highlight').position().top;
-            $('#left-component').scrollTop(p + 13);
-        }
+        $(this).closest('.youtube_item').addClass('highlight well');
     });
 
     $(document).on('click', '.upnpMedia', function(e) {
@@ -615,6 +609,17 @@ function main() {
     player.media.addEventListener('ended', function() {
         on_media_finished();
     });
+    
+    player.media.addEventListener('pause', function() {
+		$('#subPlayer-play').show();
+		$('#subPlayer-pause').hide();
+    });
+    
+    player.media.addEventListener('play', function() {
+		$('#subPlayer-play').hide();
+		$('#subPlayer-pause').show();
+    });
+    
     //load playlist
     $(document).on('click', '.load_playlist', function(e) {
         var pid = $(this).attr('id');
@@ -654,6 +659,16 @@ function main() {
             downloadFile(link, title, engine);
         }
     });
+    
+    // download file signal and callback
+    $(document).on('click', '.download_file_https', function(e) {
+        e.preventDefault();
+        var link = $(this).attr('href');
+        var title = $(this).attr('alt');
+        var engine = title.split('::')[2];
+        downloadFileHttps(link, title, engine);
+    });
+    
     //cancel download
     $(document).on('click', '.cancel', function(e) {
         canceled = true;
@@ -928,7 +943,7 @@ function main() {
     $('#closePlayer').click(function() {
         $('#playerContainer').hide();
         $('#playerTopBar').hide();
-        $('#homeToggle')[0].click();
+        $('#tab a[href="#tabpage_'+activeTab+'"]').click();
     });
 
     // airplay
@@ -1040,50 +1055,55 @@ function main() {
     
     win.on('resize', function() {
         $(".nano").nanoScroller();
-        //var h = window.innerHeight;
-			//$('#mep_0').attr('style', 'height:'+h+'px;');
+        settings.defaultWidth = win.width;
+		settings.defaultHeight = win.height;
+		saveSettings();
     });
     
-    setTimeout(function() {
-		// load upnp devices
-		cli.searchDevices();
-		cli.on('updateUpnpDevice', function() {
-			updateUpnpList()
-		});
-	},2000);
+
+	// load upnp devices
+	cli.searchDevices();
+	cli.on('updateUpnpDevice', function() {
+		updateUpnpList()
+	});
 	
+	
+	//show gui
+    $('#loadingApp').remove();
+    new imageLoader(cImageSrc, 'startAnimation()');
+    $('#main').show();
+    $("#navBar").show();
+    $(".myBrand").show();
+	$("#settingsContainer").show();
+	if(settings.init) {
+		checkUpdates();
+		checkFreebox();
+	} else {
+		$("#settingsToggle").click();
+		loadConfig();
+	}
+	var w = 0;
+	$.each($("#tab a"),function(index,size) { 
+		w+=$(this).width();
+		if(index+1 == $("#tab a").length) { 
+			var wid = Math.round(w / 2) + 100;
+			$("#navBar").css('margin-left','-'+wid+'px')
+		}
+	})
+
 	$('button[aria-label="playlist"]').attr('title','play and stop');
 	
 	$('.tab-content').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
-		$(".nano").nanoScroller();
-		//$('.nano-pane').css('display','block')
+		updateScroller();
 	});
 	$('.selectpicker').selectpicker({
 	  style: 'btn-default btn-sm',
 	  hideDisabled : true
 	});
-	
 }
 
-// code from popcorn time (popcorntime.io)
-function setResolution() {
-    var zoom = 0;
-    var screen = window.screen;
-
-    if (ScreenResolution.QuadHD) {
-        zoom = 2;
-    } else if (ScreenResolution.UltraHD || ScreenResolution.Retina) {
-        zoom = 1;
-    }
-
-    var width = localStorage.width ? localStorage.width : settings.defaultWidth;
-    var height = localStorage.height ? localStorage.height : settings.defaultHeight;
-    var x = localStorage.posX ? localStorage.posX : Math.round((screen.availWidth - settings.defaultWidth) / 2);
-    var y = localStorage.posY ? localStorage.posY : Math.round((screen.availHeight - settings.defaultHeight) / 2);
-
-    win.zoomLevel = zoom;
-    win.resizeTo(width, height);
-    win.moveTo(x, y);
+function updateScroller() {
+	$(".nano").nanoScroller();
 }
 
 function changePage() {
@@ -1138,6 +1158,7 @@ function update_searchOptions() {
 //search
 function startSearch(query) {
     $("#search p").empty().append(' ');
+    $('#loading p').empty().append(_("Loading..."));
     if ($('.tabActiveHeader').attr('id') !== 'tabHeader_1') {
         $("#tabHeader_1").click();
     }

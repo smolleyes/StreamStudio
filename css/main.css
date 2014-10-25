@@ -18,15 +18,39 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 */
 
+@font-face {
+	font-family: Ripper; 
+	src: url('../fonts/Ripper.ttf');
+}
+
+.myBrand {
+	font-family: Ripper;
+	color: white;
+	font-size: 28px;
+	margin-left:25px;
+	position: relative;
+	top: -5px;
+	float:left;
+}
+
 a {
 	text-decoration: none !important;
 }
 
+input[type="checkbox"] {
+margin: 4px 10px 0 0 !important;
+position: relative !important;
+top: 2px !important;
+}
+
+#countries_titleText {
+	display: none !important;
+}
+
 #navBar {
-	width: 510px;
 	left: 50%;
-	margin-left: -255px;
 	top: 5px !important;
+	margin-right: 200px;
 }
 
 #settingsContainer {
@@ -58,7 +82,7 @@ button[aria-label="playlist"] {
 	margin-top: 5px !important;
 }
 
- select.selectpicker {
+select.selectpicker {
 	opacity: 0 !important;
 	margin-bottom: -20px !important;
 }
@@ -69,18 +93,6 @@ button[aria-label="playlist"] {
 	top: -3px;
 	right: 2em;
 }
-
-.form-group {
-	margin-bottom: 0 !important;
-}
-/*
-select, input[type="submit"]{
-	background: -webkit-linear-gradient(top, rgba(235,235,235,1) 0%,rgba(233,233,233,1) 50%,rgba(229,229,229,1) 51%,rgba(247,247,247,1) 100%); 
-	color: black;
-	border: 1px solid black;
-	border-radius: 3px;
-}
-*/
 
 input[type='text'] {
 	padding: 5px;
@@ -111,14 +123,15 @@ pre {
 	white-space: pre-wrap;
 }
 
-.qtip {
-  left:385px !important;
+.qtip-youtube {
+  margin-left: -25px;
 }
 
 .qtip-tip {
   display:none !important;
 }
 
+/*
 .ItemInput,.ItemCheckbox, ItemCheckbox > label{
     display:inline-block;
     vertical-align:top;
@@ -127,6 +140,7 @@ pre {
 
 .ItemCheckbox, ItemCheckbox > label {
     margin-left:10px; /* Or whatever you want */
+/*
     line-height:14px;
 }
 
@@ -134,6 +148,7 @@ pre {
   position: relative;
   top: 8px;
 }
+*/
 
 .mejs-time-total, .mejs-time-rail {
 	width: calc(100% - 310px) !important;
@@ -141,27 +156,56 @@ pre {
 }
 
 #fbxMsg {
-height: 100%;
-width: 100%;
-background: black;
-position: absolute;
-padding: 10px;
-color: white !important;
-z-index: 2000;
-overflow: scroll;
-left:0;
+	height: 100%;
+	width: 100%;
+	background: black;
+	position: absolute;
+	padding: 10px;
+	color: white !important;
+	z-index: 2000;
+	overflow: scroll;
+	left:0;
+}
+
+#fbxMsg_content {
+	overflow: scroll;
+	height: 100%;
+}
+
+#fbxMsg_content .nano-slider {
+	border: 3px solid white;
+}
+
+#fbxMsg_content .nano-pane {
+	border: 1px solid white;
+}
+
+#fbxMsg_content #nanoContent {
+	top:0 !important;
+}
+
+#infosPage {
+	height: calc(100% - 60px);
+	width: 100%;
+	background: black;
+	position: absolute;
+	padding: 10px;
+	color: white !important;
+	z-index: 2000;
+	overflow: scroll;
+	left:0;
 }
 
 #closePreview {
 position: absolute;
 top: 20px;
 right: 35px;
-font-size: 16px;
+font-size: 24px;
 font-weight:bold;
 }
 
 #closePreview:hover {
-  color:orange !important;
+  color:red !important;
 }
 
 #fbxMsg h1 {
@@ -357,31 +401,22 @@ video{
 	-webkit-animation-name: flipInX;
 	-webkit-animation-duration: 1s;
 	-webkit-animation-fill-mode: both;
-	width: 160px;
-	height: 335px;
+	width: 348px;
+	height: 211px;
 	float: left;
-	margin: 0 2px;
+	margin: 0 10px 15px 0 !important;
 }
 
 .start_video {
-    float: left;
-    margin-right: 2%;
-    overflow: hidden;
     position: relative;
-	display: block;
-	overflow: hidden;
-	height: 2.6em;
+	top: -5px;
 }
 
-.start_video:after {
-display: block;
-      content: '...';
-      width: 1em;
-  height: 1.5em;
-  background: #fff;
-  position: absolute;
-  bottom: -6px;
-  right: 0;
+.mvthumb {
+	float:left;
+	height:125px;
+	width:100px;
+	margin-top:5px;
 }
 
 #subPlayer {
@@ -409,7 +444,7 @@ display: block;
 #subPlayer-title {
 	position: absolute;
 	top: 11px;
-	left: 112;
+	left: 75px;
 }
 
 #subPlayer-controls {
@@ -520,10 +555,27 @@ display: block;
     vertical-align:middle;
 }
 
-.hide_bar, .convert, .cancel {
+.hide_bar, .open_folder, .convert, .cancel {
 	position:relative;
-	top:-12px;
     margin-left: 5px;
+}
+
+.open_folder, .cancel {
+	position: relative;
+	top: -17px;
+	margin-left: 5px;
+}
+
+.download_file_https {
+	margin-right:5px;
+}
+
+.hide_bar {
+	top: -16px;
+}
+
+.convert {
+	top: -16px;
 }
 
 .progress {
@@ -550,14 +602,16 @@ display: block;
 	margin-left: 5px;
 }
 */
-.item_infos {
+.video_length {
     position: relative;
     top: -20;
 }
 
 .video_thumbnail {
-    width: 160px;
-	height: 125px;
+    float:left;
+    width: 120px;
+    height:90px;
+    margin: 0 5px 5px 0;
 }
 
 
@@ -570,6 +624,7 @@ display: block;
 	bottom: 0;
 }
 
+/*
 .highlight {
     background: -webkit-linear-gradient(top, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%);
 }
@@ -581,6 +636,7 @@ display: block;
 .highlight a:hover {
     color:red;
 }
+*/
 
 #config_btn {
     position:absolute;
@@ -665,29 +721,34 @@ display: block;
     left: 200px;
 }
 
-#resolutions_select, #interface_select,#shared_dir_select,#shared_dir_controls {
+#resolutions_select, #interface_select,#shared_dir_controls {
     position: absolute;
     left: 200px;
+}
+
+#download_path {
+	width: 400px !important;
+	float:left;
 }
 
 #shared_dir_select {
 	height: 200px;
 	width:250px;
+	padding:0;
 }
+
 #shared_dir_controls {
 	width: 200px;
-}
-
-
-#download_path, #gmailUser, #gmailPass {
-    position: absolute;
-    left:200px;
-    width:305px;
+	position: relative;
+	left: 260px;
+	top: -220px;
 }
 
 #choose_download_dir {
-    position: absolute;
-    left:502px;
+    top: 4px;
+	width: auto;
+	position: relative;
+	height: 34;
 }
 
 #main {
@@ -742,9 +803,17 @@ display: block;
 .video_length {
 background: rgba(0, 0, 0, 0.6);
 color: white;
-position: relative;
-right: -94px;
+position: absolute;
+left: 54px;
 padding: 2px 5px;
+top: 66px;
+}
+
+.downloads_container {
+	width: 225px;
+	left: 125px;
+	position: absolute;
+	margin-bottom: 20px;
 }
 
 ::-webkit-scrollbar { 
@@ -881,7 +950,9 @@ color: White;
 /* toggle control*/
 
 .toggle-control {
-    padding: 5px 10px 10px 10px;
+    position: absolute;
+	top: 175px;
+	width: 325px;
 }
 
 .toggle-control-link {
@@ -892,7 +963,37 @@ color: White;
     padding: 5px;
 }
 
+#subList {
+	position: fixed;
+	top: 350;
+	padding-top: 20px;
+	width: calc(100% - 346px);
+	height: calc(100% - 350px);
+	background: #272b30;
+	display: inline-block;
+	left: 312px;
+	overflow: scroll;
+}
+
 /* others */
+.panel-heading {
+	padding : 10px 7px !important;
+}
+
+.highlight.well {
+	padding:2px !important;
+}
+
+.ddcommon {
+	width: 200px;
+	left: 90px;
+	top: 4px;
+}
+
+#externalPlayers, #resolutions_select_cont {
+	width: 300px;
+	margin-left: -5px;
+}
 
 #version {
     background: black;
@@ -1183,23 +1284,30 @@ color: White;
 }
 
 .list-row {
-font-size : 12px;
-overflow:auto;
-width:300px;
-height: 145px;
-float:left;
--webkit-animation-name: flipInX;
--webkit-animation-duration: 1s;
--webkit-animation-fill-mode: both;
+	font-size : 12px;
+	overflow:auto;
+	width:300px;
+	height: 150px;
+	float:left;
+	-webkit-animation-name: flipInX;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-fill-mode: both;
+	margin : 0 10px 20px 0 !important;
+}
+
+.ItemCheckbox {
+	float:left;
 }
 
 .item-title {
 	font-size:14px;
 	font-weight:bold;
+	width: 195px !important;
+	display: block;
 }
 
 .item-info {
-	margin: 10px 0;
+	margin: 5px 0;
 }
 
 .list-row h3 {

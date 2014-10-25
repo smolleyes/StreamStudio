@@ -277,9 +277,12 @@ function loadUpnpQtip() {
       content : {text: text},
       position: {
         corner: {
-          target: 'bottomMiddle',
-          tooltip: 'topMiddle'
-        }
+          target: 'bottomLeft',
+          tooltip: 'bottomLeft'
+        },
+        position: {
+			at: 'bottom left'
+		}
       },
       show: { ready: true },
       hide: {
@@ -342,7 +345,7 @@ function playUpnpRenderer(obj) {
 	$('.mejs-time-current').width(0+'%');
 	$('span.mejs-currenttime').text('00:00:00');
 	$('span.mejs-duration').text('00:00:00');
-	//'http://'+ipaddress+':8081/?stream='+
+	//'http://'+ipaddress+':4575/'+
 	var uri = XMLEscape.xmlEscape(obj.link.replace('&upnp','').replace('&torrent','').replace('&direct',''));
 	var infos = JSON.parse(obj.data).protocolInfo;
 	var title = XMLEscape.escape(obj.title);
@@ -443,8 +446,8 @@ function getRendererState(state) {
 						$(".mejs-layer").show();
 						$(".mejs-overlay-loading").hide();
 						$(".mejs-overlay-button").show();
-						$('#fbxMsg').remove();
 						$('#song-title').empty().append(_('Stopped...'));
+						$('.mejs-container#fbxMsg').remove();
 					},2000);
 				}
 			}
@@ -465,7 +468,7 @@ function startUPNPserver() {
         upnpDirs.push(share);
         if (index + 1 == settings.shared_dirs.length) {
             UPNPserver = new upnpServer({
-                name: 'Ht5streamer_' + os.hostname(),
+                name: 'StreamStudio_' + os.hostname(),
                 uuid: uuid.v4()
             }, upnpDirs);
             UPNPserver.start();

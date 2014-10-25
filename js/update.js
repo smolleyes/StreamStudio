@@ -41,18 +41,18 @@ $(document).on('click','#updateBtn',function(e) {
 	var file = '';
 	var link = '';
 	if (process.platform === 'win32') {
-		file = 'StreamStudio-setup.exe';
+		file = 'streamstudio-setup.exe';
 		link = 'http://ubukey.fr/StreamStudio/windows/'+file;
 	} else if (process.platform === 'darwin') {
-		 file = 'StreamStudio-osx.zip';
+		 file = 'streamstudio-osx.zip';
 		 link = 'http://www.ubukey.fr/StreamStudio/osx/'+file;
 	} else {
 		if (arch === 'ia32') {
 			console.log('linux 32 bits detected...');
-			file = 'StreamStudio-32.zip';
+			file = 'streamstudio-32.zip';
 		} else if (arch === 'x64') {
 			console.log('linux 64 bits detected...');
-			file = 'StreamStudio-64.zip';
+			file = 'streamstudio-64.zip';
 		}
 		link = 'http://ubukey.fr/StreamStudio/'+file;
 	}
@@ -114,7 +114,7 @@ function downloadUpdate(link,filename) {
 	    if (process.platform === 'win32') {
 			$('.notification').click();
 			$.notif({title: 'StreamStudio:',cls:'green',timeout:10000,icon: '&#10003;',content:_("Click ok to launch the update installer"),btnId:'startWinUpdate',btnTitle:'Ok',btnColor:'black',btnDisplay: 'block',updateDisplay:'none'});
-			updatePath = tmpPath.replace(/\\/g,"\\\\")+'\\\\StreamStudio-setup.exe';
+			updatePath = tmpPath.replace(/\\/g,"\\\\")+'\\\\streamstudio-setup.exe';
  	    } else if (process.platform === 'darwin') {
 			var dest = path.dirname(execDir.match(/(.*)StreamStudio.app(.*?)/)[0]);
 			var args = ['-o',filename,'-d',dest];

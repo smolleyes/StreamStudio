@@ -20,7 +20,7 @@ if (localStorage.StdSettings === undefined) {
 	settings.ipaddress = nodeip.address();
 	settings.version = VERSION;
 	settings.download_dir = "";
-	settings.shared_dirs = [""];
+	settings.shared_dirs = [];
 	settings.locale = "en";
 	settings.resolution = "720p";
 	settings.os = getOsType();
@@ -28,6 +28,8 @@ if (localStorage.StdSettings === undefined) {
 	settings.selectedDir="";
 	settings.plugins=[];
 	settings.init=false;
+	settings.defaultWidth = Math.round(window.screen.availWidth * 0.8);
+	settings.defaultHeight = Math.round(window.screen.availHeight * 0.8);
 	settings.StreamStudioPlayer = {"name":"StreamStudio","path":""};
 	localStorage.StdSettings = JSON.stringify(settings);
 }
@@ -38,8 +40,6 @@ ipaddress = settings.ipaddress;
 selected_resolution = settings.resolution;
 download_dir = settings.download_dir;
 locale = settings.locale;
-settings.defaultWidth = Math.round(window.screen.availWidth * 0.8);
-settings.defaultHeight = Math.round(window.screen.availHeight * 0.8);
 
 // locale code (for youtube)
 var localeCode = 'US';
@@ -122,5 +122,27 @@ var ScreenResolution = {
 	}
 };
 
+// code from popcorn time (popcorntime.io)
+function setResolution() {
+    var zoom = 0;
+    var screen = window.screen;
+
+    if (ScreenResolution.QuadHD) {
+        zoom = 2;
+    } else if (ScreenResolution.UltraHD || ScreenResolution.Retina) {
+        zoom = 1;
+    }
+
+    var width = localStorage.width ? localStorage.width : settings.defaultWidth;
+    var height = localStorage.height ? localStorage.height : settings.defaultHeight;
+    var x = localStorage.posX ? localStorage.posX : Math.round((screen.availWidth - settings.defaultWidth) / 2);
+    var y = localStorage.posY ? localStorage.posY : Math.round((screen.availHeight - settings.defaultHeight) / 2);
+
+    win.zoomLevel = zoom;
+    win.resizeTo(width, height);
+    win.moveTo(x, y);
+}
+
 //start 
 setLocale();
+setResolution();

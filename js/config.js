@@ -30,6 +30,7 @@ function loadConfig() {
 		});
     });
     $('#valid_config').click(function(e) {
+		e.preventDefault();
       settings.init=true;
       saveSettings();
       saveConf();
@@ -49,16 +50,19 @@ function loadConfig() {
     }); 
     
     // choose download_dir
-    $('#choose_download_dir').click(function() {
+    $('#choose_download_dir').click(function(e) {
+		e.preventDefault();
 		chooseDownloadDir();
     });
     // shared dirs
-    $('#add_shared_dir').click(function() {
+    $('#add_shared_dir').click(function(e) {
+		e.preventDefault();
 		addSharedDir();
     shares_changed = true;
     settings.shares_changed = true;
     });
-    $('#remove_shared_dir').click(function() {
+    $('#remove_shared_dir').click(function(e) {
+		e.preventDefault();
 		removeSharedDir();
     shares_changed = true;
     settings.shares_changed = true;
@@ -155,7 +159,7 @@ without notice.");
 	  });
   });
   loadPlayers();
-  
+  updateScroller();
 }
 
 function writeConf(settings) {
@@ -304,9 +308,8 @@ function getIpaddress() {
 }
 
 function saveConf() {
-	
 	if (settings.download_dir === '') {
-		$('#download_path').val('REQUIRED!!!').css({'color':'red'});
+		$('#download_path').val(_('REQUIRED!!!')).css({'color':'red'});
 		return;
     }
     
@@ -345,7 +348,7 @@ function saveConf() {
 		saveSettings();
 		location.reload();
 	} else {
-		$('#settings').empty().slideToggle();
+		$('#homeToggle').click();
 	}
 	console.log("ht5config config updated successfully!");
 }
@@ -527,6 +530,7 @@ function loadPlayers() {
 								$("#playerSelect option[name='StreamStudio']").attr('selected', 'selected');
 							}
 						}
+						$('.selectpicker').selectpicker('refresh');
 					});
 					return;
 				}

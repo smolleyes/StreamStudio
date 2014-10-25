@@ -255,69 +255,69 @@ function getAirMediaReceivers() {
 }
 
 function loadQtip() {
-  if (airMediaDevice !== '') {
-      $("#fbxPopup input").each(function(){
-          var name = $(this).prop('name');
-          if (name !== airMediaDevice) {
-              $(this).prop('checked','');
-          }
-      });
-      $("#fbxPopup input[name='"+airMediaDevice+"']").prop('checked','checked');
-  }
-  if (airMediaDevices.length === 1) {
-      airMediaDevice = airMediaDevices[0];
-      return;
-  } else if (airMediaDevices.length === 0){
-      var text = '<p>Aucun Freebox player allumé! <br>Allumez votre freebox player et réactivez ce bouton...</p>';
-      $("#airplay-toggle").qtip({
-      content : {text: text},
-      position: {
-        corner: {
-          target: 'bottomMiddle',
-          tooltip: 'topMiddle'
-        }
-      },
-      show: { ready: true },
-      hide: {
-        event: 'unfocus',
-        effect: function(offset) {
-            $(this).slideDown(1000); // "this" refers to the tooltip
-        }
-      },
-      style: { classes : 'qtip-youtube'},
-      // The magic
-      api: {
-        onRender: function() {
-          this.elements.tooltip.click(this.hide) //
-        }
-      }
-    });
-  } else {
-    var text = $('#fbxPopup').html();
-    $("#airplay-toggle").qtip({
-      content : {text: text},
-      position: {
-        corner: {
-          target: 'bottomMiddle',
-          tooltip: 'topMiddle'
-        }
-      },
-      show: { ready: true },
-      hide: {
-        event: 'unfocus',
-        effect: function(offset) {
-            $(this).slideDown(1000); // "this" refers to the tooltip
-        }
-      },
-      style: { classes : 'qtip-youtube'},
-      // The magic
-      api: {
-        onRender: function() {
-          this.elements.tooltip.click(this.hide) //
-        }
-      }
-    });
-  }
+  //if (airMediaDevice !== '') {
+      //$("#fbxPopup input").each(function(){
+          //var name = $(this).prop('name');
+          //if (name !== airMediaDevice) {
+              //$(this).prop('checked','');
+          //}
+      //});
+      //$("#fbxPopup input[name='"+airMediaDevice+"']").prop('checked','checked');
+  //}
+  //if (airMediaDevices.length === 1) {
+      //airMediaDevice = airMediaDevices[0];
+      //return;
+  //} else if (airMediaDevices.length === 0){
+      //var text = '<p>Aucun Freebox player allumé! <br>Allumez votre freebox player et réactivez ce bouton...</p>';
+      //$("#airplay-toggle").qtip({
+      //content : {text: text},
+      //position: {
+        //corner: {
+          //target: 'bottomMiddle',
+          //tooltip: 'topMiddle'
+        //}
+      //},
+      //show: { ready: true },
+      //hide: {
+        //event: 'unfocus',
+        //effect: function(offset) {
+            //$(this).slideDown(1000); // "this" refers to the tooltip
+        //}
+      //},
+      //style: { classes : 'qtip-youtube'},
+      //// The magic
+      //api: {
+        //onRender: function() {
+          //this.elements.tooltip.click(this.hide) //
+        //}
+      //}
+    //});
+  //} else {
+    //var text = $('#fbxPopup').html();
+    //$("#airplay-toggle").qtip({
+      //content : {text: text},
+      //position: {
+        //corner: {
+          //target: 'bottomMiddle',
+          //tooltip: 'topMiddle'
+        //}
+      //},
+      //show: { ready: true },
+      //hide: {
+        //event: 'unfocus',
+        //effect: function(offset) {
+            //$(this).slideDown(1000); // "this" refers to the tooltip
+        //}
+      //},
+      //style: { classes : 'qtip-youtube'},
+      //// The magic
+      //api: {
+        //onRender: function() {
+          //this.elements.tooltip.click(this.hide) //
+        //}
+      //}
+    //});
+  //}
 }
 
 

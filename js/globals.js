@@ -1,4 +1,4 @@
-var VERSION = "1.9.2";
+var VERSION = "1.0";
 
 var path = require('path');
 var fs = require('fs');
@@ -66,7 +66,8 @@ var searchDate = 'today';
 var videoArray = ["avi", "webm", "mp4", "flv", "mkv", "mpeg", "mp3", "mpg", "wmv", "wma", "mov", "wav", "ogg", "flac", "opus"];
 current_search='';
 var exec_path = execDir;
-var excludedPlugins = ['mega', 'mega-files', 'vimeo'];
+var pagination_init = false;
+var activeTab = 1;
 
 //nw window
 var gui = require('nw.gui');

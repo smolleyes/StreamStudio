@@ -40,7 +40,7 @@ function getLocalDb(res) {
 }
 
 function downloadFile(link, title, vid, toTorrent) {
-    if (($('.tabActiveHeader').attr('id') !== 'downloads_tab') && (toTorrent === undefined)) {
+    if (activeTab !== 4 && (toTorrent === undefined)) {
         $("#downloads_tab").click();
     }
     if (vid === undefined) {
@@ -169,6 +169,191 @@ function downloadFile(link, title, vid, toTorrent) {
         }
     });
     current_download[vid].end();
+}
+
+function downloadFileHttps(link, title, vid, toTorrent) {
+    if (activeTab !== 4 && (toTorrent === undefined)) {
+        $("#downloads_tab").click();
+    }
+    if (vid === undefined) {
+        var vid = title.split('::')[1];
+    }
+    var title = title.split('::')[0];
+    var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
+	<p><b>' + title + '</b></p> \
+	<p> \
+		<strong>0%</strong> \
+	</p> \
+	<progress value="5" min="0" max="100">0%</progress> \
+	<a href="#" style="display:none;" class="convert" alt="" title="' + _("Convert to mp3") + '"> \
+		<img src="images/video_convert.png"> \
+	</a> \
+	<a href="#" id="cancel_' + vid + '" style="display:none;" class="cancel" alt="" title="' + _("Cancel") + '"> \
+		<img src="images/close.png"> \
+	</a> \
+	<a class="open_folder" style="display:none;" title="' + _("Open Download folder") + '" href="#">\
+		<img src="images/export.png" /> \
+	</a> \
+	<a href="#" style="display:none;" class="hide_bar" alt="" title="' + _("Close") + '"> \
+		<img src="images/close.png"> \
+	</a> \
+	</div>';
+    $('#DownloadsContainer').append(html).show();
+
+    var pbar = $('#progress_' + vid);
+    // remove file if already exist
+    fs.unlink(download_dir + '/' + title, function(err) {
+        if (err) {} else {
+            console.log('successfully deleted ' + download_dir + '/' + title);
+        }
+    });
+    // start download
+    canceled = false;
+    $('#progress_' + vid + ' strong').html(_('Waiting for connection...'));
+    var opt = {};
+    var val = $('#progress_' + vid + ' progress').attr('value');
+    title = title.trim().replace(/\\|\//g,'_');
+    if (toTorrent) {
+        title += '.torrent';
+    }
+    opt.link = link;
+    opt.title = title;
+    opt.vid = vid;
+    var currentTime;
+    var startTime = (new Date()).getTime();
+    var target = download_dir + '/' + title.replace(/  /g, ' ').trim();
+    var host;
+    var path;
+    var parsedLink = url.parse(link);
+    try {
+        host = parsedLink.host;
+        path = parsedLink.path;
+    } catch (err) {
+        console.log(err + ' ' + link);
+    }
+    current_download[opt] = opt;
+    pbar.show();
+	current_download[vid] = new XMLHttpRequest();
+	current_download[vid].onreadystatechange = function(){
+		if (this.readyState == 4 && this.status == 200){
+			var blob = this.response;
+			var arrayBuffer;
+			var fileReader = new FileReader();
+			fileReader.onload = function() {
+				arrayBuffer = this.result;
+				var nodeBuffer = new Buffer(arrayBuffer);
+				fs.writeFile(target, nodeBuffer, function(err) {
+					console.log('done')
+				});
+			};
+			fileReader.readAsBinaryString(blob);
+		}
+	}
+	current_download[vid].open('GET', link);
+	current_download[vid].responseType = 'blob';
+	current_download[vid].send();
+	
+	current_download[vid].onprogress = function(e) {
+		if (e.lengthComputable) {
+			$('#progress_' + vid + ' a.cancel').show();
+			if (canceled === true) {
+                    current_download[vid].abort();
+                    $('#progress_' + vid + ' a.cancel').hide();
+                    $('#progress_' + vid + ' strong').html(_("Download canceled!"));
+                    setTimeout(function() {
+                        pbar.hide()
+                    }, 5000);
+           } else {
+				var pct = (e.loaded / e.total) * 100;
+				currentTime = (new Date()).getTime();
+				var transfer_speed = (e.loaded / (currentTime - startTime)).toFixed(2);
+				var txt = Math.floor(pct) + '% ' + _('done at') + ' ' + transfer_speed + ' kb/s';
+				$('#progress_' + vid + ' progress').attr('value', pct).text(txt);
+				$('#progress_' + vid + ' strong').html(txt);
+				if(pct == 100) {
+					$('#progress_' + vid + ' strong').html(_('Download ended !'));
+                    if (title.match('.mp3') === null) {
+                        $('#progress_' + vid + ' a.convert').attr('alt', download_dir + '/' + title + '::' + vid).show();
+                    }
+                    $('#progress_' + vid + ' a.open_folder').show();
+                    $('#progress_' + vid + ' a.hide_bar').show();
+                    $('#progress_' + vid + ' a.cancel').hide();
+				}
+			}
+		} else {
+			$('#progress_' + vid + ' a.cancel').hide();
+			$('#progress_' + vid + ' strong').html(_("can't download this file..."));
+			setTimeout(function() {
+				pbar.hide()
+			}, 5000);
+		}
+    }
+    
+    
+    
+    //current_download[vid].on('response', function(response) {
+        //if (response.statusCode > 300 && response.statusCode < 400 && response.headers.location) {
+            //// The location for some (most) redirects will only contain the path,  not the hostname;
+            //// detect this and add the host to the path.
+            //$('#progress_' + vid).remove();
+            //return downloadFile(response.headers.location, title, vid, toTorrent);
+            //// Otherwise no redirect; capture the response as normal            
+        //} else {
+            //pbar.show();
+            //$('#progress_' + vid + ' a.cancel').show();
+            //var contentLength = response.headers["content-length"];
+            //if (parseInt(contentLength) === 0) {
+                //$('#progress_' + vid + ' a.cancel').hide();
+                //$('#progress_' + vid + ' strong').html(_("can't download this file..."));
+                //setTimeout(function() {
+                    //pbar.hide()
+                //}, 5000);
+            //}
+            //var file = fs.createWriteStream(target);
+            //response.on('data', function(chunk) {
+                //file.write(chunk);
+                //var bytesDone = file.bytesWritten;
+                //currentTime = (new Date()).getTime();
+                //var transfer_speed = (bytesDone / (currentTime - startTime)).toFixed(2);
+                //var newVal = bytesDone * 100 / contentLength;
+                //var txt = Math.floor(newVal) + '% ' + _('done at') + ' ' + transfer_speed + ' kb/s';
+                //$('#progress_' + vid + ' progress').attr('value', newVal).text(txt);
+                //$('#progress_' + vid + ' strong').html(txt);
+            //});
+            //response.on('end', function() {
+                //file.end();
+                //if (canceled === true) {
+                    //fs.unlink(target, function(err) {
+                        //if (err) {} else {
+                            //console.log('successfully deleted ' + target);
+                        //}
+                    //});
+                    //$('#progress_' + vid + ' a.cancel').hide();
+                    //$('#progress_' + vid + ' strong').html(_("Download canceled!"));
+                    //setTimeout(function() {
+                        //pbar.hide()
+                    //}, 5000);
+                //} else {
+                    //fs.rename(target, download_dir + '/' + title.replace(/  /g, ' ').trim(), function(err) {
+                        //if (err) {} else {
+                            //console.log('successfully renamed ' + download_dir + '/' + title);
+                            //if (toTorrent !== undefined) {
+                                //gui.Shell.openItem(download_dir + '/' + title);
+                            //}
+                        //}
+                    //});
+                    //$('#progress_' + vid + ' strong').html(_('Download ended !'));
+                    //if (title.match('.mp3') === null) {
+                        //$('#progress_' + vid + ' a.convert').attr('alt', download_dir + '/' + title + '::' + vid).show();
+                    //}
+                    //$('#progress_' + vid + ' a.open_folder').show();
+                    //$('#progress_' + vid + ' a.hide_bar').show();
+                    //$('#progress_' + vid + ' a.cancel').hide();
+                //}
+            //});
+        //}
+    //});
+    //current_download[vid].end();
 }
 
 function convertTomp3Win(file) {

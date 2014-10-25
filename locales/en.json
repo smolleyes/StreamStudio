@@ -126,5 +126,11 @@
 	"Default player:": "Default player:",
 	"Play thru Upnp": "Play thru Upnp",
 	"Current Media:": "Current Media:",
-	"Waiting...": "Waiting..."
+	"Waiting...": "Waiting...",
+	"Playing:": "Playing:",
+	"Home": "Home",
+	"Web library": "Web library",
+	"Player": "Player",
+	"Website ubukey.fr is unreachable !": "Website ubukey.fr is unreachable !",
+	"REQUIRED!!!": "REQUIRED!!!"
 }

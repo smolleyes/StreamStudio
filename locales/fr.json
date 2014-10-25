@@ -149,5 +149,11 @@
 	"Current Media:": "Media actuel:",
 	"Disabled": "Désactivé",
 	"Play thru Upnp": "Lecture par Upnp",
-	"Website ubukey.fr is unreachable !": "Website ubukey.fr is unreachable !"
+	"Website ubukey.fr is unreachable !": "Le site ubukey.fr n'est pas joignable !",
+	"Start playing": "Démarrer la lecture",
+	"Playing:": "Lecture:",
+	"Home": "Accueil",
+	"Web library": "Librairie web",
+	"Player": "Lecteur",
+	"Loading...": "Chargement..."
 }
