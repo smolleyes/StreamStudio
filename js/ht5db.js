@@ -157,6 +157,7 @@ function createRootNodes(cb) {
 			},
 		}).bind("select_node.jstree", function (e, data) { 
 				onSelectedItem(data); 
+				$('.highlight').removeClass('highlight well');
 				console.log('clicked')
 		}).bind("rename.jstree", function (e, data) { 
 				renameItem(data);

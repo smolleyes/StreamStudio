@@ -162,60 +162,6 @@ without notice.");
   updateScroller();
 }
 
-function writeConf(settings) {
-    fs.writeFile(confDir+'/ht5conf.json', JSON.stringify(settings), function(err) {
-				if(err) {
-          console.log(err);
-				} else {
-          window.location="index.html";
-          return;
-				}
-			});
-}
-
-function getUserHome() {
-  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-}
-
-function initCheck() {
-	confWin.show();
-	fs.exists(confDir, function (exists) {
-		exists ? checkConf(confDir) : makeConfdir(confDir);
-	});
-}
-
-function makeConfdir(confDir) {
-    mkdirp(confDir, function(err) { 
-        if(err){
-	    console.log('can\'t create config dir '+confDir);
-	    return;
-	} else {
-	    console.log('Config dir '+confDir+' created successfully');
-	    checkConf();
-	}	
-    });
-}
-
-function makeConfigFile() {
-    fs.writeFile(confDir+'/ht5conf.json', '{"init":false,"version": "'+version+'","resolution":"1080p","download_dir":"","locale":"en","edit":true,"collections":[{"name":"Library","parent":""}],"selectedDir":"","interface":"","shared_dirs":[],"fromPopup":false,"gmailUser":"","gmailPass":"","plugins":[]}', function(err) {
-        if(err) {
-            console.log(err);
-	    return;
-        } else {
-            console.log("ht5config file created!");
-            settings = JSON.parse(fs.readFileSync(confDir+'/ht5conf.json', encoding="utf-8"));
-            $('#resolutions_select').val('1080p');
-        }
-    });
-}
-
-function checkConf(confDir) {
-    $('#main_config').show();
-    fs.exists(confDir+'/ht5conf.json', function (exists) {
-       exists ? loadConf(confDir) : makeConfigFile(confDir);
-    });
-}
-
 function chooseDownloadDir(confDir) {
     var download_dir = '';
     var chooser = $('#fileDialog');

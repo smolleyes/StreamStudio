@@ -416,6 +416,11 @@ function stopTorrent(res) {
   });
 }
 
+// get user HOMEDIR
+function getUserHome() {
+    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+}
+
 function getAuthTorrent(url,stream,toFbx) {
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){

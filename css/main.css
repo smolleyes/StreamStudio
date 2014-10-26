@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	font-family: Ripper;
 	color: white;
 	font-size: 28px;
-	margin-left:25px;
+	margin-left:10px;
 	position: relative;
 	top: -5px;
 	float:left;
@@ -172,11 +172,11 @@ pre {
 	height: 100%;
 }
 
-#fbxMsg_content .nano-slider {
+#fbxMsg .nano-slider {
 	border: 3px solid white;
 }
 
-#fbxMsg_content .nano-pane {
+#fbxMsg .nano-pane {
 	border: 1px solid white;
 }
 
@@ -401,7 +401,7 @@ video{
 	-webkit-animation-name: flipInX;
 	-webkit-animation-duration: 1s;
 	-webkit-animation-fill-mode: both;
-	width: 348px;
+	width: 330px;
 	height: 211px;
 	float: left;
 	margin: 0 10px 15px 0 !important;
@@ -416,7 +416,6 @@ video{
 	float:left;
 	height:125px;
 	width:100px;
-	margin-top:5px;
 }
 
 #subPlayer {
@@ -429,8 +428,9 @@ video{
 
 #subPlayer-timer {
 	position: absolute;
-	top: 130px;
-	left: 110px;
+	top: 125px;
+	left: 106px;
+	font-size: 11px;
 }
 
 #subPlayer-img {
@@ -451,6 +451,7 @@ video{
 	position: absolute;
 	left:100px;
 	width:155px;
+	top: 71px;
 }
 
 #subPlayer div.panel-body {
@@ -461,8 +462,8 @@ video{
 	background:url(../images/prev-icon.png);
     background-repeat:no-repeat;
     display: block;
-	width: 48px;
-	height: 48px;
+	width: 37px;
+	height: 32px;
 	float:left;
 }
 
@@ -470,27 +471,47 @@ video{
 	background:url(../images/play-icon.png);
     background-repeat:no-repeat;
     display: block;
-	width: 48px;
-	height: 48px;
+	width: 37px;
+	height: 32px;
 	float:left;
+	position: absolute;
+	top: -23px;
+	left: 37px;
+}
+
+#subPlayer-stop {
+	background:url(../images/stop-icon.png);
+    background-repeat:no-repeat;
+    display: block;
+	width: 37px;
+	height: 32px;
+	float:left;
+	position: absolute;
+	top: 15px;
+	left: 37px;
 }
 
 #subPlayer-pause {
 	background:url(../images/pause-icon-hover.png);
     background-repeat:no-repeat;
     display: block;
-	width: 48px;
-	height: 48px;
+	width: 37px;
+	height: 32px;
 	float:left;
+	position: absolute;
+	top: -23px;
+	left: 37px;
 }
 
 #subPlayer-next {
 	background:url(../images/next-icon.png);
     background-repeat:no-repeat;
     display: block;
-	width: 48px;
-	height: 48px;
+	width: 37px;
+	height: 32px;
 	float:left;
+	position: absolute;
+	left: 74px;
 }
 
 #subPlayer-prev:hover {
@@ -500,6 +521,11 @@ video{
 
 #subPlayer-play:hover {
 	background:url(../images/play-icon-hover.png);
+    background-repeat:no-repeat;
+}
+
+#subPlayer-stop:hover {
+	background:url(../images/stop-icon-hover.png);
     background-repeat:no-repeat;
 }
 
@@ -757,6 +783,11 @@ video{
 	top: 60px;
 	position: fixed;
 	padding: 0 15px;
+}
+
+#menu {
+	width: calc(100% + 20px);
+	margin-left: -10px;
 }
 
 ::-webkit-scrollbar { 

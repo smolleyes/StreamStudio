@@ -1,4 +1,4 @@
-var VERSION = "1.0";
+var VERSION = "1.1";
 
 var path = require('path');
 var fs = require('fs');
@@ -68,7 +68,7 @@ current_search='';
 var exec_path = execDir;
 var pagination_init = false;
 var activeTab = 1;
-
+var confDir;
 //nw window
 var gui = require('nw.gui');
 var win = gui.Window.get();
@@ -76,3 +76,19 @@ var win = gui.Window.get();
 //checks
 var tmpFolder = path.join(os.tmpDir(), 'ht5Torrents');
 if( ! fs.existsSync(tmpFolder) ) { fs.mkdir(tmpFolder); }
+
+// get confdir
+if (process.platform === 'win32') {
+    var cdir = process.env.APPDATA+'/StreamStudio';
+    confDir = cdir.replace(/\\/g,'//');
+    if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
+} else {
+    confDir = getUserHome()+'/.config/StreamStudio';
+    if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
+}
+
+
+// get user HOMEDIR
+function getUserHome() {
+    return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+}

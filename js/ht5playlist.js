@@ -45,6 +45,7 @@ function onSelectedItem(data) {
 	$(".mejs-layer").show();
 	$(".mejs-overlay-play").hide();
 	$(".mejs-overlay-loading").show();
+	$('.highlight').removeClass('highlight well');
 	var id = data.rslt.obj[0].id;
 	if(id.indexOf('upnpRootNode') !== -1 && $('#'+id).hasClass('loaded') === false) {
 		var serverId = parseInt(id.split('_')[0]);
@@ -163,6 +164,7 @@ function onCreateItem(item) {
 }
 
 function showInfos(datas,next_vid,vid,flink,engine,title) {
+	$('.highlight').removeClass('highlight well');
 	var link = {};
 	link.link= '';
 	link.next = next_vid;

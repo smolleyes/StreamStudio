@@ -181,8 +181,10 @@ function launchPlay() {
 		img = $('.highlight').find('img')[0].src;
 	} catch(err) {}
 	console.log(img, $('#subPlayer-img').attr('src'))
-	if (img !== $('#subPlayer-img').attr('src') && img !== null) {
+	if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
 		$('#subPlayer-img').attr('src',img);
+	} else {
+		$('#subPlayer-img').attr('src','images/play-overlay.png');
 	}
 	if($('#subPlayer-title').text() !== currentMedia.title) {
 		$('#subPlayer-title').empty().append('<marquee behavior="scroll" scrollamount="2" direction="left">'+currentMedia.title+'</marquee>');

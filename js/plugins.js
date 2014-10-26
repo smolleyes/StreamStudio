@@ -4,7 +4,6 @@ var pluginsDir;
 var pluginsList = ['grooveshark','songza','cpasbien','thepiratebay','omgtorrent','t411','kickass'];
 
 function initPlugins() {
-	console.log(confDir)
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
     chdir(confDir, function() {
         $.get('https://github.com/smolleyes/streamstudio-plugins/commits/master.atom', function(res) {

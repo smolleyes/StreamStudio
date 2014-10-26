@@ -112,7 +112,7 @@ var htmlStr = '<div class="row"> \
 		</form> \
 	</div> \
 </div> \
-<div class="panel panel-default"> \
+<div class="panel panel-default" style="width: calc(100% + 20px);margin-left: -10px;"> \
 	<div class="panel-body"> \
 		<span>'+_("Play thru Upnp")+'</span> \
 		<div id="upnpRenderersContainer" style="display:none;"><a id="upnp-toggle" class="upnp tiptip upnp-disabled"></a><form id="upnpPopup" style="display:none;"></form></div> \
@@ -125,6 +125,7 @@ var htmlStr = '<div class="row"> \
 		<div id="subPlayer-controls"> \
 			<a href="#" id="subPlayer-prev"></a> \
 			<a href="#" id="subPlayer-play"></a> \
+			<a href="#" id="subPlayer-stop"></a> \
 			<a href="#" id="subPlayer-pause" style="display:none;"></a> \
 			<a href="#" id="subPlayer-next"></a> \
 		</div> \
@@ -407,12 +408,6 @@ function main() {
 			$('#subPlayer-Timer').empty().append($('div.mejs-time').html());
 		}
 		var img = null;
-		try {
-			img = $('.highlight').find('img')[0].src;
-		} catch(err) {}
-		if (img !== $('#subPlayer-img').attr('src') && img !== null) {
-			$('#subPlayer-img').attr('src',img);
-		}
 		if($('#subPlayer-title').text() !== currentMedia.title) {
 			$('#subPlayer-title').empty().append('<marquee behavior="scroll" scrollamount="2" direction="left">'+currentMedia.title+'</marquee>');
 		}
@@ -445,7 +440,7 @@ function main() {
         getNext();
     });
     // stop button
-    $(document).on('click', '#stopBtn', function(e) {
+    $(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
 		try {
 			upnpMediaPlaying = false;
 			continueTransition = false;
@@ -756,6 +751,16 @@ function main() {
                     });
                     searchFilters_select = engine.defaultSearchFilter;
                     $("#searchFilters_select").val(searchFilters_select);
+                }
+                
+                // load category filters
+                if (engine.category_filters !== undefined) {
+                    $('#categories_select').empty();
+                    $.each(engine.category_filters, function(key, value) {
+                        $('#categories_select').append('<option value="' + value + '">' + key + '</option>');
+                    });
+                    selected_category = engine.defaultCategory;
+                    $("#categories_select").val(selected_category);
                 }
 
                 $('#video_search_query').prop('disabled', false);
