@@ -1164,8 +1164,8 @@ function update_searchOptions() {
 function startSearch(query) {
     $("#search p").empty().append(' ');
     $('#loading p').empty().append(_("Loading..."));
-    if ($('.tabActiveHeader').attr('id') !== 'tabHeader_1') {
-        $("#tabHeader_1").click();
+    if (activeTab !== 1) {
+        $("#homeToggle").click();
     }
     if ((query === '') && (browse === false)) {
         current_search = '';

@@ -77,7 +77,6 @@ function createLocalRootNodes() {
 			},
 		}).bind("select_node.jstree", function (e, data) { 
 				//onSelectedItem(data); 
-				$('#subPlayer-img').attr('src');
 		}).bind("rename.jstree", function (e, data) { 
 				//renameItem(data);
 		}).bind("remove.jstree", function (e, data) { 

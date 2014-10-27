@@ -93,6 +93,17 @@ function initPlayer() {
 
 function startPlay(media) {
     initPlayer();
+    
+    if(extPlayerRunning) {
+		try {
+			extPlayerProc.kill('SIGKILL');
+			setTimeout(function() {
+				startPlay(media);
+				extPlayerRunning = false;
+			},1000);
+		} catch(err){};
+	}
+    
     playFromFile = false;
     playFromHttp = false;
     torrentPlaying = false;
@@ -168,12 +179,11 @@ function startPlay(media) {
 
 function launchPlay() {
 	try {
-		if(engine.type == "video" && activeTab == 1 || activeTab == 2 ) {
-			$('#playerToggle')[0].click();
+		var obj = JSON.parse(settings.ht5Player);
+		if(engine.type == "video" && obj.name === "StreamStudio" && activeTab == 1 || activeTab == 2 ) {
+			$('#playerToggle').click();
 		}
-	} catch(err) {
-		$('#playerToggle')[0].click();
-	}
+	} catch(err) {}
 	$('#subPlayer-play').hide();
 	$('#subPlayer-pause').show();
 	var img = null;
@@ -223,19 +233,23 @@ function launchPlay() {
 			player.setSrc(currentMedia.link);
 			player.play();
 		} else {
-			try {extPlayerProc.kill();} catch(err){}
-			if(currentMedia.link.indexOf('mega.co') !== -1) {
-				extPlayerProc = exec('"'+obj.path+'"' +' "'+currentMedia.link+'"');
-			} else {
-				console.log('"'+obj.path+'"' +' "'+decodeURIComponent(currentMedia.link)+'"')
-				extPlayerProc = exec('"'+obj.path+'"' +' "'+decodeURIComponent(currentMedia.link)+'"');
-			}
-			extPlayerProc.on('exit',function() {
-				console.log(obj.name + ' process terminated....');
-				initPlayer();
-			});
+			startExtPlayer(obj);
 		}
 	}
+}
+
+function startExtPlayer(obj) {
+	if(currentMedia.link.indexOf('mega.co') !== -1) {
+		extPlayerProc = spawn(''+obj.path+'', [''+decodeURIComponent(currentMedia.link)+'']);
+	} else {
+		extPlayerProc = spawn(''+obj.path+'', [''+decodeURIComponent(currentMedia.link)+'']);
+	}
+	extPlayerRunning = true;
+	extPlayerProc.on('exit',function() {
+		console.log(obj.name + ' process terminated....');
+		initPlayer();
+		extPlayerRunning = false;
+	});
 }
 
 

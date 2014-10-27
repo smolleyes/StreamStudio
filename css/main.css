@@ -428,7 +428,7 @@ video{
 
 #subPlayer-timer {
 	position: absolute;
-	top: 125px;
+	top: 133px;
 	left: 106px;
 	font-size: 11px;
 }
@@ -439,6 +439,7 @@ video{
 	position: absolute;
 	left: 5px;
 	border:0;
+	top:55px;
 }
 
 #subPlayer-title {
@@ -451,7 +452,7 @@ video{
 	position: absolute;
 	left:100px;
 	width:155px;
-	top: 71px;
+	top: 81px;
 }
 
 #subPlayer div.panel-body {
@@ -492,7 +493,7 @@ video{
 }
 
 #subPlayer-pause {
-	background:url(../images/pause-icon-hover.png);
+	background:url(../images/pause-icon.png);
     background-repeat:no-repeat;
     display: block;
 	width: 37px;
@@ -530,7 +531,7 @@ video{
 }
 
 #subPlayer-pause:hover {
-	background:url(../images/pause-icon.png);
+	background:url(../images/pause-icon-hover.png);
     background-repeat:no-repeat;
 }
 
