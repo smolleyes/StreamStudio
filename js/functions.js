@@ -410,6 +410,7 @@ function stopTorrent(res) {
     flix.destroy();
     delete flix;
     videoStreamer = null;
+    initPlayer();
   } catch(err) {
       console.log(err);
   }

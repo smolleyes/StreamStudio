@@ -1,6 +1,6 @@
 /**
  * node-airplay
- * 
+ *
  * @file bojour server
  * @author zfkun(zfkun@msn.com)
  * @thanks https://github.com/benvanik/node-airplay/blob/master/lib/airplay/browser.js
@@ -10,11 +10,9 @@ var util = require( 'util' );
 var events = require( 'events' );
 //var mdns = require( 'mdns' );
 
-var mdns = require( 'mdns-js2' );
+var mdns = require( 'mdns-js' );
 
 var Device = require( './device' ).Device;
-
-
 
 var Browser = function( options ) {
     events.EventEmitter.call( this );
@@ -34,36 +32,51 @@ Browser.prototype.init = function ( options ) {
 
     this.devices = {};
 
-    var mdnsBrowser = new mdns.Mdns(mdns.tcp('airplay'));
+    //var mdnsBrowser = new mdns.Mdns(mdns.tcp('airport'));
+    var browser = new mdns.createBrowser(mdns.tcp('airplay'));
+    //var legacyMdnsBrowser = new mdns.Mdns(mdns.tcp('airplay'));
 
-    mdnsBrowser.on('ready', function () {
-            mdnsBrowser.discover()
+    var mdnsOnUpdate = function(data) {
+        if(data.port && data.port == 7000){
+            var info = data.addresses
+            var name = data.type[0].name
+            /*
+            if ( !self.isValid( info ) ) {
+                return;
+            }
+
+            var device = self.getDevice( info );
+            if ( device ) {
+                return;
+            }
+            */
+            //if(info.length && name){
+                device = new Device( nextDeviceId++, info , name );
+                device.on( 'ready', function( d ) {
+                    self.emit( 'deviceOn', d );
+                });
+                device.on( 'close', function( d ) {
+                    delete self.devices[ d.id ];
+                    self.emit( 'deviceOff', d );
+                });
+
+                self.devices[ device.id ] = device;
+            //}else{
+            //    console.log("Error adding device: "+JSON.stringify(data))
+            //}
+        }
+    };
+
+    //mdnsBrowser.on('ready', function () {
+    //        mdnsBrowser.discover();
+    //});
+
+    browser.on('ready', function () {
+            browser.discover();
     });
 
-    mdnsBrowser.on( 'update', function(data) {
-        var info = data.addresses 
-        var name = data.name
-        /*
-        if ( !self.isValid( info ) ) {
-            return;
-        }
-
-        var device = self.getDevice( info );
-        if ( device ) {
-            return;
-        }
-        */
-        device = new Device( nextDeviceId++, info , name );
-        device.on( 'ready', function( d ) {
-            self.emit( 'deviceOn', d );
-        });
-        device.on( 'close', function( d ) {
-            delete self.devices[ d.id ];
-            self.emit( 'deviceOff', d );
-        });
-
-        self.devices[ device.id ] = device;
-    });
+    //mdnsBrowser.on('update', mdnsOnUpdate);
+    browser.on('update', mdnsOnUpdate);
     /*
     this.browser.on( 'serviceDown', function( info ) {
         if ( !self.isValid( info ) ) {

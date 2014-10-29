@@ -345,7 +345,7 @@ function playUpnpRenderer(obj) {
 	$('.mejs-time-current').width(0+'%');
 	$('span.mejs-currenttime').text('00:00:00');
 	$('span.mejs-duration').text('00:00:00');
-	//'http://'+ipaddress+':4575/'+
+	//'http://'+ipaddress+':9005/?url='+
 	var uri = XMLEscape.xmlEscape(obj.link.replace('&upnp','').replace('&torrent','').replace('&direct',''));
 	var infos = JSON.parse(obj.data).protocolInfo;
 	var title = XMLEscape.escape(obj.title);
@@ -353,7 +353,7 @@ function playUpnpRenderer(obj) {
 	currentMedia = obj;
 	
 	//var metaString = '&lt;DIDL-Lite xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot; xmlns:dlna=&quot;urn:schemas-dlna-org:metadata-1-0/&quot; xmlns:sec=&quot;http://www.sec.co.kr/&quot;&gt;&lt;item&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;res protocolInfo=&quot;'+infos+':*&quot; size=&quot;0&quot;&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
-	var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*\"&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
+	var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
 	mediaRenderer.setAVTransportURI("0",uri,metaString).then(function(response) {
 		if (response && response.data) {
 			console.log('UPNP: Ok playing' + uri);
@@ -379,9 +379,10 @@ function playUpnpRenderer(obj) {
 function getRendererState(state) {
 	mediaRenderer.getTransportInfo().then(function(response) {
 		if (response && response.data) {
+			console.log(response.data.CurrentTransportState, state ,continueTransition)
 			if(response.data.CurrentTransportState !== state && continueTransition) {
 				if(response.data.CurrentTransportState === 'TRANSITIONING') {
-					if (transitionCount === 20) {
+					if (transitionCount === 60) {
 						upnpMediaPlaying = false;
 						continueTransition = false;
 						mediaRenderer.stop();
@@ -396,6 +397,8 @@ function getRendererState(state) {
 							getUpnpPosition(); 
 						},1000);
 					}
+				} else if (response.data.CurrentTransportState === "NO_MEDIA_PRESENT") {
+					stopUpnp();
 				} else {
 					setTimeout(function(){ 
 						getRendererState(state);
@@ -405,6 +408,7 @@ function getRendererState(state) {
 			} else {
 				console.log("PLAYER STATE " + state)
 				if (state === 'PLAYING') {
+					transitionCount = 0;
 					upnpMediaPlaying = true;
 					continueTransition = true;
 					setTimeout(function(){
@@ -419,36 +423,7 @@ function getRendererState(state) {
 					console.log("start watching for stopped state")
 					getRendererState('STOPPED');
 				} else if (state === 'STOPPED') {
-					continueTransition = false;
-					setTimeout(function(){
-					// if user asked stop
-						if(upnpMediaPlaying === false) {
-							console.log("upnp stopped")
-							continueTransition = false;
-						// else continue
-						} else {
-							console.log('upnp finished playing...')
-							continueTransition = false;
-							upnpMediaPlaying = false;
-							on_media_finished();
-						}
-						try {
-							if(torrentPlaying) {
-							 stopTorrent();
-							}
-						} catch (err) {}
-						$('.mejs-time-buffering').width(0+'%');
-						$('.mejs-time-loaded').width(0+'%');
-						$('.mejs-time-current').width(0+'%');
-						$('span.mejs-currenttime').text('00:00:00');
-						$('span.mejs-duration').text('00:00:00');
-						$(".mejs-overlay").show();
-						$(".mejs-layer").show();
-						$(".mejs-overlay-loading").hide();
-						$(".mejs-overlay-button").show();
-						$('#song-title').empty().append(_('Stopped...'));
-						$('.mejs-container#fbxMsg').remove();
-					},2000);
+					stopUpnp();
 				}
 			}
 		} else {
@@ -457,6 +432,39 @@ function getRendererState(state) {
 	}).then( null, function( error ) { // Handle any errors
 		console.log( "An error occurred: " + error );
 	});
+}
+
+function stopUpnp() {
+	continueTransition = false;
+	setTimeout(function(){
+	// if user asked stop
+		if(upnpMediaPlaying === false) {
+			console.log("upnp stopped")
+			continueTransition = false;
+		// else continue
+		} else {
+			console.log('upnp finished playing...')
+			continueTransition = false;
+			upnpMediaPlaying = false;
+			on_media_finished();
+		}
+		try {
+			if(torrentPlaying) {
+			   stopTorrent();
+			}
+		} catch (err) {}
+		$('.mejs-time-buffering').width(0+'%');
+		$('.mejs-time-loaded').width(0+'%');
+		$('.mejs-time-current').width(0+'%');
+		$('span.mejs-currenttime').text('00:00:00');
+		$('span.mejs-duration').text('00:00:00');
+		$(".mejs-overlay").show();
+		$(".mejs-layer").show();
+		$(".mejs-overlay-loading").hide();
+		$(".mejs-overlay-button").show();
+		$('#song-title').empty().append(_('Stopped...'));
+		$('.mejs-container#fbxMsg').remove();
+	},2000);
 }
 
 function startUPNPserver() {
@@ -475,6 +483,84 @@ function startUPNPserver() {
         }
     });
 }
+
+
+// save http proxy try ..
+
+//var sys = require('sys'),
+	//http =require('http'),
+	//https = require('https'),
+	//request = require('request'),
+	//xhr = require('xhr2'),
+	//fs= require('fs'),
+	//httpProxy = require('http-proxy'),
+	//qs = require('querystring'),
+	//url =require('url');
+
+//http.createServer(function (b_req, b_res) {
+	//var b_url = url.parse(b_req.url,true);
+	
+	//if(!b_url.query || !b_url.query.url) return notFound(b_res);
+	
+	//var p_url = url.parse(b_req.url.split('/?url=')[1]);
+
+	//console.log(p_url)
+	
+	//if(p_url.protocol === 'https:') {
+		//var options = {
+		  //host: p_url.host,
+		  //path: p_url.path,
+		  //headers: b_req.headers,
+		  //method: 'GET'
+		//};
+		
+		//var p_req = https.request(options,function(res) {
+			////b_res.setHeader("Content-Type", "video/x-msvideo");
+			//b_res.setHeader('transferMode.dlna.org', 'Streaming');
+			//b_res.setHeader('contentFeatures.dlna.org','DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000');
+			//b_res.setHeader('realTimeInfo.dlna.org','DLNA.ORG_TLAG=*');
+			//b_res.writeHead(res.statusCode,res.headers);
+			//res.on('data',function(chunk) {
+				//b_res.write(chunk);
+			//});
+			
+			//res.on('end',function() {
+				//b_res.end();
+			//});
+		//}); 
+	//} else {
+		//var options = {
+		  //host: p_url.host,
+		  //path: p_url.path,
+		  //method: 'GET'
+		//};
+		
+		//var p_req = http.request(options,function(res) {
+			////b_res.setHeader("Content-Type", "video/x-msvideo");
+			//b_res.setHeader('transferMode.dlna.org', 'Streaming');
+			//b_res.setHeader('contentFeatures.dlna.org','DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000');
+			//b_res.setHeader('realTimeInfo.dlna.org','DLNA.ORG_TLAG=*');
+			//b_res.writeHead(res.statusCode,res.headers);
+			//res.on('data',function(chunk) {
+				//b_res.write(chunk);
+			//});
+			
+			//res.on('end',function() {
+				//b_res.end();
+			//});
+		//}); 
+	//}
+	
+	//p_req.end();
+  
+//}).listen(9005);
+
+//function notFound(res) {
+	//res.writeHead(404,"text/plain");
+	//res.end('404: File not found');
+//}
+
+
 
 // start 
 startUPNPserver();

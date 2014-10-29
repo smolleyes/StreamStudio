@@ -21,7 +21,7 @@ $(document).ready(function() {
 		bindType: "contextmenu",
 		delegateType: "contextmenu"
 	};
-  $(document).on("rightclick", "#left-component", function(e) {
+  $(document).on("rightclick", "body", function(e) {
         var text = clipboard.get('text');
         $('#custom-menu ol').empty();
         if (text.indexOf('mega.co.nz') !== -1) {

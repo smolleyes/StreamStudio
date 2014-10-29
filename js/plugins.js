@@ -84,7 +84,7 @@ function updatePlugins(url) {
                     var zip = new AdmZip(confDir + '/master.zip');
                     zip.extractAllTo(confDir + "/plugins", true);
                     loadApp();
-                }, 2000);
+                }, 5000);
             } catch (err) {
                 console.log("plugins update error" + err);
             }

@@ -325,6 +325,7 @@ try {
 $(document).ready(function() {
     $('#main').append(htmlStr).hide();
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
+	new imageLoader(cImageSrc, 'startAnimation()');
     $('#loadingApp').show();
     // load plugins
     initPlugins();
@@ -338,6 +339,10 @@ function main() {
     $('#downloads_tab').text(_("Downloads"));
     $('#upnpToggle').text(_("Upnp"));
     $('#playerToggle').text(_("Player"));
+    
+    win.on('new-win-policy', function(frame, url, policy){
+        policy.forceNewWindow();
+    });
     
     // load and hide catgories
     getCategories();
@@ -727,6 +732,7 @@ function main() {
                 });
                 // load searchTypes options
                 if (engine.searchTypes !== undefined) {
+					$('#searchTypes_select').empty();
                     $.each(engine.searchTypes, function(key, value) {
                         $('#searchTypes_select').append('<option value="' + value + '">' + key + '</option>');
                     });
@@ -761,7 +767,9 @@ function main() {
                     });
                     selected_category = engine.defaultCategory;
                     $("#categories_select").val(selected_category);
-                }
+                } else if (engine.hasCategory) {
+					engine.loadCategories();
+				}
 
                 $('#video_search_query').prop('disabled', false);
                 update_searchOptions();
@@ -1109,6 +1117,10 @@ function main() {
 
 function updateScroller() {
 	$(".nano").nanoScroller();
+}
+
+function updatePickers() {
+	$('.selectpicker').selectpicker('refresh');
 }
 
 function changePage() {
