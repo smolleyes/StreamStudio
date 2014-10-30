@@ -56,7 +56,7 @@ $(document).on('click','#updateBtn',function(e) {
 		}
 		link = 'http://ubukey.fr/StreamStudio/'+file;
 	}
-	downloadUpdate(link,file);
+	return downloadUpdate(link,file);
 });
 
 $(document).on('click','#startWinUpdate',function(e) {
@@ -127,7 +127,7 @@ function downloadUpdate(link,filename) {
 			  } else {
 				  setTimeout(function(){
 					installUpdate(args)
-				  },3000);
+				  },5000);
 			  }
 			});
 
@@ -146,7 +146,7 @@ function downloadUpdate(link,filename) {
 				} else {
 					setTimeout(function(){
 						installUpdate(args);
-					},3000);
+					},5000);
 				}
 			});
 

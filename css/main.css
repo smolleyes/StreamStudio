@@ -807,9 +807,10 @@ video{
 
 #updateProgress{
 	position:relative;
-	width:90%;
+	width:98%;
 	top:-10px;
 	left:2px;
+	color:white !important;
 }
 #updateProgress progress{
 	width:90%
@@ -922,11 +923,16 @@ progress::-webkit-progress-bar{
 {
 z-index: 1500;
 position: absolute;
-border: solid 2px black;
-background-color: white;
-padding: 5px 0;
 display: none;
+z-index: 1500;
+position: absolute;
+display: none;
+border-top: 2px solid black;
+border-bottom: 2px solid black;
+-webkit-border-radius: 4px;
+background: black;
 }
+
 #custom-menu ol
 {
 padding: 0;
@@ -941,19 +947,8 @@ font-size:12px;
 #custom-menu ol li
 {
 margin: 0;
-display: block;
+display: table-row;
 list-style: none;
-padding: 5px 5px;
-}
-#custom-menu ol li:hover
-{
-background-color: #efefef;
-}
-
-#custom-menu ol li:active
-{
-color: White;
-background-color: #000;
 }
 
 #custom-menu ol .list-devider
@@ -962,21 +957,10 @@ padding: 0px;
 margin: 0px;
 }
 
-#custom-menu ol .list-devider hr
-{
-margin: 2px 0px;
-}
-
 #custom-menu ol li a
 {
-color: Black;
-text-decoration: none;
-display: block;
-padding: 0px 5px;
-}
-#custom-menu ol li a:active
-{
-color: White;
+width: calc(100% + -4px);
+margin: 0px 2px;
 }
 
 /* toggle control*/

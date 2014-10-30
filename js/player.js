@@ -180,7 +180,7 @@ function startPlay(media) {
 function launchPlay() {
 	try {
 		var obj = JSON.parse(settings.ht5Player);
-		if(engine.type == "video" && obj.name === "StreamStudio" && activeTab == 1 || activeTab == 2 ) {
+		if( search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video" && obj.name === "StreamStudio" && activeTab == 1 || activeTab == 2 ) {
 			$('#playerToggle').click();
 		}
 	} catch(err) {}

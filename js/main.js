@@ -150,7 +150,8 @@ var htmlStr = '<div class="row"> \
 				</div> \
 			</div> \
 			<div class="tab-pane" id="tabpage_2"> \
-				<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 90px);"> \
+				<p>'+_("Use your mouse right click on Youtube or Dailymotion video's titles to bookmark them in this library.")+'</p> \
+				<div id="nanoContent" class="nano" style="top:10px !important; height: calc(100% - 110px);"> \
 					<div id="treeview" class="nano-content"> \
 					</div> \
 				</div> \
@@ -341,7 +342,10 @@ function main() {
     $('#playerToggle').text(_("Player"));
     
     win.on('new-win-policy', function(frame, url, policy){
-        policy.forceNewWindow();
+        policy.forceNewWindow({"position": 'center',
+              "width": 400,
+              "height": 400,
+              "toolbar": false })
     });
     
     // load and hide catgories

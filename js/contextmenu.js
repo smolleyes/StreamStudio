@@ -25,14 +25,14 @@ $(document).ready(function() {
         var text = clipboard.get('text');
         $('#custom-menu ol').empty();
         if (text.indexOf('mega.co.nz') !== -1) {
-            $('#custom-menu ol').empty().append('<li><a id="mega_link" href="#" alt="'+text+'">'+_("Open mega link")+'</a></li>');
+            $('#custom-menu ol').empty().append('<li><a id="mega_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open mega link")+'</a></li>');
         } else if (text.indexOf('torrent') !== -1 && text.indexOf('magnet:?xt') === -1){
-            $('#custom-menu ol').empty().append('<li><a id="torrent_link" href="#" alt="'+text+'">'+_("Open Torrent")+'</a></li>');
+            $('#custom-menu ol').empty().append('<li><a id="torrent_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open Torrent")+'</a></li>');
         } else if (text.indexOf('magnet:?xt') !== -1){
-            $('#custom-menu ol').empty().append('<li><a id="magnet_link" href="#" alt="'+text+'">'+_("Open Magnet")+'</a></li>');
+            $('#custom-menu ol').empty().append('<li><a id="magnet_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open Magnet")+'</a></li>');
         } else {
 			if(text !== '' && text.match(/^(http|https)/) !== null) {
-				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+text+'">'+_("Open external link")+'</a></li>');
+				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
 			}
 		}
   });
@@ -52,18 +52,18 @@ $(document).ready(function() {
 			if (search_engine === 'youtube') {
 				var link = "http://www.youtube.com/watch?v="+vid;
 				var engine='youtube';
-				$('#custom-menu ol').append('<li><a id="copy_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'">'+_("Copy youtube link")+'</a></li>');
-				$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'">'+_("Save to playlist")+'</a></li>');
+				$('#custom-menu ol').append('<li><a id="copy_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Copy youtube link")+'</a></li>');
+				$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Save to playlist")+'</a></li>');
 			} else if (search_engine === 'dailymotion') {
 				var link = "http://www.dailymotion.com/video/"+vid;
 				var engine='dailymotion';
-				$('#custom-menu ol').append('<li><a id="copy_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'">'+_("Copy dailymotion link")+'</a></li>');
-				$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'">'+_("Save to playlist")+'</a></li>');
+				$('#custom-menu ol').append('<li><a id="copy_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Copy dailymotion link")+'</a></li>');
+				$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Save to playlist")+'</a></li>');
 			}
 		} catch(err) {
 			console.log("can't detect link to copy..." + err);
 		}
-		$("#custom-menu").css({ top: e.pageY + "px", left: e.pageX + "px" }).show(100);
+		showContextMenu(e);
 		return false;
 	});
     //custom context menu
@@ -76,24 +76,24 @@ $(document).ready(function() {
 			var ytlink = getYtlinkFromClipboard();
 			var textStr = getSelectedText();
 			if (textStr !== null) {
-				$('#custom-menu ol').append('<li><a id="copy" href="#">'+_("Copy")+'</a></li>');
+				$('#custom-menu ol').append('<li><a id="copy" href="#" class="btn btn-default ">'+_("Copy")+'</a></li>');
 			}
 			if ((search_engine === 'youtube') && ytlink !== null) {
-				$('#custom-menu ol').append('<li><a id="paste_ytlink" href="#">'+_("Paste/Open youtube link")+'</a></li>');
+				$('#custom-menu ol').append('<li><a id="paste_ytlink" href="#" class="btn btn-default ">'+_("Paste/Open youtube link")+'</a></li>');
 			}
 			if ($('#custom-menu li').length === 0 ) {
 				return;
 			} else {
-				$("#custom-menu").css({ top: e.pageY + "px", left: e.pageX + "px" }).show(100);
+				showContextMenu(e);
 			}
 			return false;
 		});
 		
 		$('#custom-menu').click(function() {
-			$('#custom-menu').hide();
+			$('#custom-menu').slideUp();
 		});
 		$(document).click(function() {
-			$('#custom-menu').hide();
+			$('#custom-menu').slideUp();
 		});
 	} catch (err) {
 		console.log(err);
@@ -104,7 +104,7 @@ $(document).ready(function() {
 		var text = getSelectedText();
 		if (text !== null) {
 			clipboard.set(''+text+'','text');
-			$('#custom-menu').hide();
+			$('#custom-menu').slideUp();
 		}
     });
     // paste yt link
@@ -112,7 +112,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		var ytlink = getYtlinkFromClipboard();
 		youtube.getVideoInfos(ytlink,0,1,function(datas) {fillPlaylist(datas,false,'','youtube')});
-		$('#custom-menu').hide();
+		$('#custom-menu').slideUp();
 	});
   // open mega link
 	$(document).on('click','#mega_link',function(e) {
@@ -122,7 +122,7 @@ $(document).ready(function() {
     f.link='http://'+ipaddress+':8888/?file='+encodeURIComponent(vlink);
     f.title='';
     startPlay(f);
-		$('#custom-menu').hide();
+		$('#custom-menu').slideUp();
 	});
   // open torrent link
 	$(document).on('click','#torrent_link',function(e) {
@@ -133,7 +133,7 @@ $(document).ready(function() {
     }
     console.log(vlink);
     getAuthTorrent(vlink,true,false)
-		$('#custom-menu').hide();
+		$('#custom-menu').slideUp();
 	});
   // open torrent magnet
 	$(document).on('click','#magnet_link',function(e) {
@@ -141,29 +141,27 @@ $(document).ready(function() {
 		var vlink = $(this).attr('alt');
     console.log(vlink);
     getTorrent(vlink);
-		$('#custom-menu').hide();
+		$('#custom-menu').slideUp();
 	});
 	// open external link
 	$(document).on('click','#external_link',function(e) {
 		e.preventDefault();
 		var vlink = $(this).attr('alt');
-    console.log(vlink);
-    var media = {};
-    media.link = 'http://'+ipaddress+':8888/?file='+vlink+'&external';
-    media.title = 'external link...';
-    startPlay(media);
-		$('#custom-menu').hide();
+		console.log(vlink);
+		var media = {};
+		media.link = 'http://'+ipaddress+':8888/?file='+vlink+'&external';
+		media.title = vlink.split('/').pop();
+		startPlay(media);
+		$('#custom-menu').slideUp();
 	});
-	
-  
-  
+
 	// copy link
 	$(document).on('click','#copy_link',function(e) {
 		e.preventDefault();
 		clipboard.clear();
 		var text = $(this).attr('alt').split('::')[2];
 		clipboard.set(''+text+'','text');
-		$('#custom-menu').hide();
+		$('#custom-menu').slideUp();
 	});
 	// save link
 	$(document).on('click','#save_link',function(e) {
@@ -177,7 +175,8 @@ $(document).ready(function() {
               "position": 'center',
               "width": 400,
               "height": 400,
-              "toolbar": false
+              "toolbar": false,
+              "show" : false
             });
             new_win.on('close', function() {
 				settings = JSON.parse(localStorage.StdSettings);
@@ -193,7 +192,17 @@ $(document).ready(function() {
 				settings.selectedDir = '';
 				saveSettings();
             });
-		$('#custom-menu').hide();
+            new_win.on('loaded', function() {
+				console.log("loadedd") 
+				var x = Math.round((screen.availWidth - 400) / 2);
+				var y = Math.round((screen.availHeight - 400) / 2);
+				setTimeout(function() {
+					new_win.resizeTo(400,400)
+					new_win.moveTo(x,y)
+					new_win.show();
+				},1000);
+			});
+		$('#custom-menu').slideUp();
 		$('#save_link').parent().remove();
 	});
 });
@@ -228,5 +237,16 @@ function getSelectedText() {
 		return null;
 	} else {
 		return t.toLocaleString();
+	}
+}
+
+function showContextMenu(e) {
+	if(activeTab !== 2 && activeTab !== 3 && activeTab !== 5) {
+		var x = e.pageX - $('#menuContainer').width() - 50;
+		var y = e.pageY - 60;
+		$("#custom-menu").css({ top: y + "px", left: x + "px" }).slideDown("slow",function() { 
+			var w = $("#custom-menu li").width();
+			$('#custom-menu').css('width',w+'px');
+		});
 	}
 }
