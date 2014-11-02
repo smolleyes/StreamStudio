@@ -1,3 +1,7 @@
+V 1.6
+  * fix pagination
+  * fix local files scan
+
 V 1.5
   * fix cpu usage at 20-25%
 

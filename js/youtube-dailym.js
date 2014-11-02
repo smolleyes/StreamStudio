@@ -167,7 +167,10 @@ function getVideosDetails(datas, engine, sublist, vid) {
         });
         pagination_init = true;
         total_pages = $("#pagination").pagination('getPagesCount');
-    }
+        $("#pagination").show();
+    } else {
+		$("#pagination").show();
+	}
     // load videos
     switch (engine) {
         case 'dailymotion':
@@ -205,6 +208,7 @@ function getPlaylistInfos(datas, engine) {
         $('#search_results').html(_("<p><strong>No playlist</strong> found...</p>"));
         $('#search').show();
         $('#loading').hide();
+        $("#pagination").hide();
         return;
     }
     $('#search_results').html('<p><strong>' + totalResults + '</strong> ' + _("playlists found") + '</p>');
@@ -526,7 +530,6 @@ function fillPlaylist(items, sublist, sublist_id, engine) {
     $('#search').show();
     $('#loading').hide();
     if (searchTypes_select === 'playlists') {
-        $('#pagination').hide();
         if (sublist === false) {
             var valid_vid = $('.youtube_item').length
             $('#search_results').html('<p><strong>' + valid_vid + '</strong>' + _("verified videos in this playlist") + '</p>');

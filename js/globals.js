@@ -1,4 +1,4 @@
-var VERSION = "1.5";
+var VERSION = "1.6";
 
 var path = require('path');
 var fs = require('fs');

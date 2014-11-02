@@ -130,16 +130,15 @@ function loadLocalDb() {
 		return;
 	}
 	$.each(dirs,function(index,dir){
-		var parent = Math.floor(Math.random()*1000000);
-		var obj = { 
-					"attr" : { id : ''+parent+'_rootnode' },
-					"data" : path.basename(dir),
-					"children" : []
-		}
-		$("#fileBrowserContent").jstree("create", $("#"+_("Local library")+"_rootnode"), "inside", obj, function() {}, true);
-		scanForDirs(dir,parent);
+		getLocalDb(dir,parent);
 	});	
 }
+
+function loadInTree(dir,parent) {
+	var list = dirTree(dir);
+	
+}
+
 
 function scanForDirs(dir,parent,list) {
 	try {
@@ -164,7 +163,7 @@ function scanForDirs(dir,parent,list) {
 							"icon" : "js/jstree/themes/default/movie_file.png",
 							"data" : {
 								"title" : path.basename(file), 
-								"attr" : { "id": id, "parent" : parent, "link" : "file://"+encodeURI(dir+'/'+file), "class" : "localFile","dir":encodeURI(dir),"title":path.basename(file)} 
+								"attr" : { "id": id, "parent" : parent, "link" : "file://"+encodeURI(child.path), "class" : "localFile","dir":encodeURI(dir),"title":child.name} 
 							}
 						}
 					} else {

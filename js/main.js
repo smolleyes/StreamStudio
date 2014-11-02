@@ -324,6 +324,7 @@ try {
 
 
 $(document).ready(function() {
+	new imageLoader(cImageSrc, 'startAnimation()');
     $('#main').append(htmlStr).hide();
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
     $('#loadingApp').show();

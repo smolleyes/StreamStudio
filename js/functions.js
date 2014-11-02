@@ -2,41 +2,56 @@ function saveSettings() {
 	localStorage.StdSettings = JSON.stringify(settings);
 }
 
-function getLocalDb(res) {
-    try {
-        var dirs = settings.shared_dirs;
-        if ((dirs === undefined) || (dirs.length === 0)) {
-            fileList.basedirs[dir] = {};
-            return;
-        }
-    } catch (err) {
-        console.log("shared dirs error : " + err);
-        fileList.basedirs[dir] = {};
-        return;
-    }
+function getLocalDb(dir,parent) {
     var fileList = [];
-    var total = dirs.length;
-    $.each(dirs, function(index, dir) {
-        if (dir === "") {
-            if (index + 1 === dirs.length) {
-                var body = JSON.stringify(fileList);
-                res.writeHead(200, {
-                    "Content-Type": "application/json;charset=utf-8"
-                });
-                res.end(body);
-            }
-            return true;
-        } else {
-            fileList.push(dirTree(dir));
-            if (index + 1 === dirs.length) {
-                var body = JSON.stringify(fileList);
-                res.writeHead(200, {
-                    "Content-Type": "application/json;charset=utf-8"
-                });
-                res.end(body);
-            }
-        }
-    });
+	fileList.push(dirTree(dir));
+	loadPcFiles(fileList)
+}
+
+function loadPcFiles(list) {
+	$.each(list,function(index,dir) {
+		var parent = Math.floor(Math.random()*1000000);
+		var obj = { 
+					"attr" : { id : ''+parent+'_rootnode' },
+					"data" : dir.name,
+					"children" : []
+		}
+		$("#fileBrowserContent").jstree("create", $("#"+_("Local library")+"_rootnode"), "inside", obj, function() {}, true);
+		loadchildrens(dir.children,parent);
+	});
+}
+
+function loadchildrens(childs,parent) {
+  var html;
+	if ((childs !== undefined) && (childs !== null) && (childs.length !== 0)) {
+		$.each(childs,function(index,child) {
+			if(child.type==="file") {
+				var id = Math.floor(Math.random()*1000000);
+				var ext = child.name.split('.').pop().toLowerCase();
+				if (ext === 'webm' || ext === 'mp4' || ext === 'wav' || ext === 'mpg' || ext === 'opus' || ext === 'avi' || ext === 'mpeg' || ext === 'mkv' || ext === 'mp3' || ext === 'ogg' || ext === 'mov') {
+						 var obj = {
+									"attr" : { "id" : id },
+									"icon" : "js/jstree/themes/default/movie_file.png",
+									"data" : {
+										"title" : child.name, 
+										"attr" : { "id": id, "parent" : parent, "link" : "file://"+encodeURI(child.path), "class" : "localFile","dir":encodeURI(child.path),"title":child.name} 
+									}
+						}
+						$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside",  obj, function() { }, true);
+						$("#fileBrowserContent").jstree('close_all');
+				}
+			} else {
+				var nid = Math.floor(Math.random()*1000000);
+				var obj = { 
+						"attr" : { id : ''+nid+'_rootnode' },
+						"data" : child.name,
+						"children" : []
+					}
+					$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside", obj, function() {}, true);
+				loadchildrens(child.children,nid);
+			}
+		});
+	}
 }
 
 function downloadFile(link, title, vid, toTorrent) {
@@ -619,5 +634,3 @@ function AnimateRotate(angle) {
         }
     });
 }
-
-new imageLoader(cImageSrc, 'startAnimation()');

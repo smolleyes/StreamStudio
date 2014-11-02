@@ -24,7 +24,6 @@ function browseUpnpDir(serverId, indexId, parentId) {
                     } catch (err) {}
                     $('#items_container').empty().show();
                     if (items) {
-						console.log(items)
                         $.each(items, function(index, dir) {
                             var channel = {};
                             channel.parentId = parentId;
@@ -75,7 +74,6 @@ function browseUpnpDir(serverId, indexId, parentId) {
                         });
                     } else {
                         if (dirs) {
-							console.log(dirs)
                             $.each(dirs, function(index, dir) {
                                 var channel = {};
                                 channel.parentId = parentId;
@@ -121,7 +119,6 @@ function browseUpnpDir(serverId, indexId, parentId) {
 
 function loadUpnpItems(items) {
     $.each(items, function(index, file) {
-        console.log(file);
         if (file.type === "folder") {
             var id = Math.floor(Math.random() * 1000000);
             var obj = {
@@ -379,7 +376,6 @@ function playUpnpRenderer(obj) {
 function getRendererState(state) {
 	mediaRenderer.getTransportInfo().then(function(response) {
 		if (response && response.data) {
-			console.log(response.data.CurrentTransportState, state ,continueTransition)
 			if(response.data.CurrentTransportState !== state && continueTransition) {
 				if(response.data.CurrentTransportState === 'TRANSITIONING') {
 					if (transitionCount === 60) {
@@ -406,7 +402,6 @@ function getRendererState(state) {
 					},1000);
 				}
 			} else {
-				console.log("PLAYER STATE " + state)
 				if (state === 'PLAYING') {
 					transitionCount = 0;
 					upnpMediaPlaying = true;
@@ -420,7 +415,6 @@ function getRendererState(state) {
 						$('.mejs-controls').width('100%');
 					},1000);
 					// watch for STOPPED state
-					console.log("start watching for stopped state")
 					getRendererState('STOPPED');
 				} else if (state === 'STOPPED') {
 					stopUpnp();
