@@ -1,4 +1,4 @@
-var VERSION = "1.4";
+var VERSION = "1.5";
 
 var path = require('path');
 var fs = require('fs');
@@ -70,6 +70,7 @@ var pagination_init = false;
 var activeTab = 1;
 var confDir;
 var extPlayerRunning = false;
+var spinnerPlay = false;
 //nw window
 var gui = require('nw.gui');
 var win = gui.Window.get();

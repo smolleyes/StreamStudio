@@ -1,3 +1,6 @@
+V 1.5
+  * fix cpu usage at 20-25%
+
 V 1.4
   * fix web library playlists
   * fix right click contextmenu

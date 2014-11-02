@@ -326,7 +326,6 @@ try {
 $(document).ready(function() {
     $('#main').append(htmlStr).hide();
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
-	new imageLoader(cImageSrc, 'startAnimation()');
     $('#loadingApp').show();
     // load plugins
     initPlugins();
@@ -347,7 +346,6 @@ function main() {
               "height": 400,
               "toolbar": false })
     });
-    
     // load and hide catgories
     getCategories();
     // start keyevent listener
@@ -1087,11 +1085,27 @@ function main() {
 	
 	//show gui
     $('#loadingApp').remove();
-    new imageLoader(cImageSrc, 'startAnimation()');
     $('#main').show();
     $("#navBar").show();
     $(".myBrand").show();
 	$("#settingsContainer").show();
+	new imageLoader(cImageSrc, 'startAnimation()');
+    
+    var observer = new MutationObserver(function(mutations) {
+      if(!spinnerPlay) {
+		console.log("starting animation")
+		startAnimation();
+		spinnerPlay = true;
+	  } else {
+		console.log("stoping animation")
+		stopAnimation();  
+		spinnerPlay = false;
+	  }
+    });
+    var target = document.querySelector('#loading');
+    observer.observe(target, { attributes: true });
+    
+    
 	if(settings.init) {
 		checkUpdates();
 		checkFreebox();
@@ -1107,6 +1121,14 @@ function main() {
 			$("#navBar").css('margin-left','-'+wid+'px')
 		}
 	})
+	
+	$("#loading").on('show',function(){
+		startAnimation();
+	});
+	$("#loading").on('hide',function(){
+		console.log('stopAnimation')
+		stopAnimation();
+	});
 
 	$('button[aria-label="playlist"]').attr('title','play and stop');
 	

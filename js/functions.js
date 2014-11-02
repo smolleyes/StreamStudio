@@ -619,3 +619,5 @@ function AnimateRotate(angle) {
         }
     });
 }
+
+new imageLoader(cImageSrc, 'startAnimation()');
