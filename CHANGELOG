@@ -1,3 +1,8 @@
+V 1.7
+  * fix peerflix with upnp on samsung tv
+  * fix fullscreen exit
+  * filter some local dirs in the scan
+
 V 1.6
   * fix pagination
   * fix local files scan

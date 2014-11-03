@@ -424,19 +424,13 @@ function main() {
     var left;
     var right;
     $(document).on('click', '.mejs-fullscreen-button', function(e) {
-		console.log("clicked")
 		e.preventDefault();
         if (win.isFullscreen === true) {
             win.toggleFullscreen();
             player.isFullScreen = false;
-            $('#menuContainer').show();
-            $('.navbar').show();
-            $('#main').removeClass('fullscreen');
         } else {
             player.isFullScreen = true;
             win.enterFullscreen();
-            $('#menuContainer').hide();
-            $('.navbar').hide();
             //$('#main').attr('style', 'height:'+window.innerHeight+'px;width:'+window.innerWidth+';');
             //$('#main').addClass('fullscreen');
         }
@@ -686,6 +680,10 @@ function main() {
     //hide preview
     $(document).on('click', '#closePreview', function(e) {
         e.preventDefault();
+        if (win.isFullscreen === true) {
+            win.toggleFullscreen();
+            player.isFullScreen = false;
+        }
         $('#fbxMsg').slideUp();
     });
 
@@ -957,6 +955,10 @@ function main() {
     });
     
     $('#closePlayer').click(function() {
+		if (win.isFullscreen === true) {
+            win.toggleFullscreen();
+            player.isFullScreen = false;
+        }
         $('#playerContainer').hide();
         $('#playerTopBar').hide();
         $('#tab a[href="#tabpage_'+activeTab+'"]').click();

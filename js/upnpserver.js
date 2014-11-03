@@ -350,7 +350,7 @@ function playUpnpRenderer(obj) {
 	currentMedia = obj;
 	
 	//var metaString = '&lt;DIDL-Lite xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot; xmlns:dlna=&quot;urn:schemas-dlna-org:metadata-1-0/&quot; xmlns:sec=&quot;http://www.sec.co.kr/&quot;&gt;&lt;item&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;res protocolInfo=&quot;'+infos+':*&quot; size=&quot;0&quot;&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
-	var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
+	var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*\"&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
 	mediaRenderer.setAVTransportURI("0",uri,metaString).then(function(response) {
 		if (response && response.data) {
 			console.log('UPNP: Ok playing' + uri);
@@ -509,10 +509,10 @@ function startUPNPserver() {
 		//};
 		
 		//var p_req = https.request(options,function(res) {
-			////b_res.setHeader("Content-Type", "video/x-msvideo");
+			//b_res.setHeader("Content-Type", "video/mpeg");
+			//b_res.setHeader("Content-Transfer-Encoding", "chunk");
 			//b_res.setHeader('transferMode.dlna.org', 'Streaming');
-			//b_res.setHeader('contentFeatures.dlna.org','DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000');
-			//b_res.setHeader('realTimeInfo.dlna.org','DLNA.ORG_TLAG=*');
+			//b_res.setHeader('contentFeatures.dlna.org','DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000');
 			//b_res.writeHead(res.statusCode,res.headers);
 			//res.on('data',function(chunk) {
 				//b_res.write(chunk);
@@ -530,10 +530,10 @@ function startUPNPserver() {
 		//};
 		
 		//var p_req = http.request(options,function(res) {
-			////b_res.setHeader("Content-Type", "video/x-msvideo");
+			//b_res.setHeader("Content-Type", "video/mpeg");
+			//b_res.setHeader("Content-Transfer-Encoding", "chunk");
 			//b_res.setHeader('transferMode.dlna.org', 'Streaming');
 			//b_res.setHeader('contentFeatures.dlna.org','DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000');
-			//b_res.setHeader('realTimeInfo.dlna.org','DLNA.ORG_TLAG=*');
 			//b_res.writeHead(res.statusCode,res.headers);
 			//res.on('data',function(chunk) {
 				//b_res.write(chunk);
@@ -547,7 +547,7 @@ function startUPNPserver() {
 	
 	//p_req.end();
   
-//}).listen(9005);
+//}).listen(9005,ipaddress);
 
 //function notFound(res) {
 	//res.writeHead(404,"text/plain");

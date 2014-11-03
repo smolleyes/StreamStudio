@@ -109,7 +109,7 @@ function startStreaming(req, res, width, height,duration) {
 		res.writeHead(200, { // NOTE: a partial http response
 			// 'Date':date.toUTCString(),
 			'Connection': 'keep-alive',
-			'Content-Type': 'video/x-matroska',
+			'Content-Type': 'video/mpeg',
 			'Server':'CustomStreamer/0.0.1',
 			'transferMode.dlna.org': 'Streaming',
 			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'

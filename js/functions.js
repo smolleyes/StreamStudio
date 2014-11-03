@@ -34,21 +34,23 @@ function loadchildrens(childs,parent) {
 									"icon" : "js/jstree/themes/default/movie_file.png",
 									"data" : {
 										"title" : child.name, 
-										"attr" : { "id": id, "parent" : parent, "link" : "file://"+encodeURI(child.path), "class" : "localFile","dir":encodeURI(child.path),"title":child.name} 
+										"attr" : { "id": id, "parent" : parent, "link" : "file://"+encodeURI(child.path), "class" : "localFile","dir":encodeURI(path.dirname(child.path)),"title":child.name} 
 									}
 						}
 						$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside",  obj, function() { }, true);
 						$("#fileBrowserContent").jstree('close_all');
 				}
 			} else {
-				var nid = Math.floor(Math.random()*1000000);
-				var obj = { 
-						"attr" : { id : ''+nid+'_rootnode' },
-						"data" : child.name,
-						"children" : []
-					}
-					$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside", obj, function() {}, true);
-				loadchildrens(child.children,nid);
+				if (child.name !== "node_modules") {
+					var nid = Math.floor(Math.random()*1000000);
+					var obj = { 
+							"attr" : { id : ''+nid+'_rootnode' },
+							"data" : child.name,
+							"children" : []
+						}
+						$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside", obj, function() {}, true);
+					loadchildrens(child.children,nid);
+				}
 			}
 		});
 	}
