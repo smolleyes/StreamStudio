@@ -40,6 +40,19 @@ function showItems(results) {
 	}
 }
 
+function onSelectedLocalItem(data) {
+	try {
+		var id = data.rslt.obj[0].id;
+		var dir = data.rslt.obj[0].attributes.path.nodeValue;
+		if(id.indexOf('localSubNode') !== -1 && $('#'+id).hasClass('loaded') === false) {
+			$('#'+id).addClass('loaded');
+			var fileList = [];
+			fileList.push(dirTree(dir));
+			loadchildrens(fileList[0].children,id.split('_')[0])
+		}
+	} catch(err) {}
+}
+
 function onSelectedItem(data) {
 	$(".mejs-overlay").show();
 	$(".mejs-layer").show();

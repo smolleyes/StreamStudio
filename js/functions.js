@@ -3,25 +3,30 @@ function saveSettings() {
 }
 
 function getLocalDb(dir,parent) {
-    var fileList = [];
+	var fileList = [];
 	fileList.push(dirTree(dir));
 	loadPcFiles(fileList)
 }
 
-function loadPcFiles(list) {
+function loadPcFiles(list,mainParent) {
 	$.each(list,function(index,dir) {
 		var parent = Math.floor(Math.random()*1000000);
 		var obj = { 
-					"attr" : { id : ''+parent+'_rootnode' },
-					"data" : dir.name,
-					"children" : []
+			"attr" : { id : ''+parent+'_localSubNode', path : dir.path },
+			"data" : dir.name,
+			"children" : []
 		}
-		$("#fileBrowserContent").jstree("create", $("#"+_("Local library")+"_rootnode"), "inside", obj, function() {}, true);
-		loadchildrens(dir.children,parent);
+		if(mainParent !== undefined) {
+			$("#fileBrowserContent").jstree("create", $("#"+mainParent), "inside", obj, function() {}, true);
+			loadchildrens(dir.children,parent,false);
+		} else {
+			$("#fileBrowserContent").jstree("create", $("#"+_("Local library")+"_rootnode"), "inside", obj, function() {}, true);
+			loadchildrens(dir.children,parent,true);
+		}
 	});
 }
 
-function loadchildrens(childs,parent) {
+function loadchildrens(childs,parent,close) {
   var html;
 	if ((childs !== undefined) && (childs !== null) && (childs.length !== 0)) {
 		$.each(childs,function(index,child) {
@@ -37,19 +42,22 @@ function loadchildrens(childs,parent) {
 										"attr" : { "id": id, "parent" : parent, "link" : "file://"+encodeURI(child.path), "class" : "localFile","dir":encodeURI(path.dirname(child.path)),"title":child.name} 
 									}
 						}
-						$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside",  obj, function() { }, true);
-						$("#fileBrowserContent").jstree('close_all');
+						$("#fileBrowserContent").jstree("create", $("#"+parent+"_localSubNode"), "inside",  obj, function() { }, true);
+						$("#"+parent+"_localSubNode").addClass('loaded');
+						if(close) {
+							$("#fileBrowserContent").jstree('close_all');
+						}
 				}
 			} else {
 				if (child.name !== "node_modules") {
 					var nid = Math.floor(Math.random()*1000000);
 					var obj = { 
-							"attr" : { id : ''+nid+'_rootnode' },
+							"attr" : { id : ''+nid+'_localSubNode', path : child.path },
 							"data" : child.name,
 							"children" : []
 						}
-						$("#fileBrowserContent").jstree("create", $("#"+parent+"_rootnode"), "inside", obj, function() {}, true);
-					loadchildrens(child.children,nid);
+						$("#fileBrowserContent").jstree("create", $("#"+parent+"_localSubNode"), "inside", obj, function() {}, true);
+					//loadchildrens(child.children,nid);
 				}
 			}
 		});
@@ -57,7 +65,7 @@ function loadchildrens(childs,parent) {
 }
 
 function downloadFile(link, title, vid, toTorrent) {
-    if (activeTab !== 4 && (toTorrent === undefined)) {
+    if (activeTab !== 4 && (toTorrent === false || toTorrent == undefined)) {
         $("#downloads_tab").click();
     }
     if (vid === undefined) {
@@ -169,7 +177,7 @@ function downloadFile(link, title, vid, toTorrent) {
                     fs.rename(target, download_dir + '/' + title.replace(/  /g, ' ').trim(), function(err) {
                         if (err) {} else {
                             console.log('successfully renamed ' + download_dir + '/' + title);
-                            if (toTorrent !== undefined) {
+                            if (toTorrent !== undefined && toTorrent !== false) {
                                 gui.Shell.openItem(download_dir + '/' + title);
                             }
                         }
@@ -495,7 +503,6 @@ function dirTree(filename) {
             path: filename,
             name: path.basename(filename)
         };
-
     if (stats.isDirectory()) {
         info.type = "folder";
         info.children = fs.readdirSync(filename).map(function(child) {

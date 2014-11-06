@@ -1,4 +1,4 @@
-var VERSION = "1.7";
+var VERSION = "1.8";
 
 var path = require('path');
 var fs = require('fs');
@@ -71,6 +71,8 @@ var activeTab = 1;
 var confDir;
 var extPlayerRunning = false;
 var spinnerPlay = false;
+//local web db
+var wdb;
 //nw window
 var gui = require('nw.gui');
 var win = gui.Window.get();

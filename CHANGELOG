@@ -1,3 +1,7 @@
+V 1.8
+  * disable recursive scan for local db
+  * fix songza engine
+
 V 1.7
   * fix peerflix with upnp on samsung tv
   * fix fullscreen exit

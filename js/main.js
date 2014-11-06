@@ -347,6 +347,16 @@ function main() {
               "height": 400,
               "toolbar": false })
     });
+    
+    //show gui
+    createLocalRootNodes();
+    $('#loadingApp').remove();
+    $('#main').show();
+    $("#navBar").show();
+    $(".myBrand").show();
+	$("#settingsContainer").show();
+	new imageLoader(cImageSrc, 'startAnimation()');
+    
     // load and hide catgories
     getCategories();
     // start keyevent listener
@@ -390,10 +400,6 @@ function main() {
     $('#resolutions_select').val(selected_resolution);
     $('#searchTypes_select').val('videos');
 
-    player = MediaElementPlayer('#videoPlayer', {
-        features: ['playpause', 'progress', 'current', 'duration', 'stop', 'volume', 'fullscreen']
-    });
-
     $('#video_search').bind('submit', function(e) {
         e.preventDefault();
         query = $('#video_search_query').val();
@@ -431,88 +437,9 @@ function main() {
         } else {
             player.isFullScreen = true;
             win.enterFullscreen();
-            //$('#main').attr('style', 'height:'+window.innerHeight+'px;width:'+window.innerWidth+';');
-            //$('#main').addClass('fullscreen');
         }
     });
-    
-    // next signal and callback
-    $(document).on('click', '.mejs-next-btn', function(e) {
-		e.preventDefault();
-        getNext();
-    });
-    // stop button
-    $(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
-		try {
-			upnpMediaPlaying = false;
-			continueTransition = false;
-			mediaRenderer.stop();
-		} catch(err) {}
-        initPlayer();
-        $('#playerContainer').hide();
-        $('#playerTopBar').hide();
-        $('#homeToggle')[0].click();
-    });
-    // pause/stop button
-    $('.mejs-playpause-button').click(function(e) {
-        if (playAirMedia === true) {
-            if (airMediaPlaying === true) {
-                login(stop_on_fbx);
-                if (currentMedia.link !== currentAirMedia.link) {
-                    setTimeout(function() {
-                        $('.mejs-overlay-button').hide();
-                        play_on_fbx(currentMedia.link);
-                    }, 2000);
-                }
-            } else {
-                $('.mejs-overlay-button').hide();
-                play_on_fbx(currentMedia.link);
-            }
-        }
-    });
-    //transcoder button
-     $(document).on('click','#transcodeBtnContainer',function(e) {
-		e.preventDefault();
-		if(transcoderEnabled) {
-			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
-			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding disabled'));
-			transcoderEnabled = false;
-		} else {
-			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
-			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding enabled'));
-			transcoderEnabled = true;
-		}
-	 });
-    
-    //playlist buttons
-    $(document).on('click','#playlistBtn',function(e) {
-		e.preventDefault();
-		console.log('playlist clicked');
-		var pos = $('button[aria-label="playlist"]').css('backgroundPosition-y');
-		if(pos === '0px') {
-			$('button[aria-label="playlist"]').attr('style', 'background-position-y:-16px !important');
-			$('button[aria-label="playlist"]').attr('title',_('repeat mode'));
-			playlistMode = 'loop';
-		//} else if(pos === '-16px') {
-			//$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
-			//$('button[aria-label="playlist"]').attr('title','shuffle mode');
-			//playlistMode = 'shuffle';
-		} else if (pos === '-16px') {
-			$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
-			$('button[aria-label="playlist"]').attr('title',_('play and stop'));
-			playlistMode = 'normal';
-		} else if (pos === '-48px') {
-			$('button[aria-label="playlist"]').attr('style', 'background-position-y:0px !important');
-			$('button[aria-label="playlist"]').attr('title',_('playlist mode'));
-			playlistMode = 'continue';
-		}
-	});
-	
-    // previous signal and callback
-    $(document).on('click', '.mejs-back-btn', function(e) {
-        e.preventDefault();
-        getPrev();
-    });
+
     // start video by clicking title
     $(document).on('click', '.start_video', function(e) {
         e.preventDefault();
@@ -581,8 +508,10 @@ function main() {
         } catch (err) {}
         startPlay(video);
     });
+    
     //play local file
     $(document).on('click', '.localFile', function(e) {
+		var videoCodecs = ["avi", "webm", "mp4", "flv", "mkv", "mpeg", "mpg", "wmv", "mov"];
         playFromFile = true;
         var video = {};
         video.link = $(this).attr('link');
@@ -600,21 +529,9 @@ function main() {
         } else {
             $('video').trigger('loadPlayer', video, '');
         }
-    });
-
-    // next vid
-    player.media.addEventListener('ended', function() {
-        on_media_finished();
-    });
-    
-    player.media.addEventListener('pause', function() {
-		$('#subPlayer-play').show();
-		$('#subPlayer-pause').hide();
-    });
-    
-    player.media.addEventListener('play', function() {
-		$('#subPlayer-play').hide();
-		$('#subPlayer-pause').show();
+        if(videoCodecs.indexOf(video.title.split('.').pop()) !== -1) {
+			$('#playerToggle').click();
+		}
     });
     
     //load playlist
@@ -866,7 +783,6 @@ function main() {
             } catch (err) {
 
             }
-            $('#video_search_btn')[0].click();
         });
     });
     //search filters
@@ -954,15 +870,6 @@ function main() {
         $('#playerTopBar').show();
     });
     
-    $('#closePlayer').click(function() {
-		if (win.isFullscreen === true) {
-            win.toggleFullscreen();
-            player.isFullScreen = false;
-        }
-        $('#playerContainer').hide();
-        $('#playerTopBar').hide();
-        $('#tab a[href="#tabpage_'+activeTab+'"]').click();
-    });
 
     // airplay
     $('#airplay-toggle').click(function(e) {
@@ -1045,7 +952,7 @@ function main() {
         return false
     };
 
-    var holder = document.getElementById('main');
+    var holder = document.getElementById('mainContainer');
     holder.ondrop = function(e) {
         e.preventDefault();
         var file = e.dataTransfer.files[0],
@@ -1056,18 +963,16 @@ function main() {
         }
         return false;
     };
+    
     win.on('maximize', function() {
         setTimeout(function() {
-            //var h = window.innerHeight;
-			//$('#mep_0').attr('style', 'height:'+h+'px;');
+			$(".nano").nanoScroller();
         }, 200);
-        $(".nano").nanoScroller();
     });
 
     win.on('unmaximize', function() {
         setTimeout(function() {
-            //var h = window.innerHeight;
-			//$('#mep_0').attr('style', 'height:'+h+'px;');
+            $(".nano").nanoScroller();
         }, 200);
     });
     
@@ -1077,22 +982,12 @@ function main() {
 		settings.defaultHeight = win.height;
 		saveSettings();
     });
-    
 
 	// load upnp devices
 	cli.searchDevices();
 	cli.on('updateUpnpDevice', function() {
 		updateUpnpList()
 	});
-	
-	
-	//show gui
-    $('#loadingApp').remove();
-    $('#main').show();
-    $("#navBar").show();
-    $(".myBrand").show();
-	$("#settingsContainer").show();
-	new imageLoader(cImageSrc, 'startAnimation()');
     
     var observer = new MutationObserver(function(mutations) {
       if(!spinnerPlay) {

@@ -76,7 +76,7 @@ function createLocalRootNodes() {
 				}
 			},
 		}).bind("select_node.jstree", function (e, data) { 
-				//onSelectedItem(data); 
+				onSelectedLocalItem(data); 
 		}).bind("rename.jstree", function (e, data) { 
 				//renameItem(data);
 		}).bind("remove.jstree", function (e, data) { 
@@ -119,6 +119,7 @@ function loadLocalNodes(results){
 
 function loadLocalDb() {
 	$("#fileBrowserContent").empty();
+	// check settings
 	try {
 		var dirs = settings.shared_dirs;
 		if ((dirs === undefined) || (dirs.length === 0)) {
@@ -131,12 +132,11 @@ function loadLocalDb() {
 	}
 	$.each(dirs,function(index,dir){
 		getLocalDb(dir,parent);
-	});	
+	});
 }
 
 function loadInTree(dir,parent) {
 	var list = dirTree(dir);
-	
 }
 
 

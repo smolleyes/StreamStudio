@@ -307,42 +307,6 @@ function loadPlayers() {
 	var child = require('child_process');
 	var __ = require('underscore');
 
-	//var External = App.Device.Generic.extend({
-		//defaults: {
-			//type: 'external',
-			//name: i18n.__('External Player'),
-		//},
-
-		//play: function (streamModel) {
-			//// "" So it behaves when spaces in path
-			//// TODO: Subtitles
-			//var url = streamModel.attributes.src;
-			//var cmd = path.normalize('"' + this.get('path') + '"');
-			//var subtitle = streamModel.attributes.subFile || '';
-			//cmd += getPlayerSwitches(this.get('id')) + '"' + subtitle + '" ' + url;
-			//win.info('Launching External Player: ' + cmd);
-			//child.exec(cmd);
-		//},
-
-		//pause: function () {
-			//var cmd = path.normalize('"' + this.get('path') + '"');
-			//cmd += ' ' + this.get('pause');
-			//child.exec(cmd);
-		//},
-
-		//stop: function () {
-			//var cmd = path.normalize('"' + this.get('path') + '"');
-			//cmd += ' ' + this.get('stop');
-			//child.exec(cmd);
-		//},
-
-		//unpause: function () {
-			//var cmd = path.normalize('"' + this.get('path') + '"');
-			//cmd += ' ' + this.get('unpause');
-			//child.exec(cmd);
-		//}
-	//});
-
 	function getPlayerName(loc) {
 		return path.basename(loc).replace(path.extname(loc), '');
 	}

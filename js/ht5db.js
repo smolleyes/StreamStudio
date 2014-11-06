@@ -18,7 +18,7 @@ var db;
 
 $(document).ready(function() {
 	
-loadDb(function() {createRootNodes()});
+loadDb();
 
 });
 

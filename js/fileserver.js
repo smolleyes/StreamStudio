@@ -33,7 +33,6 @@ function createServer() {
     }
     server = http.createServer(vidStreamer.settings(serverSettings));
     server.listen(8889);
-    createLocalRootNodes();
 }
 
 // start file server
