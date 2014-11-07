@@ -375,7 +375,7 @@ function startVideo(vid_id, title) {
         for (var i = 0; i < elength; i++) {
             var found = false;
             var res = $(childs[i], this).attr('alt');
-            if (res == selected_resolution) {
+            if (res == settings.resolution) {
                 childs[i].click();
                 break;
             } else {

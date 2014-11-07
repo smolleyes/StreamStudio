@@ -443,10 +443,10 @@ function main() {
     // start video by clicking title
     $(document).on('click', '.start_video', function(e) {
         e.preventDefault();
-        $(this).closest('.youtube_item').addClass('highlight well');
         try {
             $('.highlight.well').removeClass('highlight well');
         } catch (err) {}
+        $(this).closest('.youtube_item').addClass('highlight well');
         // save current song/page and search for back btn
         try {
             prev_vid = current_song;
@@ -454,9 +454,42 @@ function main() {
             console.log('no media loaded, can\'t save current song...');
         }
         current_song_page = current_page;
-        var title = $(this)[0].innerText;
+        var title = $(this).attr('alt');
         current_song = $(this).closest('.youtube_item').find('.downloads_container').attr('id');
-        startVideo(current_song, title);
+        var vid = current_song.split('youtube_entry_res_')[1];
+        if ($('#youtube_entry_res_' + vid + ' a.video_link').length === 0) {
+			$(this).closest('.youtube_item').find('.spiffy').show();
+			youtube.getVideoInfos('http://youtube.com/watch?v='+vid,1,1, function(datas){
+				$('.spiffy').hide();
+				var infos = datas[25];
+				var resolutions_string = ['1080p', '720p', '480p', '360p'];
+				var resolutions = infos.resolutions;
+				for (var i = 0; i < resolutions_string.length; i++) {
+					try {
+						var resolution = resolutions_string[i];
+						var vlink = resolutions[resolution]['link'];
+						if (vlink === 'null') {
+							continue;
+						}
+						var container = resolutions[resolution]['container'];
+					} catch (err) {
+						continue;
+					}
+					var img = '';
+					if (resolution == "720p" || resolution == "1080p") {
+						img = 'images/hd.png';
+					} else {
+						img = 'images/sd.png';
+					}
+					// append links
+					$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink + '" alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
+					
+				}
+				startVideo(current_song);
+			})
+		} else {
+			startVideo(current_song);
+		}
     });
     
     // load video signal and callback
@@ -472,7 +505,7 @@ function main() {
         current_song = $(this).parent().closest('.youtube_item').find('.downloads_container').attr('id');
         var video = {};
         video.link = $(this).attr('href');
-        video.title = $(this).parent().closest('.youtube_item').find('b')[0].innerText;
+        video.title = $(this).parent().closest('.youtube_item').find('.start_video').attr('alt');
         video.next = next_vid;
         $('video').trigger('loadPlayer', video);
         $(this).closest('.youtube_item').addClass('highlight well');
@@ -991,11 +1024,9 @@ function main() {
     
     var observer = new MutationObserver(function(mutations) {
       if(!spinnerPlay) {
-		console.log("starting animation")
 		startAnimation();
 		spinnerPlay = true;
 	  } else {
-		console.log("stoping animation")
 		stopAnimation();  
 		spinnerPlay = false;
 	  }
@@ -1024,7 +1055,6 @@ function main() {
 		startAnimation();
 	});
 	$("#loading").on('hide',function(){
-		console.log('stopAnimation')
 		stopAnimation();
 	});
 
@@ -1150,6 +1180,7 @@ function startSearch(query) {
             if (searchTypes_select === 'videos') {
                 youtube.searchVideos(query, current_page, searchFilters, search_order, function(datas) {
                     getVideosDetails(datas, 'youtube', false);
+                    //printVideoInfos(datas,false,false,null,'youtube')
                 });
             } else if (searchTypes_select === 'playlists') {
                 youtube.searchPlaylists(query, current_page, function(datas) {

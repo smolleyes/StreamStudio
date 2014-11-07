@@ -62,7 +62,7 @@ function searchRelated(vid, page, engine) {
 function getVideosDetails(datas, engine, sublist, vid) {
     switch (engine) {
         case 'youtube':
-            var items = datas.items;
+            var items = datas.items.reverse();
             var totalResults = datas.totalItems;
             var pages = totalResults / 10;
             var startPage = 1;
@@ -71,7 +71,7 @@ function getVideosDetails(datas, engine, sublist, vid) {
             var itemsByPage = 25;
             break;
         case 'dailymotion':
-            var items = datas.list;
+            var items = datas.list.reverse();
             var totalResults = datas.total;
             var pages = totalResults / 10;
             var startPage = 1;
@@ -182,9 +182,12 @@ function getVideosDetails(datas, engine, sublist, vid) {
             break;
         case 'youtube':
             for (var i = 0; i < items.length; i++) {
-                youtube.getVideoInfos('http://www.youtube.com/watch?v=' + items[i].id, i, items.length, function(datas) {
-                    fillPlaylist(datas, sublist, vid, 'youtube')
-                });
+				var list = [];
+				list.push(items[i])
+                fillPlaylist(list, sublist, vid, 'youtube')
+                //youtube.getVideoInfos('http://www.youtube.com/watch?v=' + items[i].id, i, items.length, function(datas) {
+                    //fillPlaylist(datas, sublist, vid, 'youtube')
+                //});
             }
             break;
     }
@@ -194,12 +197,12 @@ function getPlaylistInfos(datas, engine) {
     sublist = false;
     switch (engine) {
         case 'youtube':
-            var items = datas.items;
+            var items = datas.items.reverse();
             var totalResults = datas.totalItems;
             var itemsByPage = 25;
             break;
         case 'dailymotion':
-            var items = datas.list;
+            var items = datas.list.reverse();
             var totalResults = datas.total;
             var itemsByPage = 25;
             break;
@@ -234,6 +237,8 @@ function getPlaylistInfos(datas, engine) {
         $('#search_results').html(_("<p><strong>No playlist</strong> found...</p>"));
         $('#search').show();
         $('#loading').hide();
+        $("#pagination").hide();
+        return;
     }
     $('#items_container').show();
     $('#pagination').show();
@@ -465,7 +470,7 @@ function fillPlaylistFromChannel(datas, engine) {
 
 function fillPlaylistFromPlaylist(datas, length, pid, engine) {
     var sublist = false;
-    if (search_engine === 'dailymotion') {
+    if (engine === 'dailymotion') {
         var items = datas.list;
         for (var i = 0; i < items.length; i++) {
             dailymotion.getVideoInfos(items[i].id, i, items.length, function(datas) {
@@ -492,9 +497,9 @@ function fillPlaylistFromPlaylist(datas, length, pid, engine) {
         }
         try {
             for (var i = 0; i < items.length; i++) {
-                youtube.getVideoInfos('http://www.youtube.com/watch?v=' + items[i].video.id, i, items.length, function(datas) {
-                    fillPlaylist(datas, false, '', 'youtube');
-                });
+                var list = [];
+				list.push(items[i].video)
+                fillPlaylist(list, false, '', 'youtube')
             }
         } catch (err) {
             if (sublist === false) {
@@ -518,13 +523,19 @@ function fillPlaylistFromPlaylist(datas, length, pid, engine) {
 function fillPlaylist(items, sublist, sublist_id, engine) {
 	$('#subList').empty();
     for (var i = 0; i < items.length; i++) {
-        if (items.length === 1) {
-            printVideoInfos(items[i], true, sublist, sublist_id, engine);
-            var pos = $('#items_container .youtube_item').first().position()['top'];
-            $(window).scrollTop(pos - 65);
-        } else {
-            printVideoInfos(items[i], false, sublist, sublist_id, engine);
-        }
+		if(engine === 'youtube') {
+			if (items.length === 1) {
+				printYtVideoInfos(items[i], true, sublist, sublist_id, engine);
+			} else {
+				printYtVideoInfos(items[i], false, sublist, sublist_id, engine);
+			}
+		} else {
+			if (items.length === 1) {
+				printVideoInfos(items[i], true, sublist, sublist_id, engine);
+			} else {
+				printVideoInfos(items[i], false, sublist, sublist_id, engine);
+			}
+		}
     }
     $('#items_container').show();
     $('#search').show();
@@ -566,12 +577,12 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
 			text = title;
 		}
         if (solo === true) {
-            $('#items_container').prepend('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
+            $('#items_container').prepend('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
         } else {
             if (sublist === false) {
-                $('#items_container').append('<div class="youtube_item" ><img class="video_thumbnail" src="' + thumb + '" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
+                $('#items_container').append('<div class="youtube_item" ><img class="video_thumbnail" src="' + thumb + '" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
             } else {
-                $('#subList').append('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><div class="item_infos"><span class="video_length">' + seconds + '</span><div><p><a class="start_video"><b>' + text + '</b></a></p><div><span><b>' + _("Posted by:") + '</b> ' + author + ' </span><span><b>' + _("Views:") + ' </b> ' + views + '</span></div></div><div id="youtube_entry_res_sub_' + vid + '" class="downloads_container"></div></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div>').show();
+                $('#subList').append('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><div class="item_infos"><span class="video_length">' + seconds + '</span><div><p><a class="start_video" alt="'+title+'"><b>' + text + '</b></a></p><div><span><b>' + _("Posted by:") + '</b> ' + author + ' </span><span><b>' + _("Views:") + ' </b> ' + views + '</span></div></div><div id="youtube_entry_res_sub_' + vid + '" class="downloads_container"></div></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div>').show();
             }
         }
         var resolutions_string = ['1080p', '720p', '480p', '360p'];
@@ -616,6 +627,47 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
         }
 
     } catch (err) {
-        //console.log('printVideoInfos err: '+err);
+        console.log('printVideoInfos err: '+err);
+    }
+}
+
+
+function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
+    try {
+        var title = infos.title.replace(/[\"\[\]\.\)\(\''\*]/g, '').replace(/  /g, ' ');
+        var thumb = infos.thumbnail['sqDefault'];
+        var vid = infos.id;
+        var seconds = secondstotime(infos.duration);
+        var views = infos.viewCount;
+        var author = infos.uploader;
+        if (author === 'unknown') {
+            author = _("unknown");
+        }
+        var page = 1;
+        var text = '' 
+        if(title.length > 45){
+			text = title.substring(0,45)+'...';
+		} else {
+			text = title;
+		}
+        if (solo === true) {
+            $('#items_container').prepend('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><img src="images/spiffygif_30x30.gif" class="spiffy" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video" id="'+vid+'" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
+        } else {
+            $('#items_container').append('<div class="youtube_item" ><img class="video_thumbnail" src="' + thumb + '" /><img src="images/spiffygif_30x30.gif" class="spiffy" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video" id="'+vid+'" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
+        }
+        
+        if (search_engine === 'youtube') {
+            var slink = "http://www.youtube.com/watch?v=" + vid;
+        } else if (search_engine === 'dailymotion') {
+            var slink = "http://www.dailymotion.com/video/" + vid;
+        }
+        if (sublist === false) {
+            $('#youtube_entry_res_' + vid).append('<a class="open_in_browser" title="' + _("Open in ") + engine + '" href="' + slink + '"><img style="margin-top:10px;" src="images/export.png" />');
+        } else {
+            $('#youtube_entry_res_sub_' + vid).append('<a class="open_in_browser" title="' + _("Open in ") + engine + '" href="' + slink + '"><img style="margin-top:10px;" src="images/export.png" />');
+        }
+
+    } catch (err) {
+        console.log('printVideoInfos err: '+err);
     }
 }
