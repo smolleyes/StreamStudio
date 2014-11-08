@@ -1,4 +1,4 @@
-var VERSION = "1.9";
+var VERSION = "1.9.1";
 
 var path = require('path');
 var fs = require('fs');
@@ -70,6 +70,7 @@ var pagination_init = false;
 var activeTab = 1;
 var confDir;
 var extPlayerRunning = false;
+var cPreloaderTimeout = false;
 var spinnerPlay = false;
 //local web db
 var wdb;

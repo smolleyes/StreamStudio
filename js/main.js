@@ -324,7 +324,6 @@ try {
 
 
 $(document).ready(function() {
-	new imageLoader(cImageSrc, 'startAnimation()');
     $('#main').append(htmlStr).hide();
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
     $('#loadingApp').show();
@@ -355,7 +354,6 @@ function main() {
     $("#navBar").show();
     $(".myBrand").show();
 	$("#settingsContainer").show();
-	new imageLoader(cImageSrc, 'startAnimation()');
     
     // load and hide catgories
     getCategories();
@@ -1023,7 +1021,7 @@ function main() {
 	});
     
     var observer = new MutationObserver(function(mutations) {
-      if(!spinnerPlay) {
+      if(spinnerPlay === false) {
 		startAnimation();
 		spinnerPlay = true;
 	  } else {
@@ -1033,7 +1031,7 @@ function main() {
     });
     var target = document.querySelector('#loading');
     observer.observe(target, { attributes: true });
-    
+	stopAnimation();
     
 	if(settings.init) {
 		checkUpdates();
@@ -1050,13 +1048,6 @@ function main() {
 			$("#navBar").css('margin-left','-'+wid+'px')
 		}
 	})
-	
-	$("#loading").on('show',function(){
-		startAnimation();
-	});
-	$("#loading").on('hide',function(){
-		stopAnimation();
-	});
 
 	$('button[aria-label="playlist"]').attr('title','play and stop');
 	

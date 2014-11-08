@@ -389,10 +389,9 @@ video{
 }
 
 #search {
-    position: fixed;
     z-index: 500;
     overflow:auto;
-    height:85px;
+    height:50px;
 }
 
 #search p {
@@ -691,7 +690,7 @@ video{
 
 #nanoContent {
     position: relative;
-    top:85px !important;
+    top:50px !important;
 }
 #nanoContent a{
     cursor:pointer;
