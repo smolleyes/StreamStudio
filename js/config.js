@@ -14,6 +14,19 @@
 //~ along with this program; if not, write to the Free Software
 //~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+$(document).on('ready',function(){
+	$(document).on('change', '.pluginCheckBox', function(e) {
+        console.log(this.name+' '+this.value+' '+this.checked);
+        if(this.checked) {
+			settings.plugins.push(this.name);
+			saveSettings();
+		} else {
+			settings.plugins.pop(settings.plugins.indexOf(this.name));
+			saveSettings();
+		}
+    });
+});
+
 function loadConfig() {
     $('#config_title').empty().append(_("StreamStudio configuration:"));
     // start flags
@@ -25,14 +38,14 @@ function loadConfig() {
       locale_changed = true;
       settings.locale_changed = true;
       setLocale();
-      saveSettings(settings);
+      saveSettings();
 		});
     });
-    $('#valid_config').click(function(e) {
+    $(document).on('click','#valid_config',function(e) {
 		e.preventDefault();
-      settings.init=true;
-      saveSettings();
-      saveConf();
+		settings.init=true;
+		saveSettings();
+		saveConf();
     });
     //resolutions select
     var selected_resolution = settings.resolution;
@@ -188,6 +201,7 @@ function removeSharedDir() {
 	if (index>=0) settings.shared_dirs.splice(index, 1);
 	$("select#shared_dir_select option:selected").remove();
 	saveSettings();
+	createLocalRootNodes();
 }
 
 function addDir(dir) {
@@ -203,6 +217,7 @@ function addDir(dir) {
 	settings.shared_dirs.push(selected_dir);
 	$('#shared_dir_select').append('<option value="">'+selected_dir+'</option>');
 	saveSettings();
+	createLocalRootNodes();
 }
 
 function loadConf(confDir) {
@@ -264,22 +279,22 @@ function saveConf() {
 		settings.locale_changed = false;
 		settings.locale=locale;
 	}
-  //plugins
-  var list = $('.pluginCheckBox');
-  settings.plugins = [];
-  $.each(list,function(index,plugin){
-      var name = $(this).attr('name');
-      if ($('input[name="'+name+'"]').is(':checked') === true) {
-        settings.plugins.push(name);
-      }
-      //reload plugins if needed
-      if (index+1 === list.length) {
-          if(settings.plugins_changed === true) {
-              saveSettings();
-              reloadPlugins();
-          }
-      }
-  });
+  ////plugins
+  //var list = $('.pluginCheckBox');
+  //settings.plugins = [];
+  //$.each(list,function(index,plugin){
+      //var name = $(this).attr('name');
+      //if ($('input[name="'+name+'"]').is(':checked') === true) {
+        //settings.plugins.push(name);
+      //}
+      ////reload plugins if needed
+      //if (index+1 === list.length) {
+          //if(settings.plugins_changed === true) {
+              //saveSettings();
+              //reloadPlugins();
+          //}
+      //}
+  //});
   
 	if (settings.shares_changed === true) {
 		settings.shares_changed = false;
@@ -288,23 +303,13 @@ function saveConf() {
 		settings.scan_dirs = false;
 	}
     
-	if (locale_changed || shares_changed || settings.scan_dirs) {
-		$('#settings').empty().slideToggle();
-		saveSettings();
-		//Restart node-webkit app
-		var child_process = require("child_process");
-
-		//Start new app
-		var child = child_process.spawn(process.execPath, [], {detached: true});
-
-		//Don't wait for it
-		child.unref();
-
-		//Quit current
-		gui.Window.get(0).hide(); // hide window to prevent black display
-		gui.App.quit();  // quit node-webkit app
+	if (locale_changed) {
+		$('#settings').slideToggle();
+		alert(_('Please restart StreamStudio to apply your settings !'));
+		$('#homeToggle').click();
 	} else {
 		$('#homeToggle').click();
+		reloadPlugins();
 	}
 	console.log("ht5config config updated successfully!");
 }

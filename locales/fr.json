@@ -157,5 +157,6 @@
 	"Player": "Lecteur",
 	"Loading...": "Chargement...",
 	"Use your mouse right click on Youtube or Dailymotion video's titles to bookmark them in this library.": "Utilisez le bouton droit de votre souris sur le titre des vidéos Youtube ou dailymotion pour les enregistrer dans cette librairie.",
-	"play and stop mode (click to change)": "Mode de lecture normal (cliquez pour changer)"
+	"play and stop mode (click to change)": "Mode de lecture normal (cliquez pour changer)",
+	"Please restart StreamStudio to apply your settings !": "Merci de redémarrer StreamStudio pour appliquer vos paramètres !"
 }

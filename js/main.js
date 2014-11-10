@@ -902,8 +902,7 @@ function main() {
     });
     //settings
     $('#config_btn').click(function() {
-        $('#settingsToggle')[0].click();
-        loadConfig();
+        $('#settingsToggle').click();
     });
     
     $('#playerToggle').click(function() {
@@ -1042,13 +1041,13 @@ function main() {
     var target = document.querySelector('#loading');
     observer.observe(target, { attributes: true });
 	stopAnimation();
+    loadConfig();
     
 	if(settings.init) {
 		checkUpdates();
 		checkFreebox();
 	} else {
 		$("#settingsToggle").click();
-		loadConfig();
 	}
 	var w = 0;
 	$.each($("#tab a"),function(index,size) { 

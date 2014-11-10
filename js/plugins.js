@@ -100,6 +100,7 @@ function reloadPlugins() {
     console.log('Reloading plugins');
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
     $('#engines_select').empty();
+    updatePickers();
     $('#engines_select').append('<option value="youtube">Youtube</option>');
     $('#engines_select').append('<option value="dailymotion">Dailymotion</option>');
     var currentEngine = search_engine;
@@ -114,21 +115,18 @@ function reloadPlugins() {
                 if (name == 'main.js') {
                     try {
                         var eng = require(pluginsDir + file);
-                        if (in_array(eng.engine_name.toLowerCase(), excludedPlugins)) {
+                        if (excludedPlugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
                             return true;
                         }
-                        if ((in_array(eng.engine_name.toLowerCase(), pluginsList) === false) || (in_array(eng.engine_name.toLowerCase(), settings.plugins))) {
+                        if (pluginsList.indexOf(eng.engine_name.toLowerCase()) == -1 || settings.plugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
                             engines[eng.engine_name] = eng;
                             // add entry to main gui menu
                             $('#engines_select').append('<option value="' + eng.engine_name + '">' + eng.engine_name + '</option>');
+                            updatePickers()
                         }
                     } catch (err) {
                         console.log("can't load plugin " + file + ", error:" + err)
                     }
-                }
-                if (index + 1 === files.length) {
-                    engine = currentEngine;
-                    $("#engines_select option[value='" + currentEngine + "']").attr('selected', 'selected');
                 }
             });
         } catch (err) {}
