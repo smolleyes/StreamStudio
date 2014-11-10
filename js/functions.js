@@ -424,8 +424,17 @@ var wipeTmpFolder = function() {
 }
 
 function stopTorrent(res) {
-  torrentPlaying = false;
+  try {
+	torrentPlaying = false;
+    initPlayer();
+  clearTimeout(statsUpdater);
+  videoStreamer.destroy();
+  videoStreamer = null;
+  streamInfo = {};
+  statsUpdater = null;
+  playStarted = false;
   wipeTmpFolder();
+  } catch(err) { console.log(err)}
   $.each(torrentsArr,function(index,torrent) {
     try {
     clearTimeout(statsUpdater);
@@ -435,7 +444,6 @@ function stopTorrent(res) {
     flix.destroy();
     delete flix;
     videoStreamer = null;
-    initPlayer();
   } catch(err) {
       console.log(err);
   }

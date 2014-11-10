@@ -3,7 +3,7 @@
   position : relative;
   width    : calc(100% - 5px);
   overflow : hidden;
-  height: calc(100% - 150px);
+  height: calc(100% - 170px);
   overflow: hidden;
 }
 .nano > .nano-content {

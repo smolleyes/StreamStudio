@@ -81,7 +81,7 @@ $(document).ready(function() {
 	 });
     
     //playlist buttons
-    $(document).on('click','#playlistBtn',function(e) {
+    $(document).on('click','#playlistBtn,#playlistBtnSub',function(e) {
 		e.preventDefault();
 		console.log('playlist clicked');
 		var pos = $('button[aria-label="playlist"]').css('backgroundPosition-y');
@@ -95,7 +95,7 @@ $(document).ready(function() {
 			//playlistMode = 'shuffle';
 		} else if (pos === '-16px') {
 			$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
-			$('button[aria-label="playlist"]').attr('title',_('play and stop'));
+			$('button[aria-label="playlist"]').attr('title',_('play and stop mode (click to change)'));
 			playlistMode = 'normal';
 		} else if (pos === '-48px') {
 			$('button[aria-label="playlist"]').attr('style', 'background-position-y:0px !important');

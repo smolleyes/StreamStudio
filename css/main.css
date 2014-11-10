@@ -277,6 +277,15 @@ font-weight:bold;
 	color: white;
 }
 
+#playlistBtnSub button {
+	width: 16px;
+	height: 16px;
+	position: relative;
+	left: 50px;
+	top: -5px;
+	border: 0;
+}
+
 #mep_0 {
   overflow:auto;
   color:white ! important;
@@ -831,6 +840,8 @@ video{
 
 #update_img {
 	height:17px;
+	position: relative;
+	top: -5px;
 }
 
 #fileBrowser li {

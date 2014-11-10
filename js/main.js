@@ -129,6 +129,8 @@ var htmlStr = '<div class="row"> \
 			<a href="#" id="subPlayer-pause" style="display:none;"></a> \
 			<a href="#" id="subPlayer-next"></a> \
 		</div> \
+		<div id="playlistBtnSub"> \
+		</div> \
 		<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
 		<div id="subPlayer-title"><p> '+_('Waiting...')+'</p></div> \
   </div> \
@@ -424,6 +426,13 @@ function main() {
 			$('#subPlayer-title').empty().append('<marquee behavior="scroll" scrollamount="2" direction="left">'+currentMedia.title+'</marquee>');
 		}
 	});
+	
+	$("#playlistBtn").bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
+		$("#playlistBtnSub").empty().append($("#playlistBtn").html());
+	});
+	$('button[aria-label="playlist"]').attr('style', 'background-position-y:0px !important');
+	$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
+	$('button[aria-label="playlist"]').attr('title',_('play and stop mode (click to change)'));
     // fullscreen signal and callback
     var left;
     var right;
@@ -1048,8 +1057,6 @@ function main() {
 			$("#navBar").css('margin-left','-'+wid+'px')
 		}
 	})
-
-	$('button[aria-label="playlist"]').attr('title','play and stop');
 	
 	$('.tab-content').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
 		updateScroller();
