@@ -456,53 +456,65 @@ function getUserHome() {
 }
 
 function getAuthTorrent(url,stream,toFbx) {
-	var xhr = new XMLHttpRequest();
-	xhr.onreadystatechange = function(){
-		if (this.readyState == 4 && this.status == 200){
-			var blob = this.response;
-			var arrayBuffer;
-			var fileReader = new FileReader();
-			fileReader.onload = function() {
-				arrayBuffer = this.result;
-				var nodeBuffer = new Buffer(arrayBuffer);
-				if(stream) {
-					getTorrent(nodeBuffer);
-				} else {
-					var id = ((Math.random() * 1e6) | 0);
-					var p = path.join(os.tmpDir(),''+id+'.torrent');
-					fs.writeFile(p, nodeBuffer, function(err) {
-					  if (err) throw err;
-						if(toFbx) {
-							var FormData = require('form-data');
-							var form = new FormData();
-							form.append('download_file',fs.createReadStream(p));
-							form.submit({
-							  host: 'mafreebox.freebox.fr',
-							  path: '/api/v3/downloads/add',
-							  headers: {'Content-Type': 'multipart/form-data;'+form.getBoundary(),
-								        'Content-Length': blob.size,
-								        'X-Requested-With':'XMLHttpRequest',
-										'X-Fbx-App-Auth': session_token
-						      }
-							}, function(err, res) {
-							  if(res.statusCode === 200) {
-								$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Téléchargement ajouté avec succès sur la freebox!"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});  
-							  } else {
-								$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Impossible d'ajouter le téléchargement... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: '',updateDisplay:'none'});
-							  }
-							});
-						} else {
-							gui.Shell.openItem(p);
-						}
-					});
-				}
-			};
-			fileReader.readAsBinaryString(blob);
+	if(url.indexOf('magnet:?xt') !== -1) {
+		if(stream) {
+			getTorrent(url);
+		} else {
+			if(toFbx) {
+				addFreeboxDownload(url);
+			} else {
+				gui.Shell.openItem(url);
+			}
 		}
-	}
-	xhr.open('GET', url);
-	xhr.responseType = 'blob';
-	xhr.send(); 	
+	} else {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(){
+			if (this.readyState == 4 && this.status == 200){
+				var blob = this.response;
+				var arrayBuffer;
+				var fileReader = new FileReader();
+				fileReader.onload = function() {
+					arrayBuffer = this.result;
+					var nodeBuffer = new Buffer(arrayBuffer);
+					if(stream) {
+						getTorrent(nodeBuffer);
+					} else {
+						var id = ((Math.random() * 1e6) | 0);
+						var p = path.join(os.tmpDir(),''+id+'.torrent');
+						fs.writeFile(p, nodeBuffer, function(err) {
+						  if (err) throw err;
+							if(toFbx) {
+								var FormData = require('form-data');
+								var form = new FormData();
+								form.append('download_file',fs.createReadStream(p));
+								form.submit({
+								  host: 'mafreebox.freebox.fr',
+								  path: '/api/v3/downloads/add',
+								  headers: {'Content-Type': 'multipart/form-data;'+form.getBoundary(),
+											'Content-Length': blob.size,
+											'X-Requested-With':'XMLHttpRequest',
+											'X-Fbx-App-Auth': session_token
+								  }
+								}, function(err, res) {
+								  if(res.statusCode === 200) {
+									$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Téléchargement ajouté avec succès sur la freebox!"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});  
+								  } else {
+									$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Impossible d'ajouter le téléchargement... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: '',updateDisplay:'none'});
+								  }
+								});
+							} else {
+								gui.Shell.openItem(p);
+							}
+						});
+					}
+				};
+				fileReader.readAsBinaryString(blob);
+			}
+		}
+		xhr.open('GET', url);
+		xhr.responseType = 'blob';
+		xhr.send();
+	}	
 }
 
 function dirTree(filename) {
