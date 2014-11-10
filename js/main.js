@@ -1049,6 +1049,11 @@ function main() {
 	} else {
 		$("#settingsToggle").click();
 	}
+	if(settings.locale_changed) {
+		settings.locale_changed=false;
+		saveSettings();
+	}
+	
 	var w = 0;
 	$.each($("#tab a"),function(index,size) { 
 		w+=$(this).width();
