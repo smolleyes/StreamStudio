@@ -1,6 +1,6 @@
 {
   "name": "StreamStudio",
-  "main": "index.html",
+  "main": "config.html",
   "user-agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.157 Safari/537.36",
   "window": {
     "toolbar": false,

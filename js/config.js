@@ -26,7 +26,6 @@ function loadConfig() {
       settings.locale_changed = true;
       setLocale();
       saveSettings(settings);
-       loadSettingsPage(false);
 		});
     });
     $('#valid_config').click(function(e) {
@@ -292,7 +291,18 @@ function saveConf() {
 	if (locale_changed || shares_changed || settings.scan_dirs) {
 		$('#settings').empty().slideToggle();
 		saveSettings();
-		location.reload();
+		//Restart node-webkit app
+		var child_process = require("child_process");
+
+		//Start new app
+		var child = child_process.spawn(process.execPath, [], {detached: true});
+
+		//Don't wait for it
+		child.unref();
+
+		//Quit current
+		gui.Window.get(0).hide(); // hide window to prevent black display
+		gui.App.quit();  // quit node-webkit app
 	} else {
 		$('#homeToggle').click();
 	}

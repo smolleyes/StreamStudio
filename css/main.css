@@ -280,9 +280,9 @@ font-weight:bold;
 #playlistBtnSub button {
 	width: 16px;
 	height: 16px;
-	position: relative;
-	left: 50px;
-	top: -5px;
+	position: absolute;
+	left: 182px;
+	top: 64px;
 	border: 0;
 }
 

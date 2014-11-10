@@ -326,21 +326,22 @@ try {
 
 
 $(document).ready(function() {
-    $('#main').append(htmlStr).hide();
+    $('#main').empty().append(htmlStr).hide();
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
     $('#loadingApp').show();
     // load plugins
-    initPlugins();
+	initPlugins();
+	
 });
 
 function main() {
     // update navbar text
-    $('#homeToggle').text(_("Home"));
-    $('#webLibToggle').text(_("Web library"));
-    $('#localFilesToggle').text(_("Local files"));
-    $('#downloads_tab').text(_("Downloads"));
-    $('#upnpToggle').text(_("Upnp"));
-    $('#playerToggle').text(_("Player"));
+    $('#homeToggle').empty().text(_("Home"));
+    $('#webLibToggle').empty().text(_("Web library"));
+    $('#localFilesToggle').empty().text(_("Local files"));
+    $('#downloads_tab').empty().text(_("Downloads"));
+    $('#upnpToggle').empty().text(_("Upnp"));
+    $('#playerToggle').empty().text(_("Player"));
     
     win.on('new-win-policy', function(frame, url, policy){
         policy.forceNewWindow({"position": 'center',

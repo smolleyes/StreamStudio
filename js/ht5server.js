@@ -1,45 +1,35 @@
-var ht5Server;
-var proxyServer;
-
 function startHt5Server() {
-    try {
-        ht5Server.close();
-    } catch (err) {
-        ht5Server = http.createServer(function(req, res) {
-            if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
-               startStreaming(req, res)
-            }
-        }).listen(8888);
-        console.log('Ht5Server ready on port 8888');
-    }
+	ht5Server = http.createServer(function(req, res) {
+		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
+		   startStreaming(req, res)
+		}
+	}).listen(8888);
+	console.log('Ht5Server ready on port 8888');
 }
 
+
 function startProxyServer() {
-	try {
-        proxyServer.close();
-    } catch (err) {
-		proxyServer = http.createServer(function(req, resp) {
-			if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
-				var url = req.url.split('?link=')[1];
-				var jqxhr = $.get(url, function(data) {
-				})
-				.done(function(data) {
-					if(typeof(data) === 'object'){
-						resp.writeHead(200,{'Content-type': 'application/json;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-						resp.end(JSON.stringify(data));
-					} else {
-						resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-						resp.end(data);
-					}
-				})
-				.fail(function(err) {
-					console.log(err)
+	proxyServer = http.createServer(function(req, resp) {
+		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
+			var url = req.url.split('?link=')[1];
+			var jqxhr = $.get(url, function(data) {
+			})
+			.done(function(data) {
+				if(typeof(data) === 'object'){
+					resp.writeHead(200,{'Content-type': 'application/json;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
+					resp.end(JSON.stringify(data));
+				} else {
 					resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-					resp.end(err);
-				});
-			}
-		}).listen(8081);
-	}
+					resp.end(data);
+				}
+			})
+			.fail(function(err) {
+				console.log(err)
+				resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
+				resp.end(err);
+			});
+		}
+	}).listen(8081);
 }
 
 

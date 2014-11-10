@@ -19,9 +19,6 @@ function checkFileServerSettings(vpath) {
 }
 
 function createServer() {
-    try {
-        server.close();
-    } catch (err) {}
     var homeDir = getUserHome();
     serverSettings = {
         "mode": "development",
@@ -31,8 +28,14 @@ function createServer() {
         "rootPath": "",
         "server": "VidStreamer.js/0.1.4"
     }
-    server = http.createServer(vidStreamer.settings(serverSettings));
-    server.listen(8889);
+    try {
+        server.close();
+        server = http.createServer(vidStreamer.settings(serverSettings));
+		server.listen(8889);
+    } catch (err) {
+		server = http.createServer(vidStreamer.settings(serverSettings));
+		server.listen(8889);
+	}
 }
 
 // start file server

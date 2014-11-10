@@ -1,4 +1,4 @@
-var VERSION = "1.9.2";
+var VERSION = "1.9.3";
 
 var path = require('path');
 var fs = require('fs');
@@ -72,11 +72,6 @@ var confDir;
 var extPlayerRunning = false;
 var cPreloaderTimeout = false;
 var spinnerPlay = false;
-//local web db
-var wdb;
-//nw window
-var gui = require('nw.gui');
-var win = gui.Window.get();
 
 //checks
 var tmpFolder = path.join(os.tmpDir(), 'ht5Torrents');

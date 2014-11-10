@@ -61,7 +61,6 @@ function getTorrent(link) {
               title: title
           };
           handleTorrent(torrentInfo, stateModel);
-          torrentPlaying = true;
       }
   });
 }

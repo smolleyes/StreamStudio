@@ -98,6 +98,7 @@ function updatePlugins(url) {
 
 function reloadPlugins() {
     console.log('Reloading plugins');
+    pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
     $('#engines_select').empty();
     $('#engines_select').append('<option value="youtube">Youtube</option>');
     $('#engines_select').append('<option value="dailymotion">Dailymotion</option>');

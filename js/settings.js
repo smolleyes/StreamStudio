@@ -14,6 +14,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+//nw window
+var gui = require('nw.gui');
+var win = gui.Window.get();
  
 // create default settings or load from localstorage
 if (localStorage.StdSettings === undefined) {
