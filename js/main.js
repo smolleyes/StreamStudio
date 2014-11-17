@@ -357,6 +357,16 @@ function main() {
     $("#navBar").show();
     $(".myBrand").show();
 	$("#settingsContainer").show();
+	
+	// update youtube-dl
+	try {
+		var cmd = spawn(exec_path+'/node_modules/youtube-dl/bin/youtube-dl',['-U']); 
+		cmd.stdout.on('data', function (data) {
+		  console.log('stdout: ' + data);
+		});
+	} catch(err) {
+		console.log("can't update youtube-dl " + err)
+	}
     
     // load and hide catgories
     getCategories();

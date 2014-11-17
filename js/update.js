@@ -116,7 +116,7 @@ function downloadUpdate(link,filename) {
 			$.notif({title: 'StreamStudio:',cls:'green',timeout:10000,icon: '&#10003;',content:_("Click ok to launch the update installer"),btnId:'startWinUpdate',btnTitle:'Ok',btnColor:'black',btnDisplay: 'block',updateDisplay:'none'});
 			updatePath = tmpPath.replace(/\\/g,"\\\\")+'\\\\streamstudio-setup.exe';
  	    } else if (process.platform === 'darwin') {
-			var dest = path.dirname(execDir.match(/(.*)StreamStudio.app(.*?)/)[0]);
+			var dest = path.dirname(execDir.match(/(.*)streamstudio.app(.*?)/)[0]);
 			var args = ['-o',filename,'-d',dest];
 			var ls = spawn('stat', ['-c','%U', execDir]);
 			ls.stdout.on('data', function (data) {
