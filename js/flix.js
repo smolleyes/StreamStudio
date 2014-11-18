@@ -226,6 +226,7 @@ function handleTorrent(torrent, stateModel) {
   };
 
   videoStreamer.server.on('listening', function(){
+	  torrentPlaying = true;
       streamInfo.src = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/';
       streamInfo.type = 'video/mp4';
       var item = {};

@@ -62,6 +62,11 @@ top: 2px !important;
 	margin-right: 200px;
 }
 
+#bigcover {
+	float: left;
+	margin-right: 10px;
+}
+
 #settingsContainer {
 	float:right;
 	position: relative;

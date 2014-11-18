@@ -425,16 +425,15 @@ var wipeTmpFolder = function() {
 
 function stopTorrent(res) {
   try {
-	torrentPlaying = false;
-    initPlayer();
+	 torrentPlaying = false;
+	videoStreamer.destroy();
   clearTimeout(statsUpdater);
-  videoStreamer.destroy();
   videoStreamer = null;
   streamInfo = {};
   statsUpdater = null;
   playStarted = false;
   wipeTmpFolder();
-  } catch(err) { console.log(err)}
+  } catch(err) { console.log(err); torrentPlaying = false;}
   $.each(torrentsArr,function(index,torrent) {
     try {
     clearTimeout(statsUpdater);

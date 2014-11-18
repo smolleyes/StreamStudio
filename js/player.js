@@ -203,7 +203,9 @@ function initPlayer() {
 }
 
 function startPlay(media) {
-    initPlayer();
+	if(torrentPlaying === false) {
+		initPlayer();
+	}
     
     if(extPlayerRunning) {
 		try {
