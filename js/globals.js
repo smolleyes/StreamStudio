@@ -1,4 +1,4 @@
-var VERSION = "1.9.6";
+var VERSION = "1.9.7";
 
 var path = require('path');
 var fs = require('fs');
@@ -72,6 +72,10 @@ var confDir;
 var extPlayerRunning = false;
 var cPreloaderTimeout = false;
 var spinnerPlay = false;
+var itemTitle = '';
+
+//storedb
+var sdb = storedb('std');
 
 //checks
 var tmpFolder = path.join(os.tmpDir(), 'ht5Torrents');

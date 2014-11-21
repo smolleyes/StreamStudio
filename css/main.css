@@ -73,6 +73,26 @@ top: 2px !important;
 	top:5px;
 }
 
+.viewedItem {
+	display: block;
+	width: 100px;
+	height: 25px;
+	position: absolute;
+	z-index: 10001;
+	background: black;
+	top: 100px;
+	color: white;
+	padding: 5px 0;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.viewedItem i {
+	top:2px !important;
+	left:2px !important;
+	margin-right:5px;
+}
+
 button {
 	outline: none !important;
 }

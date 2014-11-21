@@ -1,3 +1,7 @@
+V 1.9.7
+  * add already watched database on torrent files
+  * fix youtube channels browsing
+ 
 V 1.9.6
   * fix cpasbien/kickass/omgtorrent
   * fix torrent stop function

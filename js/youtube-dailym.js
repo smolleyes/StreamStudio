@@ -441,9 +441,9 @@ function fillPlaylistFromChannel(datas, engine) {
         try {
             for (var i = 0; i < items.length; i++) {
                 if (search_engine === 'youtube') {
-                    youtube.getVideoInfos('http://www.youtube.com/watch?v=' + items[i].id, i, items.length, function(datas) {
-                        fillPlaylist(datas, false, '', 'youtube');
-                    });
+                    var list = [];
+                    list.push(items[i])
+                    fillPlaylist(list, false, items[i].id, 'youtube')
                 }
             }
             if ((sublist === false) && (pagination_init === false)) {

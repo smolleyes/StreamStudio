@@ -418,6 +418,12 @@ function main() {
         current_prev_start_index = 1;
         startSearch(query);
     });
+    // store title of selected item
+    $(document).on('click','.item-title',function(e) {
+    	e.preventDefault();
+        itemTitle = $(this).text();
+    });
+
     // open in browser
     $(document).on('click', '.open_in_browser', function(e) {
         e.preventDefault();

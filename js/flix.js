@@ -137,6 +137,14 @@ app.updateStats = function(streamInfo) {
 			  stream.link = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/&torrent';
 			  stream.next = '';
 			  stream.title = streamInfo.server.index.name;
+        console.log(currentMedia)
+        sdb.insert({"title":itemTitle},function(err,result){
+          if(!err){
+            console.log('std database updated succssfully!');
+          } else {
+            console.log(err);
+          }
+        })
 			  //clearTimeout(statsUpdater);
 			  startPlay(stream);
 			  playStarted = true;
