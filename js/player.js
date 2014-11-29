@@ -115,6 +115,10 @@ $(document).ready(function() {
         on_media_finished();
     });
     
+    player.media.addEventListener('loadeddata', function() {
+        $('.mejs-overlay,.mejs-overlay-loading').hide();
+    }, false);
+    
     player.media.addEventListener('pause', function() {
 		$('#subPlayer-play').show();
 		$('#subPlayer-pause').hide();
@@ -123,6 +127,7 @@ $(document).ready(function() {
     player.media.addEventListener('play', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
+		$('.mejs-overlay,.mejs-overlay-loading').hide();
     });
     
 	//SubPlayer controls
@@ -206,7 +211,6 @@ function startPlay(media) {
 	if(torrentPlaying === false) {
 		initPlayer();
 	}
-    
     if(extPlayerRunning) {
 		try {
 			extPlayerProc.kill('SIGKILL');
@@ -238,7 +242,8 @@ function startPlay(media) {
         
         // set title
         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(title));
-			
+		$('.mejs-overlay, .mejs-overlay-loading').show();
+		$('.mejs-overlay-play').hide();
         // check type of link to play
 		var linkType = link.split('&').pop();
 		

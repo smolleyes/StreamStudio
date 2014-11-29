@@ -1,4 +1,4 @@
-var VERSION = "1.9.7";
+var VERSION = "1.9.8";
 
 var path = require('path');
 var fs = require('fs');
@@ -73,6 +73,7 @@ var extPlayerRunning = false;
 var cPreloaderTimeout = false;
 var spinnerPlay = false;
 var itemTitle = '';
+var scrollObserver;
 
 //storedb
 var sdb = storedb('std');

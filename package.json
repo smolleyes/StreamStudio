@@ -8,5 +8,6 @@
     "title": "StreamStudio",
     "show": false
   },
-  "chromium-args": "--ignore-gpu-blacklist"
+  "chromium-args": "--ignore-gpu-blacklist",
+  "js-flags": "--harmony --harmony-generators"
 }

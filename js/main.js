@@ -1089,7 +1089,31 @@ function main() {
 }
 
 function updateScroller() {
-	$(".nano").nanoScroller();
+	try {
+		if(engine.engine_name == "T411"){
+			$(".nano").nanoScroller();
+			try {
+				scrollObserver.disconnect();
+			} catch(err) {}
+			scrollObserver = new MutationObserver(function(mutations) {
+				mutations.forEach(function(mutation) {
+					var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
+					if(($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && $("#t411_cont li").length == engine.lazyStart) || !$('.nano-slider').is(':visible') && $("#t411_cont li").length == engine.lazyStart){
+						if(engine.lazyStart !== engine.lazyLength) {
+							engine.loadMore();
+						}
+					}
+				});    
+			});
+
+			var target = document.querySelector('.nano-slider');
+			scrollObserver.observe(target, { attributes : true, attributeFilter : ['style'] });
+		} else {
+			$(".nano").nanoScroller();
+		}
+	} catch(err) {
+		$(".nano").nanoScroller();
+	}
 }
 
 function updatePickers() {

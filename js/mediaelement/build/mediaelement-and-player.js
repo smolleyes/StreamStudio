@@ -3188,7 +3188,6 @@ if (typeof jQuery != 'undefined') {
 	// progress/loaded bar
 	$.extend(MediaElementPlayer.prototype, {
 		buildprogress: function(player, controls, layers, media) {
-
 			$('<div class="mejs-time-rail">'+
 				'<span class="mejs-time-total">'+
 					'<span class="mejs-time-buffering"></span>'+
@@ -3205,8 +3204,12 @@ if (typeof jQuery != 'undefined') {
 				controls.find('.mejs-time-buffering').hide();
 
 			var 
-				t = this,
-				total = controls.find('.mejs-time-total'),
+				t = this;
+				if(t.media.duration == Infinity) {
+					t.media.duration = mediaDuration;
+					t.options.duration = mediaDuration;
+				}
+				var total = controls.find('.mejs-time-total'),
 				loaded  = controls.find('.mejs-time-loaded'),
 				current  = controls.find('.mejs-time-current'),
 				handle  = controls.find('.mejs-time-handle'),
@@ -3221,8 +3224,7 @@ if (typeof jQuery != 'undefined') {
 						newTime = 0,
 						pos = 0;
 
-
-					if (media.duration) {
+					if (media.duration && media.duration !== Infinity) {
 						if (x < offset.left) {
 							x = offset.left;
 						} else if (x > width + offset.left) {
@@ -3235,6 +3237,42 @@ if (typeof jQuery != 'undefined') {
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
 							media.setCurrentTime(newTime);
+						}
+
+						// position floating time box
+						if (!mejs.MediaFeatures.hasTouch) {
+								timefloat.css('left', pos);
+								timefloatcurrent.html( mejs.Utility.secondsToTimeCode(newTime) );
+								timefloat.show();
+						}
+					} else {
+						if (x < offset.left) {
+							x = offset.left;
+						} else if (x > width + offset.left) {
+							x = width + offset.left;
+						}
+						pos = x - offset.left;
+						percentage = (pos / width);
+						newTime = (percentage <= 0.02) ? 0 : percentage * mediaDuration;
+						
+						// seek to where the mouse is
+						if (mouseIsDown && newTime !== media.currentTime) {
+							media.setCurrentTime(newTime);
+							var m = {};
+							var l = currentMedia.link.replace(/&start=(.*)/,'')
+							$('.mejs-overlay,.mejs-overlay-loading').show();
+							if(playFromFile) {
+								m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+							} else if(playFromHttp) {
+								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
+							} else if (torrentPlaying) {
+								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
+							} else if (playFromUpnp) {
+								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+							}
+							m.title = currentMedia.title;
+							console.log(m)
+							startPlay(m);
 						}
 
 						// position floating time box
@@ -3304,8 +3342,12 @@ if (typeof jQuery != 'undefined') {
 		},
 		setProgressRail: function(e) {
 			var
-				t = this,
-				target = (e != undefined) ? e.target : t.media,
+				t = this;
+				if(t.media.duration == Infinity) {
+					t.media.duration = mediaDuration;
+					t.options.duration = mediaDuration;
+				}
+				var target = (e != undefined) ? e.target : t.media,
 				percent = null;			
 
 			// newest HTML5 spec has buffered array (FF4, Webkit)
@@ -3337,17 +3379,30 @@ if (typeof jQuery != 'undefined') {
 		setCurrentRail: function() {
 
 			var t = this;
-		
-			if (t.media.currentTime != undefined && t.media.duration) {
+		    if(t.media.duration == Infinity) {
+				if (t.media.currentTime != undefined && mediaDuration) {
+					// update bar and handle
+					if (t.total && t.handle) {
+						var 
+							newWidth = Math.round(t.total.width() * t.media.currentTime / mediaDuration),
+							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
 
-				// update bar and handle
-				if (t.total && t.handle) {
-					var 
-						newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
-						handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
+						t.current.width(newWidth);
+						t.handle.css('left', handlePos);
+					}
+				}
+			} else {
+				if (t.media.currentTime != undefined && t.media.duration) {
 
-					t.current.width(newWidth);
-					t.handle.css('left', handlePos);
+					// update bar and handle
+					if (t.total && t.handle) {
+						var 
+							newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
+							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
+
+						t.current.width(newWidth);
+						t.handle.css('left', handlePos);
+					}
 				}
 			}
 
@@ -3368,7 +3423,10 @@ if (typeof jQuery != 'undefined') {
 	$.extend(MediaElementPlayer.prototype, {
 		buildcurrent: function(player, controls, layers, media) {
 			var t = this;
-			
+			if(t.media.duration == Infinity) {
+				t.media.duration = mediaDuration;
+				t.options.duration = mediaDuration;
+			}
 			$('<div class="mejs-time">'+
 					'<span class="mejs-currenttime">' + (player.options.alwaysShowHours ? '00:' : '')
 					+ (player.options.showTimecodeFrameCount? '00:00':'00:00')+ '</span>'+
@@ -3385,7 +3443,10 @@ if (typeof jQuery != 'undefined') {
 
 		buildduration: function(player, controls, layers, media) {
 			var t = this;
-			
+			if(t.media.duration == Infinity) {
+				t.media.duration = mediaDuration;
+				t.options.duration = mediaDuration;
+			}
 			if (controls.children().last().find('.mejs-currenttime').length > 0) {
 				$(t.options.timeAndDurationSeparator +
 					'<span class="mejs-duration">' + 
@@ -3419,7 +3480,10 @@ if (typeof jQuery != 'undefined') {
 		
 		updateCurrent:  function() {
 			var t = this;
-
+			if(t.media.duration == Infinity) {
+				t.media.duration = mediaDuration;
+				t.options.duration = mediaDuration;
+			}
 			if (t.currenttime) {
 				t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 			}
@@ -3427,6 +3491,10 @@ if (typeof jQuery != 'undefined') {
 		
 		updateDuration: function() {
 			var t = this;
+			if(t.media.duration == Infinity) {
+				t.media.duration = mediaDuration;
+				t.options.duration = mediaDuration;
+			}
 			//Toggle the long video class if the video is longer than an hour.
 			t.container.toggleClass("mejs-long-video", t.media.duration > 3600);
 			if (t.durationD && (t.options.duration > 0 || t.media.duration)) {
