@@ -9,6 +9,7 @@ var mime = require('mime');
 var path = require('path');
 var mime = require('mime');
 var ___ = require('underscore');
+var totalBuffered = 0;
 
 var statsUpdater = null;
 var active = function(wire) {
@@ -162,6 +163,8 @@ app.updateStats = function(streamInfo) {
 				statsUpdater = null
 			 } else {
 				var t = _('(%s%% downloaded)',downloadedPct);
+				totalBuffered = swarm.downloaded;
+				totalBytes = streamInfo.server.index.length;
 				if(upnpToggleOn) {
 					$('.mejs-time-loaded').width(downloadedPct+'%')
 				}

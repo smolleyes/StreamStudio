@@ -424,6 +424,22 @@ var wipeTmpFolder = function() {
 }
 
 function stopTorrent(res) {
+setTimeout(function() {
+	player.currentTime = 0;
+	player.current[0].style.width = 0;
+	player.loaded[0].style.width = 0;
+	player.durationD.html('00:00:00');
+	$('.mejs-time-loaded').width(0+'%');
+	$('.mejs-time-buffering').width(0+'%');
+	$('.mejs-time-current').width(0+'%');
+	$('.mejs-currenttime').text('00:00:00');
+	$('.mejs-duration').text('00:00:00');
+	$("#preloadTorrent").remove();
+	$(".mejs-overlay").show();
+	$(".mejs-layer").show();
+	$(".mejs-overlay-loading").hide();
+	$(".mejs-overlay-button").show();
+},100);
   try {
 	 torrentPlaying = false;
 	videoStreamer.destroy();

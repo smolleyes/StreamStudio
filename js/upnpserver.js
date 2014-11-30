@@ -1,4 +1,5 @@
 var mediaServer;
+playFromUpnp = false;
 
 function browseUpnpDir(serverId, indexId, parentId) {
     console.log('loading file for server index ' + serverId + " at index " + indexId)
@@ -440,6 +441,7 @@ function stopUpnp() {
 			console.log('upnp finished playing...')
 			continueTransition = false;
 			upnpMediaPlaying = false;
+			playFromUpnp = false;
 			on_media_finished();
 		}
 		try {
@@ -447,17 +449,22 @@ function stopUpnp() {
 			   stopTorrent();
 			}
 		} catch (err) {}
-		$('.mejs-time-buffering').width(0+'%');
-		$('.mejs-time-loaded').width(0+'%');
-		$('.mejs-time-current').width(0+'%');
-		$('span.mejs-currenttime').text('00:00:00');
-		$('span.mejs-duration').text('00:00:00');
-		$(".mejs-overlay").show();
-		$(".mejs-layer").show();
-		$(".mejs-overlay-loading").hide();
-		$(".mejs-overlay-button").show();
-		$('#song-title').empty().append(_('Stopped...'));
-		$('.mejs-container#fbxMsg').remove();
+		setTimeout(function() {
+			player.currentTime = 0;
+			player.current[0].style.width = 0;
+			player.loaded[0].style.width = 0;
+			player.durationD.html('00:00:00');
+			$('.mejs-time-loaded').width(0+'%');
+			$('.mejs-time-buffering').width(0+'%');
+			$('.mejs-time-current').width(0+'%');
+			$('.mejs-currenttime').text('00:00:00');
+			$('.mejs-duration').text('00:00:00');
+			$("#preloadTorrent").remove();
+			$(".mejs-overlay").show();
+			$(".mejs-layer").show();
+			$(".mejs-overlay-loading").hide();
+			$(".mejs-overlay-button").show();
+		},1000);
 	},2000);
 }
 

@@ -164,20 +164,22 @@ $(document).ready(function() {
 function initPlayer() {
     player.pause();
     player.setSrc('');
-    player.currentTime = 0;
-    player.current[0].style.width = 0;
-    player.loaded[0].style.width = 0;
-    player.durationD.html('00:00:00');
-    $('.mejs-time-loaded').width(0+'%');
-    $('.mejs-time-buffering').width(0+'%');
-	$('.mejs-time-current').width(0+'%');
-	$('span.mejs-currenttime').text('00:00:00');
-	$('span.mejs-duration').text('00:00:00');
-    $("#preloadTorrent").remove();
-    $(".mejs-overlay").show();
-    $(".mejs-layer").show();
-    $(".mejs-overlay-loading").hide();
-    $(".mejs-overlay-button").show();
+    setTimeout(function() {
+		player.currentTime = 0;
+		player.current[0].style.width = 0;
+		player.loaded[0].style.width = 0;
+		player.durationD.html('00:00:00');
+		$('.mejs-time-loaded').width(0+'%');
+		$('.mejs-time-buffering').width(0+'%');
+		$('.mejs-time-current').width(0+'%');
+		$('.mejs-currenttime').text('00:00:00');
+		$('.mejs-duration').text('00:00:00');
+		$("#preloadTorrent").remove();
+		$(".mejs-overlay").show();
+		$(".mejs-layer").show();
+		$(".mejs-overlay-loading").hide();
+		$(".mejs-overlay-button").show();
+	},100);
     $('#song-title').empty().append(_('Stopped...'));
     $('#infosPage').remove();
      $('.mejs-container #fbxMsg').remove();
@@ -208,7 +210,7 @@ function initPlayer() {
 }
 
 function startPlay(media) {
-	if(torrentPlaying === false) {
+	if(torrentPlaying === false && playFromUpnp == false) {
 		initPlayer();
 	}
     if(extPlayerRunning) {

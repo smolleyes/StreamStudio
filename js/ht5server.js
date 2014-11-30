@@ -35,7 +35,6 @@ function startProxyServer() {
 
 function startStreaming(req, res, width, height) {
     try {
-		currentRes = res;
         var baseLink = url.parse(req.url).href;
         var megaKey;
         var link;
@@ -48,13 +47,14 @@ function startStreaming(req, res, width, height) {
 		console.log('startstreaming parsedlink: ' + parsedLink)
 		res.writeHead(200, { // NOTE: a partial http response
 			// 'Date':date.toUTCString(),
-			'Connection': 'keep-alive',
+			'Connection': 'close',
 			'Content-Type': 'video/mpeg',
 			'Server':'CustomStreamer/0.0.1',
 			'transferMode.dlna.org': 'Streaming',
 			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'
 		});
-
+		res.setTimeout(10000000000)
+		currentRes = res;
         var linkParams = parsedLink.split('&');
         var bitrate = 300;
         var time = 0;
@@ -229,6 +229,7 @@ function startStreaming(req, res, width, height) {
         console.log(err);
     }
     res.on("close", function() {
+		currentRes= null;
 		console.log('request end!!!!!!!!!!!!!!!!')
         ffar[0].kill('SIGKILL');
     });
@@ -269,7 +270,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	}
 	if (host === undefined || link !== '') {
 		//local file...
-		args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn', '-c:v', 'libx264', '-c:a', 'libvorbis','-f', 'matroska','pipe:1'];
+		args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn', '-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
 	} else {
 		if (device === "phone") {
 			if (host.match(/(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^::1$)/) !== null) {
