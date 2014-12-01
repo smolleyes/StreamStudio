@@ -330,6 +330,7 @@ $(document).ready(function() {
 	$('#loadingApp p').empty().append(_("Loading StreamStudio..."));
     $('#loadingApp').show();
     // load plugins
+    ipaddress = nodeip.address();
 	initPlugins();
 	
 });

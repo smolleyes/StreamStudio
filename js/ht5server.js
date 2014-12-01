@@ -236,7 +236,12 @@ function startStreaming(req, res, width, height) {
 }
 
 function checkDuration(link, device, host, bitrate,res,seekTo) {
-	var p = exec("ffprobe -i '"+decodeURIComponent(link)+"' -show_format -v quiet | sed -n 's/duration=//p'"); 
+	var p;
+	if (process.platform === 'win32') {
+		p = exec(exec_path + '/ffprobe.exe' + " -i '"+decodeURIComponent(link)+"' -show_format -v quiet | sed -n 's/duration=//p'"); 
+	} else {
+		p = exec(exec_path + '/ffprobe' + " -i '"+decodeURIComponent(link)+"' -show_format -v quiet | sed -n 's/duration=//p'"); 
+	}
 	p.stdout.on('data',function(data){
 		if(data.indexOf('N/A') !== -1) {
 			mediaDuration = 0;

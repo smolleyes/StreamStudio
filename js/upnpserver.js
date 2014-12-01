@@ -332,7 +332,7 @@ function playUpnpRenderer(obj) {
 	timeUpdater = null;
 	transitionCount = 0;
 	try {
-		if (upnpMediaPlaying || continueTransition) {
+		if (upnpMediaPlaying || playFromUpnp || continueTransition) {
 			mediaRenderer.stop();
 			continueTransition = false;
 		}
@@ -356,15 +356,19 @@ function playUpnpRenderer(obj) {
 		if (response && response.data) {
 			console.log('UPNP: Ok playing' + uri);
 			// start watching for PLAYING state
-			mediaRenderer.play();
-			continueTransition = true;
-			getRendererState('PLAYING');
+			mediaRenderer.play().then(function(response) {
+				console.log(response);
+				continueTransition = true;
+				transitionCount = 0;
+				getRendererState('PLAYING');
+			});
 		} else {
-			mediaRenderer.stop();
-			continueTransition = false;
-			upnpMediaPlaying = false;
-			console.log('UPNP: No response for' + uri)
-			getRendererState('STOPPED');
+			mediaRenderer.stop().then(function(response) {
+				continueTransition = false;
+				upnpMediaPlaying = false;
+				console.log('UPNP: No response for' + uri)
+				getRendererState('STOPPED');
+			});
 		}
 		
 	}).then( null, function( error ) { // Handle any errors
@@ -377,9 +381,10 @@ function playUpnpRenderer(obj) {
 function getRendererState(state) {
 	mediaRenderer.getTransportInfo().then(function(response) {
 		if (response && response.data) {
+			console.log(response.data.CurrentTransportState, state, continueTransition , transitionCount)
 			if(response.data.CurrentTransportState !== state && continueTransition) {
 				if(response.data.CurrentTransportState === 'TRANSITIONING') {
-					if (transitionCount === 60) {
+					if (transitionCount === 120) {
 						upnpMediaPlaying = false;
 						continueTransition = false;
 						mediaRenderer.stop();
@@ -449,7 +454,6 @@ function stopUpnp() {
 			   stopTorrent();
 			}
 		} catch (err) {}
-		setTimeout(function() {
 			player.currentTime = 0;
 			player.current[0].style.width = 0;
 			player.loaded[0].style.width = 0;
@@ -464,7 +468,6 @@ function stopUpnp() {
 			$(".mejs-layer").show();
 			$(".mejs-overlay-loading").hide();
 			$(".mejs-overlay-button").show();
-		},1000);
 	},2000);
 }
 

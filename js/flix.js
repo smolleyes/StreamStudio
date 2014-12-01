@@ -61,6 +61,10 @@ function getTorrent(link) {
               info: torrent,
               title: title
           };
+          var obj = JSON.parse(settings.ht5Player);
+		  if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
+			  $('#playerToggle').click();
+		  }
           handleTorrent(torrentInfo, stateModel);
       }
   });
@@ -90,6 +94,7 @@ var watchState = function(stateModel) {
 };
 
 app.updateStats = function(streamInfo) {
+			$(".mejs-overlay-button").hide();
 			var active = function(wire) {return !wire.peerChoking;};
 			var swarm = streamInfo.swarm;
 
@@ -138,7 +143,6 @@ app.updateStats = function(streamInfo) {
 			  stream.link = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/&torrent';
 			  stream.next = '';
 			  stream.title = streamInfo.server.index.name;
-        console.log(currentMedia)
         sdb.insert({"title":itemTitle},function(err,result){
           if(!err){
             console.log('std database updated succssfully!');
@@ -163,8 +167,13 @@ app.updateStats = function(streamInfo) {
 				statsUpdater = null
 			 } else {
 				var t = _('(%s%% downloaded)',downloadedPct);
-				totalBuffered = swarm.downloaded;
-				totalBytes = streamInfo.server.index.length;
+				if(player.media.paused) {
+					totalBuffered = swarm.downloaded;
+					totalBytes = streamInfo.server.index.length;
+				} else {
+					totalBuffered = 0;
+					totalBytes = 0;
+				}
 				if(upnpToggleOn) {
 					$('.mejs-time-loaded').width(downloadedPct+'%')
 				}
@@ -207,14 +216,16 @@ function handleTorrent(torrent, stateModel) {
   var tmpFilename = torrent.info.infoHash;
   tmpFilename = tmpFilename.replace(/([^a-zA-Z0-9-_])/g, '_') +'-'+ (new Date()*1);
   var tmpFile = path.join(tmpFolder, tmpFilename);
-  
-  $('.mejs-overlay-button').hide();
+
   $('#preloadTorrent').empty().remove();
-  $('.mejs-container').append('<div id="preloadTorrent" \
-  style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;"> \
-  <p><b id="preloadProgress">'+_("Connecting... please wait")+'</b></p> \
-  <progress value="5" min="0" max="100">0%</progress> \
-  </div>');
+  setTimeout(function() {
+	  $('.mejs-container').append('<div id="preloadTorrent" \
+	  style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;"> \
+	  <p><b id="preloadProgress">'+_("Connecting... please wait")+'</b></p> \
+	  <progress value="5" min="0" max="100">0%</progress> \
+	  </div>');
+	  $(".mejs-overlay-button").hide();
+  },1000);
   videoStreamer = peerflix(torrent.info, {
       connections: 100, // Max amount of peers to be connected to.
       path: tmpFile, // we'll have a different file name for each stream also if it's same torrent in same session

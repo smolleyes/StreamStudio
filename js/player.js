@@ -115,16 +115,25 @@ $(document).ready(function() {
         on_media_finished();
     });
     
-    player.media.addEventListener('loadeddata', function() {
-        $('.mejs-overlay,.mejs-overlay-loading').hide();
-    }, false);
+    //player.media.addEventListener('loadeddata', function() {
+        //$('.mejs-overlay,.mejs-overlay-loading').hide();
+    //}, false);
     
     player.media.addEventListener('pause', function() {
 		$('#subPlayer-play').show();
 		$('#subPlayer-pause').hide();
     });
+    player.media.addEventListener('seeking', function() {
+		$(".mejs-overlay-button").show();
+		$(".mejs-overlay-loading").show();
+    });
     
-    player.media.addEventListener('play', function() {
+    player.media.addEventListener('stalled', function() {
+		$(".mejs-overlay-button").show();
+		$(".mejs-overlay-loading").show();
+    });
+    
+    player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
 		$('.mejs-overlay,.mejs-overlay-loading').hide();
@@ -174,7 +183,7 @@ function initPlayer() {
 		$('.mejs-time-current').width(0+'%');
 		$('.mejs-currenttime').text('00:00:00');
 		$('.mejs-duration').text('00:00:00');
-		$("#preloadTorrent").remove();
+		//$("#preloadTorrent").remove();
 		$(".mejs-overlay").show();
 		$(".mejs-layer").show();
 		$(".mejs-overlay-loading").hide();
@@ -190,8 +199,9 @@ function initPlayer() {
     $("#subPlayer-title").text(' '+_('Waiting...'));
     $('#subPlayer-play').show();
 	$('#subPlayer-pause').hide();
-    if (upnpMediaPlaying === true) {
+    if (upnpMediaPlaying && playFromUpnp) {
 		upnpMediaPlaying = false;
+		playFromUpnp = false;
 		mediaRenderer.stop();
     }
     try {
@@ -210,7 +220,7 @@ function initPlayer() {
 }
 
 function startPlay(media) {
-	if(torrentPlaying === false && playFromUpnp == false) {
+	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false) {
 		initPlayer();
 	}
     if(extPlayerRunning) {
@@ -430,7 +440,7 @@ function getNext() {
 	$('.mejs-time-current').width(0+'%');
 	$('span.mejs-currenttime').text('00:00:00');
 	$('span.mejs-duration').text('00:00:00');
-    $("#preloadTorrent").remove();
+    //$("#preloadTorrent").remove();
     $(".mejs-overlay").show();
     $(".mejs-layer").show();
     $(".mejs-overlay-loading").hide();
@@ -475,7 +485,7 @@ function getPrev() {
 	$('.mejs-time-current').width(0+'%');
 	$('span.mejs-currenttime').text('00:00:00');
 	$('span.mejs-duration').text('00:00:00');
-    $("#preloadTorrent").remove();
+    //$("#preloadTorrent").remove();
     $(".mejs-overlay").show();
     $(".mejs-layer").show();
     $(".mejs-overlay-loading").hide();

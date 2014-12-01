@@ -424,7 +424,6 @@ var wipeTmpFolder = function() {
 }
 
 function stopTorrent(res) {
-setTimeout(function() {
 	player.currentTime = 0;
 	player.current[0].style.width = 0;
 	player.loaded[0].style.width = 0;
@@ -438,8 +437,6 @@ setTimeout(function() {
 	$(".mejs-overlay").show();
 	$(".mejs-layer").show();
 	$(".mejs-overlay-loading").hide();
-	$(".mejs-overlay-button").show();
-},100);
   try {
 	 torrentPlaying = false;
 	videoStreamer.destroy();
@@ -449,6 +446,7 @@ setTimeout(function() {
   statsUpdater = null;
   playStarted = false;
   wipeTmpFolder();
+ 
   } catch(err) { console.log(err); torrentPlaying = false;}
   $.each(torrentsArr,function(index,torrent) {
     try {
@@ -459,6 +457,7 @@ setTimeout(function() {
     flix.destroy();
     delete flix;
     videoStreamer = null;
+    $('.mejs-time-loaded').width(0+'%');
   } catch(err) {
       console.log(err);
   }
