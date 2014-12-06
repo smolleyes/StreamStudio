@@ -1,3 +1,6 @@
+V 1.12
+  * bug fix
+
 V 1.11
   * remove pagination system, replaced by lazyloading
 

@@ -190,7 +190,7 @@ pre {
 }
 
 #fbxMsg {
-	height: 100%;
+	height: calc(100% - 75px) !important;
 	width: 100%;
 	background: black;
 	position: absolute;

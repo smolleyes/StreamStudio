@@ -1224,7 +1224,7 @@ function startSearch(query) {
     $("#search p").empty().append(' ');
     $('#loading p').empty().append(_("Loading..."));
 
-    if ((query === '') && (browse === false) || (query === '') && engine && engine.searchType && engine.searchType !== "navigation") {
+    if ((query === '') && (browse === false) || (query === '') && engine && engine.searchType && engine.searchType == "search") {
         current_search = '';
         if ((searchTypes_select !== 'category') && (searchTypes_select !== 'topRated') && (searchTypes_select !== 'mostViewed')) {
             $('#video_search_query').attr('placeholder', '').focus();
