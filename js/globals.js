@@ -1,4 +1,4 @@
-var VERSION = "1.10";
+var VERSION = "1.11";
 
 var path = require('path');
 var fs = require('fs');
@@ -74,7 +74,7 @@ var cPreloaderTimeout = false;
 var spinnerPlay = false;
 var itemTitle = '';
 var scrollObserver;
-
+var updateLazy = true;
 //storedb
 var sdb = storedb('std');
 

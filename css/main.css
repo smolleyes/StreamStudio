@@ -443,7 +443,7 @@ video{
 	-webkit-animation-name: flipInX;
 	-webkit-animation-duration: 1s;
 	-webkit-animation-fill-mode: both;
-	width: 330px;
+	width: 345px;
 	height: 211px;
 	float: left;
 	margin: 0 10px 15px 0 !important;
@@ -724,7 +724,7 @@ video{
 
 #nanoContent {
     position: relative;
-    top:50px !important;
+    top:20px !important;
 }
 #nanoContent a{
     cursor:pointer;

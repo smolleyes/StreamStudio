@@ -9,5 +9,5 @@
     "show": false
   },
   "chromium-args": "--ignore-gpu-blacklist",
-  "js-flags": "--harmony --harmony-generators"
+  "js-flags": "--harmony"
 }

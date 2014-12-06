@@ -381,6 +381,11 @@ function main() {
 		  var id = $(this).attr('href').split('_')[1];
 		  if (id) {
 			activeTab = parseInt(id);
+			if(activeTab !== 1) {
+				updateLazy = false;
+			} else {
+				updateLazy = true;
+			}
 		  }
 	  } catch(err) {}
 	  $('#tab .btn.active').removeClass('active');
@@ -417,7 +422,13 @@ function main() {
         query = $('#video_search_query').val();
         current_start_index = 1;
         current_prev_start_index = 1;
+        current_page = 1;
+        searchOptions.currentPage = 1;
+        $('#items_container').empty().hide();
         startSearch(query);
+        if (activeTab !== 1) {
+			$("#homeToggle").click();
+		}
     });
     // store title of selected item
     $(document).on('click','.item-title',function(e) {
@@ -594,11 +605,18 @@ function main() {
     
     //load playlist
     $(document).on('click', '.load_playlist', function(e) {
+		pageLoading = true;
+		itemsCount = 0;
+		current_page = 1;
         var pid = $(this).attr('id');
         loadPlaylistSongs(pid);
     });
     //load channels
     $(document).on('click', '.load_channel', function(e) {
+		pageLoading = true;
+		itemsCount = 0;
+		current_page = 1;
+		$('#items_container').empty();
         var pid = $(this).attr('id');
         loadChannelSongs(pid);
     });
@@ -674,6 +692,7 @@ function main() {
             current_search_page = 1;
             current_start_index = 1;
             searchOptions.currentPage = 1;
+            itemsCount = 0;
             $("#searchTypes_select").empty().hide();
             $("#searchTypes_label").hide();
             $("#dateTypes_select").empty().hide();
@@ -811,6 +830,7 @@ function main() {
             current_prev_start_index = 1;
             current_page = 1;
             current_search_page = 1;
+            itemsCount = 0;
             searchDate = $(this).val();
         });
     });
@@ -822,6 +842,7 @@ function main() {
             current_prev_start_index = 1;
             current_page = 1;
             current_search_page = 1;
+            itemsCount = 0;
             search_order = $(this).val();
         });
     });
@@ -834,6 +855,7 @@ function main() {
             current_prev_start_index = 1;
             current_page = 1;
             current_search_page = 1;
+            itemsCount = 0;
             try {
                 engine.search_type_changed();
                 engine.pagination_init = false;
@@ -851,6 +873,7 @@ function main() {
             current_prev_start_index = 1;
             current_page = 1;
             current_search_page = 1;
+            itemsCount = 0;
             searchFilters = $(this).val();
         });
     });
@@ -863,6 +886,7 @@ function main() {
             current_prev_start_index = 1;
             current_page = 1;
             current_search_page = 1;
+            itemsCount = 0;
             try {
                 engine.search_type_changed();
                 engine.pagination_init = false;
@@ -1090,31 +1114,58 @@ function main() {
 }
 
 function updateScroller() {
-	try {
-		if(engine.engine_name == "T411"){
+	setTimeout(function() {
+		try {
 			$(".nano").nanoScroller();
 			try {
 				scrollObserver.disconnect();
 			} catch(err) {}
 			scrollObserver = new MutationObserver(function(mutations) {
 				mutations.forEach(function(mutation) {
-					var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
-					if(($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && $("#t411_cont li").length == engine.lazyStart) || !$('.nano-slider').is(':visible') && $("#t411_cont li").length == engine.lazyStart){
-						if(engine.lazyStart !== engine.lazyLength) {
-							engine.loadMore();
+					try {
+						var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
+						if(engine) {
+							if(($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && $("#items_container ul li").length == engine.lazyStart) || !$('.nano-slider').is(':visible') && $("#items_container ul li").length == engine.lazyStart){
+								if(engine.lazyStart !== engine.lazyLength) {
+									engine.loadMore();
+								}
+							} else if (($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !engine.pageLoading ) || $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
+								if($("#items_container ul li").length < engine.totalItems) {
+									engine.loadMore();
+								}
+							}
+						} else {
+							if (($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading ) || $("#items_container div.youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
+								if(search_engine === "youtube" && searchTypes_select === "playlists" && $("#items_container div.youtube_item_playlist").length !== 0 && $("#items_container div.youtube_item_playlist").length < totalResults) {	
+									current_page += 1;
+									pageLoading = true;
+									changePage();
+								} else if(search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container div.youtube_item_channel").length !== 0 && $("#items_container div.youtube_item_channel").length < totalResults) {	
+									current_page += 1;
+									pageLoading = true;
+									changePage();
+								} else if(search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container div.youtube_item").length < totalResults) {	
+									current_page += 1;
+									pageLoading = true;
+									changeChannelPage();
+								} else if($("#items_container div.youtube_item").length < totalResults) {
+									current_page += 1;
+									pageLoading = true;
+									changePage();
+								} 
+							}
 						}
+					} catch(err) {
+						console.log(err)
 					}
 				});    
 			});
-
 			var target = document.querySelector('.nano-slider');
 			scrollObserver.observe(target, { attributes : true, attributeFilter : ['style'] });
-		} else {
-			$(".nano").nanoScroller();
-		}
 	} catch(err) {
 		$(".nano").nanoScroller();
 	}
+	},200);
 }
 
 function updatePickers() {
@@ -1122,8 +1173,6 @@ function updatePickers() {
 }
 
 function changePage() {
-    current_page = $("#pagination").pagination('getCurrentPage');
-    searchOptions.currentPage = current_page;
     startSearch(current_search);
 }
 
@@ -1174,18 +1223,14 @@ function update_searchOptions() {
 function startSearch(query) {
     $("#search p").empty().append(' ');
     $('#loading p').empty().append(_("Loading..."));
-    if (activeTab !== 1) {
-        $("#homeToggle").click();
-    }
-    if ((query === '') && (browse === false)) {
+
+    if ((query === '') && (browse === false) || (query === '') && engine && engine.searchType && engine.searchType !== "navigation") {
         current_search = '';
         if ((searchTypes_select !== 'category') && (searchTypes_select !== 'topRated') && (searchTypes_select !== 'mostViewed')) {
             $('#video_search_query').attr('placeholder', '').focus();
             return;
         }
     }
-    $('#items_container').empty().hide();
-    $('#pagination').hide();
     $('#search').hide();
     $('#loading').show();
     if (query !== current_search) {
@@ -1193,8 +1238,10 @@ function startSearch(query) {
         current_search_page = 1;
         current_start_index = 1;
         searchOptions.currentPage = 1;
+        itemsCount = 0;
         pagination_init = false;
         channelPagination = false;
+        $('#items_container').empty().hide();
     }
     current_search = query;
     try {
@@ -1203,9 +1250,10 @@ function startSearch(query) {
         searchOptions.dateFilter = $("#dateTypes_select option:selected").val();
         searchOptions.searchFilter = $("#searchFilters_select option:selected").val();
         searchOptions.category = $("#categories_select option:selected").val();
+        searchOptions.currentPage = current_page;
         engine.search(query, searchOptions, win.window);
     } catch (err) {
-
+		pageLoading = true;
         if (search_engine === 'dailymotion') {
             if (searchTypes_select === 'videos') {
                 dailymotion.searchVideos(query, current_page, searchFilters, search_order, function(datas) {
@@ -1224,7 +1272,6 @@ function startSearch(query) {
             if (searchTypes_select === 'videos') {
                 youtube.searchVideos(query, current_page, searchFilters, search_order, function(datas) {
                     getVideosDetails(datas, 'youtube', false);
-                    //printVideoInfos(datas,false,false,null,'youtube')
                 });
             } else if (searchTypes_select === 'playlists') {
                 youtube.searchPlaylists(query, current_page, function(datas) {
@@ -1252,11 +1299,6 @@ function startSearch(query) {
 }
 
 function changeChannelPage() {
-    current_page = $("#pagination").pagination('getCurrentPage');
-    $('#items_container').empty().hide();
-    $('#pagination').hide();
-    $('#search').hide();
-    $('#loading').show();
     if (current_channel_engine === 'youtube') {
         youtube.loadChannelSongs(current_channel_link, current_page, function(datas) {
             fillPlaylistFromChannel(datas, current_channel_engine);
