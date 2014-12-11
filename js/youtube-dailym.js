@@ -80,7 +80,6 @@ function getVideosDetails(datas, engine, sublist, vid) {
             var itemsByPage = 25;
             break;
     }
-    console.log(datas)
     if (totalResults === 0) {
         if (sublist === false) {
             $('#search_results').html(_("<p><strong>No videos</strong> found...</p>"));

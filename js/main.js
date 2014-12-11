@@ -429,6 +429,7 @@ function main() {
         if (activeTab !== 1) {
 			$("#homeToggle").click();
 		}
+		itemsCount = 0;
     });
     // store title of selected item
     $(document).on('click','.item-title',function(e) {
@@ -709,6 +710,9 @@ function main() {
             $("#cover").remove();
             $('#search').show();
             $('#pagination').hide();
+            if($('#fbxMsg2').length !== 0) {
+				$('#fbxMsg2').remove();
+			};
             try {
                 engine = engines[search_engine];
                 engine.init(gui, win.window, $.notif);

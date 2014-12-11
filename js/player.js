@@ -199,6 +199,7 @@ function initPlayer() {
     $("#subPlayer-title").text(' '+_('Waiting...'));
     $('#subPlayer-play').show();
 	$('#subPlayer-pause').hide();
+	$('#fbxMsg2').remove();
     if (upnpMediaPlaying && playFromUpnp) {
 		upnpMediaPlaying = false;
 		playFromUpnp = false;

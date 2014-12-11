@@ -190,7 +190,7 @@ pre {
 }
 
 #fbxMsg {
-	height: calc(100% - 75px) !important;
+	height: 100%;
 	width: 100%;
 	background: black;
 	position: absolute;
@@ -239,7 +239,7 @@ font-weight:bold;
 }
 
 #closePreview:hover {
-  color:red !important;
+  color:#28a4c9 !important;
 }
 
 #fbxMsg h1 {
