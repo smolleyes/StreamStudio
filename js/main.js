@@ -187,6 +187,7 @@ var htmlStr = '<div class="row"> \
 							<option value = "720p">720p</option> \
 							<option value = "480p">480p</option> \
 							<option value = "360p">360p</option> \
+							<option value = "240p">240p</option> \
 					  </select> \
 					  </div> \
 					</div> \
@@ -501,7 +502,7 @@ function main() {
 			youtube.getVideoInfos('http://youtube.com/watch?v='+vid,1,1, function(datas){
 				$('.spiffy').hide();
 				var infos = datas[25];
-				var resolutions_string = ['1080p', '720p', '480p', '360p'];
+				var resolutions_string = ['720p', '360p'];
 				var resolutions = infos.resolutions;
 				for (var i = 0; i < resolutions_string.length; i++) {
 					try {

@@ -376,7 +376,6 @@ function launchPlay() {
 	try {
 		img = $('.highlight').find('img')[0].src;
 	} catch(err) {console.log(err)}
-	console.log(img, $('#subPlayer-img').attr('src'))
 	if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
 		$('#subPlayer-img').attr('src',img);
 	} else {
@@ -414,7 +413,6 @@ function launchPlay() {
 		}
 	} else {
 		var obj = JSON.parse(settings.ht5Player);
-		console.log('PLAYING in player: ' + currentMedia.link)
 		if(obj.name === 'StreamStudio') {
 			player.setSrc(currentMedia.link);
 			player.play();

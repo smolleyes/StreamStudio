@@ -502,9 +502,9 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
         var vid = infos.id;
         var seconds = secondstotime(infos.duration);
         var views = infos.views;
-        var author = infos.author;
-        if (author === 'unknown') {
-            author = _("unknown");
+        var aut = infos.author;
+        if (aut === 'unknown') {
+            aut = _("unknown");
         }
         if ($('#youtube_entry_res_' + vid).length === 1) {
             return;
@@ -519,6 +519,13 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
 		} else {
 			text = title;
 		}
+		var author = '';
+        if(aut.length > 17){
+			author = aut.toLowerCase().substring(0,17)+'...';
+		} else {
+			author = aut;
+		}
+		
         if (solo === true) {
             $('#items_container').prepend('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
         } else {
@@ -528,7 +535,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
                 $('#subList').append('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><div class="item_infos"><span class="video_length">' + seconds + '</span><div><p><a class="start_video" alt="'+title+'"><b>' + text + '</b></a></p><div><span><b>' + _("Posted by:") + '</b> ' + author + ' </span><span><b>' + _("Views:") + ' </b> ' + views + '</span></div></div><div id="youtube_entry_res_sub_' + vid + '" class="downloads_container"></div></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div>').show();
             }
         }
-        var resolutions_string = ['1080p', '720p', '480p', '360p'];
+        var resolutions_string = ['1080p', '720p', '480p', '360p','240p'];
         var resolutions = infos.resolutions;
         for (var i = 0; i < resolutions_string.length; i++) {
             try {
@@ -590,9 +597,9 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
         var vid = infos.id;
         var seconds = secondstotime(infos.duration);
         var views = infos.viewCount;
-        var author = infos.uploader;
-        if (author === 'unknown') {
-            author = _("unknown");
+        var aut = infos.uploader;
+        if (aut === 'unknown') {
+            aut = _("unknown");
         }
         var page = current_page;
         var text = '' 
@@ -601,6 +608,13 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
 		} else {
 			text = title;
 		}
+		var author = '';
+        if(aut.length > 17){
+			author = aut.toLowerCase().substring(0,17)+'...';
+		} else {
+			author = aut;
+		}
+		
         if (solo === true) {
             $('#items_container').append('<div class="youtube_item"><img class="video_thumbnail" src="' + thumb + '" /><img src="images/spiffygif_30x30.gif" class="spiffy" /><div class="video_length"><span>' + seconds + '</span></div><div class="item-info"><p><a class="start_video" id="'+vid+'" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Posted by:") + '</b> ' + author + ' </span></div><div class="item-info"><span><b>' + _("Views:") + ' </b> ' + views + '</span></div><div id="youtube_entry_res_' + vid + '" class="downloads_container"></div><div class="toggle-control" style="display:none;"><a href="#" class="toggle-control-link" alt="' + vid + '::' + engine + '">+ ' + _("Open related videos") + '</a><div class="toggle-content" style="display:none;"><div id="sublist_' + vid + '"></div><button id="loadmore_' + vid + '" href="#" class="load_more" alt="0::' + page + '::' + vid + '::' + engine + '" style="display:none">' + _("Load more videos") + '</button></div></div></div></div>');
         } else {
