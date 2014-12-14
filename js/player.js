@@ -23,7 +23,7 @@ var playFromFile = false;
 var playFromUpnp = false;
 var playFromMega = false;
 var playFromMegaUser = false;
-
+var playFromTwitch = false;
 
 $(document).ready(function() {
 	
@@ -113,6 +113,8 @@ $(document).ready(function() {
     // player signals
     player.media.addEventListener('ended', function() {
         on_media_finished();
+		$('.mejs-overlay-play').show();
+		$(".mejs-overlay-loading").hide();
     });
     
     //player.media.addEventListener('loadeddata', function() {
@@ -124,19 +126,19 @@ $(document).ready(function() {
 		$('#subPlayer-pause').hide();
     });
     player.media.addEventListener('seeking', function() {
-		$(".mejs-overlay-button").show();
 		$(".mejs-overlay-loading").show();
+		$('.mejs-overlay-play').hide();
     });
     
     player.media.addEventListener('stalled', function() {
-		$(".mejs-overlay-button").show();
 		$(".mejs-overlay-loading").show();
+		$('.mejs-overlay-play').hide();
     });
     
     player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
-		$('.mejs-overlay,.mejs-overlay-loading').hide();
+		$('.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     });
     
 	//SubPlayer controls
@@ -155,6 +157,45 @@ $(document).ready(function() {
 	$('#subPlayer-prev').click(function() {
 		getPrev();
 	});
+	
+	// subPlayer show/hide 
+	$("#subPlayer").hide();
+	
+	$( "#showPlayer" ).mouseover(function() {
+	  $("#subPlayer").show();
+	});
+	$("#subPlayer" ).mouseleave(function() {
+	  $("#subPlayer").hide();
+	});
+	
+	// subPlayer progress bar
+	mediaPlayer = document.getElementById('videoPlayer');
+	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
+	$('#progress-bar').click(function(e) {
+		var pos = e.offsetX;
+		var pct = (( pos * 100) / $('#progress-bar').width()).toFixed(2);
+		var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
+		console.log(pct + "%")
+		var newTime = Math.round((duree * pct) / 100);
+		if(transcoderEnabled) {
+			var m = {};
+			var l = currentMedia.link.replace(/&start=(.*)/,'')
+			if(playFromFile) {
+				m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+			} else if(playFromHttp) {
+				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
+			} else if (torrentPlaying) {
+				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
+			} else if (playFromUpnp) {
+				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+			}
+			m.title = currentMedia.title;
+			console.log(m)
+			startPlay(m);
+		} else {
+			player.setCurrentTime(newTime)
+		}
+	})
 	
 	// close player
 	$('#closePlayer').click(function() {
@@ -177,47 +218,54 @@ function initPlayer() {
 		player.currentTime = 0;
 		player.current[0].style.width = 0;
 		player.loaded[0].style.width = 0;
-		player.durationD.html('00:00:00');
+		//player.durationD.html('00:00:00');
 		$('.mejs-time-loaded').width(0+'%');
 		$('.mejs-time-buffering').width(0+'%');
 		$('.mejs-time-current').width(0+'%');
 		$('.mejs-currenttime').text('00:00:00');
 		$('.mejs-duration').text('00:00:00');
+		$('#subPlayer-Progress progress').val(0);
 		//$("#preloadTorrent").remove();
 		$(".mejs-overlay").show();
 		$(".mejs-layer").show();
 		$(".mejs-overlay-loading").hide();
-		$(".mejs-overlay-button").show();
+		$('#subPlayer-title').empty().append(_('Waiting...'));
 	},100);
-    $('#song-title').empty().append(_('Stopped...'));
-    $('#infosPage').remove();
-     $('.mejs-container #fbxMsg').remove();
-    continueTransition = false;
-    clearInterval(timeUpdater);
-    timeUpdater = null;
-    $("#subPlayer-img").attr('src',"images/play-overlay.png");
-    $("#subPlayer-title").text(' '+_('Waiting...'));
-    $('#subPlayer-play').show();
-	$('#subPlayer-pause').hide();
-	$('#fbxMsg2').remove();
-    if (upnpMediaPlaying && playFromUpnp) {
-		upnpMediaPlaying = false;
-		playFromUpnp = false;
-		mediaRenderer.stop();
-    }
-    try {
-        cleanffar();
-        currentRes.end();
-    } catch (err) {}
-    try {
-		if(torrentPlaying) {
-		 stopTorrent();
+		$('#infosPage').remove();
+		$('#song-title').empty().append(_('Waiting...'));
+		$('.mejs-container #fbxMsg').remove();
+		continueTransition = false;
+		clearInterval(timeUpdater);
+		timeUpdater = null;
+		$("#subPlayer-title").text(' '+_('Waiting...'));
+		$('#subPlayer-play').show();
+		$('#subPlayer-pause').hide();
+		$('#fbxMsg2').remove();
+		if (upnpMediaPlaying && playFromUpnp) {
+			upnpMediaPlaying = false;
+			playFromUpnp = false;
+			mediaRenderer.stop();
 		}
-	} catch (err) {}
-	
-	try {
-		extPlayerProc.kill('SIGKILL');
-	} catch(err) {}
+		try {
+			cleanffar();
+			currentRes.end();
+		} catch (err) {}
+		try {
+			if(torrentPlaying) {
+			 stopTorrent();
+			}
+		} catch (err) {}
+		
+		try {
+			extPlayerProc.kill('SIGKILL');
+		} catch(err) {}
+	$("#subPlayer-img").attr('src',"images/play-overlay.png");
+	setTimeout(function() { 
+		if(player.media.paused && player.media.src.match(/index.html/) !== null && torrentPlaying == false) {
+			$(".mejs-overlay-button").show();
+			$(".mejs-overlay-play").show();
+		}
+	},2000);
 }
 
 function startPlay(media) {
@@ -231,6 +279,7 @@ function startPlay(media) {
 				startPlay(media);
 				extPlayerRunning = false;
 			},1000);
+			return;
 		} catch(err){};
 	}
     
@@ -240,6 +289,7 @@ function startPlay(media) {
     playFromUpnp = false;
     playFromMega = false;
     playFromMegaUser = false;
+    playFromTwitch = false;
     var localLink = null;
     try {
         next_vid = media.next;
@@ -259,9 +309,12 @@ function startPlay(media) {
 		$('.mejs-overlay-play').hide();
         // check type of link to play
 		var linkType = link.split('&').pop();
-		
+		if (linkType === 'twitch' || link.indexOf('twitch.tv') !== -1) {
+			playFromTwitch = true;
+			currentMedia.link = link.replace('&twitch','').replace('&external','');
+			launchPlay();
 		// torrents
-		if (linkType === 'torrent') {
+		} else if (linkType === 'torrent') {
 			torrentPlaying = true;
 			currentMedia.link = link.replace('&torrent','');
 			launchPlay();
@@ -313,6 +366,8 @@ function launchPlay() {
 		var obj = JSON.parse(settings.ht5Player);
 		if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
 			$('#playerToggle').click();
+			$(".mejs-overlay-button").hide();
+			$('.mejs-overlay-play').hide();
 		}
 	} catch(err) {}
 	$('#subPlayer-play').hide();
@@ -320,7 +375,7 @@ function launchPlay() {
 	var img = null;
 	try {
 		img = $('.highlight').find('img')[0].src;
-	} catch(err) {}
+	} catch(err) {console.log(err)}
 	console.log(img, $('#subPlayer-img').attr('src'))
 	if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
 		$('#subPlayer-img').attr('src',img);
@@ -328,10 +383,10 @@ function launchPlay() {
 		$('#subPlayer-img').attr('src','images/play-overlay.png');
 	}
 	if($('#subPlayer-title').text() !== currentMedia.title) {
-		$('#subPlayer-title').empty().append('<marquee behavior="scroll" scrollamount="2" direction="left">'+currentMedia.title+'</marquee>');
+		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// add link for transcoding
-	if(transcoderEnabled || currentMedia.link.indexOf('mega.co') !== -1) {
+	if(transcoderEnabled || playFromTwitch|| currentMedia.link.indexOf('mega.co') !== -1) {
 		var link = 'http://'+ipaddress+':8888/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
@@ -529,4 +584,14 @@ function on_media_finished(){
 	} else if (playlistMode === 'continue') {
 		getNext();
 	} 
+}
+
+function updateProgressBar() {
+   var progressBar = document.getElementById('progress-bar');
+   var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
+   var current = player.media.currentTime;
+   try {
+	   var percentage = ((100 / duree) * current);
+		progressBar.value = percentage;
+	} catch(err) {}
 }

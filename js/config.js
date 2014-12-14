@@ -18,6 +18,13 @@ $(document).on('ready',function(){
 	$(document).on('change', '.pluginCheckBox', function(e) {
         console.log(this.name+' '+this.value+' '+this.checked);
         if(this.checked) {
+			if(this.name === "twitch"){
+				if(livestreamerPath === '') {
+					alert(_('You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html'));
+					$(this).attr('checked',false);
+					return;
+				}
+			}
 			settings.plugins.push(this.name);
 			saveSettings();
 		} else {

@@ -184,10 +184,12 @@ pre {
 }
 */
 
+
 .mejs-time-total, .mejs-time-rail {
 	width: calc(100% - 310px) !important;
 	margin-right: 20px !important;
 }
+
 
 #fbxMsg {
 	height: 100%;
@@ -306,8 +308,8 @@ font-weight:bold;
 	width: 16px;
 	height: 16px;
 	position: absolute;
-	left: 182px;
-	top: 64px;
+	right: 63px;
+	top: 33px;
 	border: 0;
 }
 
@@ -462,39 +464,46 @@ video{
 
 #subPlayer {
 	position: absolute;
-	bottom: 45px;
-	height: 155px;
-	width: 100%;
-	left: 0;
+	bottom: 40px;
+	height: 60px;
+	width: calc(100% - 8px);
+	left: -1;
+	opacity: 0.9;
+	z-index:1000;
 }
 
 #subPlayer-timer {
 	position: absolute;
-	top: 133px;
-	left: 106px;
+	top: 5px;
+	right: 20px;
 	font-size: 11px;
 }
 
 #subPlayer-img {
-	width: 85px;
-	height: 85px;
+	width: 50px;
+	height: 50px;
 	position: absolute;
 	left: 5px;
 	border:0;
-	top:55px;
+	top:5px;
 }
 
 #subPlayer-title {
-	position: absolute;
-	top: 11px;
-	left: 75px;
+	float: right;
+	margin-left: 10px;
+}
+
+#subPlayer-title-container {
+	margin-left: 180px;
+	margin-top: 5px;
+	float:left;
 }
 
 #subPlayer-controls {
 	position: absolute;
-	left:100px;
-	width:155px;
-	top: 81px;
+	left:70px;
+	top: 23px;
+	width:100%;
 }
 
 #subPlayer div.panel-body {
@@ -517,21 +526,44 @@ video{
 	width: 37px;
 	height: 32px;
 	float:left;
-	position: absolute;
 	top: -23px;
 	left: 37px;
+	z-index: 10001;
+}
+
+#showPlayer {
+	height: 60px;
+	opacity: 0;
+	position: absolute;
+	width: 100%;
+	bottom: 60;
+	left: 0;
+}
+
+#subPlayer-progress {
+	position: absolute;
+	left: 70px;
+	top: 7px;
+	width:100%;
+}
+
+#subPlayer-progress progress {
+	width: calc(100% - 200px);
+	height: 9px;
+	margin: -1;
+	padding: 1;
 }
 
 #subPlayer-stop {
-	background:url(../images/stop-icon.png);
-    background-repeat:no-repeat;
-    display: block;
+	background: url(../images/stop-icon.png);
+	background-repeat: no-repeat;
+	display: inline-block;
 	width: 37px;
 	height: 32px;
-	float:left;
 	position: absolute;
-	top: 15px;
-	left: 37px;
+	right: 78px;
+	top: 23px;
+	z-index: 10001;
 }
 
 #subPlayer-pause {
@@ -541,9 +573,9 @@ video{
 	width: 37px;
 	height: 32px;
 	float:left;
-	position: absolute;
 	top: -23px;
 	left: 37px;
+	z-index: 10001;
 }
 
 #subPlayer-next {
@@ -553,8 +585,8 @@ video{
 	width: 37px;
 	height: 32px;
 	float:left;
-	position: absolute;
 	left: 74px;
+	z-index: 10001;
 }
 
 #subPlayer-prev:hover {
@@ -1617,3 +1649,22 @@ top: -0.25em;
 position: relative;
   color:red;
 }
+
+.twitchQualityLink:hover {
+	color:#28a4c9 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

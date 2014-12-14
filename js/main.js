@@ -118,26 +118,9 @@ var htmlStr = '<div class="row"> \
 		<div id="upnpRenderersContainer" style="display:none;"><a id="upnp-toggle" class="upnp tiptip upnp-disabled"></a><form id="upnpPopup" style="display:none;"></form></div> \
 	</div> \
 </div> \
-<div class="panel panel-default" id="subPlayer">\
-  <div class="panel-heading">'+_("Playing:")+'</div> \
-  <div class="panel-body" style="text-align:center;"> \
-		<img id="subPlayer-img" src="images/play-overlay.png" />  \
-		<div id="subPlayer-controls"> \
-			<a href="#" id="subPlayer-prev"></a> \
-			<a href="#" id="subPlayer-play"></a> \
-			<a href="#" id="subPlayer-stop"></a> \
-			<a href="#" id="subPlayer-pause" style="display:none;"></a> \
-			<a href="#" id="subPlayer-next"></a> \
-		</div> \
-		<div id="playlistBtnSub"> \
-		</div> \
-		<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
-		<div id="subPlayer-title"><p> '+_('Waiting...')+'</p></div> \
-  </div> \
-</div> \
 </div> <!-- end lg-3 --> \
 <div id="content" class="col-xs-8 col-md-9 col-lg-10"> \
-	<div class="tab-content"> \
+	<div class="tab-content" style="height:100%"> \
 		<div class="tab-pane active" id="tabpage_1"> \
 				<div id="loading" style="display:None;"><div id="spinner" style="float:left;margin-right:10px;"></div><p style="position:relative;top:5px;">' + _(" Loading videos...") + '</p></div> \
 				<div id="search"> \
@@ -231,16 +214,16 @@ var htmlStr = '<div class="row"> \
 						  <input class="pluginCheckBox" type="checkbox" id="songza" name="songza">\
 						</div>\
 						<div class="ItemCheckbox left">\
+						  <label for="twitch">Twitch</label>\
+						  <input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch">\
+						</div>\
+						<div class="ItemCheckbox left">\
 						  <label for="grooveshark">Grooveshark</label>\
 						  <input class="pluginCheckBox" type="checkbox" id="grooveshark" name="grooveshark">\
 						</div>\
 						<div class="ItemCheckbox left">\
 						  <label for="omgtorrent">Cpasbien</label>\
 						  <input class="pluginCheckBox" type="checkbox" id="cpasbien" name="cpasbien">\
-						</div>\
-						<div class="ItemCheckbox left">\
-						  <label for="omgtorrent">Thepiratebay</label>\
-						  <input class="pluginCheckBox" type="checkbox" id="thepiratebay" name="thepiratebay">\
 						</div>\
 						<div class="ItemCheckbox left">\
 						  <label for="omgtorrent">Omgtorrent</label>\
@@ -289,6 +272,25 @@ var htmlStr = '<div class="row"> \
 					</div> \
 			</div> \
 	</div> \
+	<div class="panel panel-default" id="subPlayer">\
+		<div class="panel-body"> \
+			<img id="subPlayer-img" src="images/play-overlay.png" />  \
+			<div id="subPlayer-controls"> \
+				<a href="#" id="subPlayer-prev"></a> \
+				<a href="#" id="subPlayer-play"></a> \
+				<a href="#" id="subPlayer-pause" style="display:none;"></a> \
+				<a href="#" id="subPlayer-next"></a> \
+			</div> \
+			<div id="subPlayer-progress"> \
+				<progress id="progress-bar" min=\'0\' max=\'100\' value=\'0\'></progress> \
+			</div> \
+			<div id="playlistBtnSub"></div> \
+			<a href="#" id="subPlayer-stop"></a> \
+			<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
+			<div id="subPlayer-title-container">'+_("Playing:")+'<span id="subPlayer-title"><p> '+_('Waiting...')+'</p></span></div> \
+	</div> \
+</div> \
+<div id="showPlayer"></div> \
     <div id="custom-menu"> \
 <ol> \
 </ol> \
@@ -453,7 +455,7 @@ function main() {
 		}
 		var img = null;
 		if($('#subPlayer-title').text() !== currentMedia.title) {
-			$('#subPlayer-title').empty().append('<marquee behavior="scroll" scrollamount="2" direction="left">'+currentMedia.title+'</marquee>');
+			$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 		}
 	});
 	

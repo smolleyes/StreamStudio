@@ -1,4 +1,4 @@
-var VERSION = "1.13";
+var VERSION = "1.14";
 
 var path = require('path');
 var fs = require('fs');
@@ -75,6 +75,7 @@ var spinnerPlay = false;
 var itemTitle = '';
 var scrollObserver;
 var updateLazy = true;
+var livestreamerPath = "";
 //storedb
 var sdb = storedb('std');
 
@@ -87,9 +88,25 @@ if (process.platform === 'win32') {
     var cdir = process.env.APPDATA+'/StreamStudio';
     confDir = cdir.replace(/\\/g,'//');
     if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
-} else {
+    livestreamerPath = execDir+'/livestreamer/livestreamer.exe';
+    
+} else if (process.platform === 'linux' || process.platform === 'darwin') {
     confDir = getUserHome()+'/.config/StreamStudio';
     if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
+    // livestreamer
+    fs.exists('/usr/bin/livestreamer',function(res) {
+		if(res) {
+			livestreamerPath = "/usr/bin/livestreamer";
+		} else {
+			fs.exists('/usr/local/bin/livestreamer',function(res) { 
+				if(res) {
+					livestreamerPath = "/usr/local/bin/livestreamer";
+				} else {
+					console.log('livestreamer not found ! ')
+				}
+			})
+		}
+	})
 }
 
 
