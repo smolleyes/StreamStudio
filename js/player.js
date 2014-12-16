@@ -219,6 +219,7 @@ $(document).ready(function() {
 function initPlayer() {
     player.pause();
     player.setSrc('');
+    $("#subPlayer-img").attr('src',"images/play-overlay.png");
     setTimeout(function() {
 		player.currentTime = 0;
 		player.current[0].style.width = 0;
@@ -264,7 +265,6 @@ function initPlayer() {
 		try {
 			extPlayerProc.kill('SIGKILL');
 		} catch(err) {}
-	$("#subPlayer-img").attr('src',"images/play-overlay.png");
 	setTimeout(function() { 
 		if(player.media.paused && player.media.src.match(/index.html/) !== null && torrentPlaying == false) {
 			$(".mejs-overlay-button").show();
@@ -388,11 +388,14 @@ function launchPlay() {
 	$('#subPlayer-pause').show();
 	var img = null;
 	try {
-		img = $('.highlight').find('img')[0].src;
-	} catch(err) {console.log(err)}
-	if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
-		$('#subPlayer-img').attr('src',img);
-	} else {
+		img = $('.highlight img')[0].src;
+		console.log(img, activeTab, $('#subPlayer-img').attr('src'))
+		if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
+			$('#subPlayer-img').attr('src',img);
+		} else {
+			$('#subPlayer-img').attr('src','images/play-overlay.png');
+		}
+	} catch(err) {
 		$('#subPlayer-img').attr('src','images/play-overlay.png');
 	}
 	if($('#subPlayer-title').text() !== currentMedia.title) {

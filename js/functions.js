@@ -384,7 +384,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 	var sys = require('sys');
 	
 	var vlink = link.split('::')[0];
-	var alink = link.split('::')[0].replace('%20','');
+	var alink = link.split('::')[1].replace('%20','');
 	
 	if (activeTab !== 4) {
         $("#downloads_tab").click();
@@ -431,10 +431,11 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
     opt.title = title;
     opt.vid = vid;
     var target = download_dir + '/' + title.replace(/  /g, ' ').trim();
-    current_download[vid] = opt;
     pbar.show();
 	
 	var encoder = child_process.spawn('ffmpeg',['-y','-i', vlink,'-i',alink, '-c:v', 'libx264', '-c:a', 'copy', '-f','matroska',target]);
+	opt.process = encoder;
+	current_download[vid] = opt;
 	var total_time = 0,
 		total_data = '';
 	 
@@ -455,9 +456,14 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 			var time = data.toString().match(/time=(\d\d:\d\d:\d\d\.\d\d)/)[1];
 			var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 			if (canceled === true) {
-                    current_download[vid].abort();
+                    current_download[vid].process.kill('SIGKILL');
                     $('#progress_' + vid + ' a.cancel').hide();
                     $('#progress_' + vid + ' strong').html(_("Download canceled!"));
+                    fs.unlink(target, function(err) {
+						if (err) {} else {
+							console.log('successfully deleted ' + target);
+						}
+					});
                     setTimeout(function() {
                         pbar.hide()
                     }, 5000);
@@ -495,7 +501,7 @@ function convertTomp3Win(file) {
     var pbar = $('#progress_' + vid);
     var target = title.substring(0, title.lastIndexOf('.')) + '.mp3';
     $('#progress_' + vid + ' strong').html(_("Converting video to mp3, please wait..."));
-    var args = ['-i', title, '-ab', '192k', target];
+    var args = ['-y','-i', title, '-ab', '192k', target];
     if (process.platform === 'win32') {
         var ffmpeg = spawn(exec_path + '/ffmpeg.exe', args);
     } else {

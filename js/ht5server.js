@@ -47,10 +47,9 @@ function startStreaming(req, res, width, height) {
 		$('.mejs-overlay-play').hide();
 		res.writeHead(200, { // NOTE: a partial http response
 			// 'Date':date.toUTCString(),
-			'Connection': 'close',
+			'Connection': 'keep-alive',
 			"Content-Transfer-Encoding": "binary",
 			'Content-Type': 'video/mpeg',
-			'Accept-Ranges': 'bytes',
 			'Server':'CustomStreamer/0.0.1',
 			'transferMode.dlna.org': 'Streaming',
 			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'
@@ -339,25 +338,59 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
-			args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn', '-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+			args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
 		} else {
 			var vlink = link.split('::')[0].trim();
 			var alink = link.split('::')[1].trim().replace('%20','');
-			args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts', '-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+			args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts','-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
 		}
 	} else {
-		args = ['-re','-i', 'pipe:0', '-sn', '-c:v', 'libx264', '-preset', 'ultrafast', '-profile:v', 'high', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
+		args = ['-re','-i', 'pipe:0', '-sn', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
 	}
 	if (process.platform === 'win32') {
-		ffmpeg = spawn(exec_path + '/ffmpeg.exe', args);
+		ffmpeg = spawn(ffmpegPath, args);
 	} else {
-		ffmpeg = spawn(exec_path + '/ffmpeg', args);
+		ffmpeg = spawn(ffmpegPath, args);
 	}
 	ffar.push(ffmpeg);
+	
+	try {
+		img = $('.highlight img')[0].src;
+		if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
+			$('#subPlayer-img').attr('src',img);
+		} else {
+			$('#subPlayer-img').attr('src','images/play-overlay.png');
+		}
+	} catch(err) {
+		$('#subPlayer-img').attr('src','images/play-overlay.png');
+	}
+	
 	console.log('Spawning ffmpeg ' + args.join(' '));
-
+	var total_time = 0,
+		total_data = '';
+		
 	ffmpeg.stderr.on('data', function(data) {
-		console.log('grep stderr: ' + data);
+		if(data) {
+			total_data += data.toString();
+			if (total_data.toString().match(/Duration:\s\d\d:\d\d:\d\d\.\d\d/)) {
+				var time = total_data.toString().match(/Duration:\s(\d\d:\d\d:\d\d\.\d\d)/).toString().substring(10,21);
+				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
+				total_data = '';
+				total_time = seconds;
+			}
+			console.log('grep stderr: ' + data);
+			
+			if (data.toString().substr(0,5) == 'frame') {
+				var time = data.toString().match(/time=(\d\d:\d\d:\d\d\.\d\d)/)[1];
+				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
+			    var pct = (seconds / total_time) * 100;
+				$('.mejs-time-loaded').css('width', pct+'%').show();
+				if(pct == 100) {
+					return;
+				}
+			}
+			
+		}
 	});
 
 	return ffmpeg;

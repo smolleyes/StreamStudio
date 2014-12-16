@@ -501,9 +501,14 @@ function main() {
 			$(this).closest('.youtube_item').find('.spiffy').show();
 			youtube.getVideoInfos('http://youtube.com/watch?v='+vid,1,1,upnpToggleOn, function(datas){
 				$('.spiffy').hide();
+				$('#youtube_entry_res_' + vid).empty()
 				var infos = datas[25];
 				mediaDuration = 0;
-				var resolutions_string = ['1080p','720p', '480p','360p','240p'];
+				if(!upnpToggleOn) {
+					var resolutions_string = ['1080p','720p', '480p','360p','240p'];
+				} else {
+					var resolutions_string = ['720p','360p'];
+				}
 				var resolutions = infos.resolutions;
 				var vlink,vlinka;
 				for (var i = 0; i < resolutions_string.length; i++) {
@@ -531,7 +536,7 @@ function main() {
 					}
 					// append links
 					if(!upnpToggleOn){
-						$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+'::'+vlinka +' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
+						$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+'::'+vlinka +' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink+'::'+vlinka + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
 					} else {
 						$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
 					}
@@ -684,6 +689,9 @@ function main() {
         } catch (err) {
             current_download[id].end();
         }
+        try {
+			current_download[id].process.kill('SIGKILL');
+		} catch(err) {}
     });
 
     //hide preview

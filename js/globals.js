@@ -1,4 +1,4 @@
-var VERSION = "1.16";
+var VERSION = "1.17";
 
 var path = require('path');
 var fs = require('fs');
@@ -76,6 +76,10 @@ var itemTitle = '';
 var scrollObserver;
 var updateLazy = true;
 var livestreamerPath = "";
+var itemsCount = 0;
+var pageLoading = false;
+var totalResults = 0;
+var ffmpegPath;
 //storedb
 var sdb = storedb('std');
 
@@ -89,9 +93,11 @@ if (process.platform === 'win32') {
     confDir = cdir.replace(/\\/g,'//');
     if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
     livestreamerPath = execDir+'/livestreamer/livestreamer.exe';
+    ffmpegPath = execDir + '/ffmpeg.exe';
     
 } else if (process.platform === 'linux' || process.platform === 'darwin') {
     confDir = getUserHome()+'/.config/StreamStudio';
+    ffmpegPath = execDir + '/ffmpeg';
     if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
     // livestreamer
     fs.exists('/usr/bin/livestreamer',function(res) {

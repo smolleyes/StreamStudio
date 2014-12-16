@@ -78,6 +78,7 @@ function onSelectedItem(data) {
 		var engine = item.engine.value;
 		var id = item.id.value;
 		var title = item.title.value;
+		item.title.value = _('Loading...');
 		var next_vid = '';
 		var next= '';
 		try {
@@ -87,10 +88,19 @@ function onSelectedItem(data) {
 			next_vid = '';
 			console.log("no more videos to play in this playlist");
 		}
+		totalResults += 1;
+		itemsCount +=1;
 		if (engine === 'youtube') {
-			youtube.getVideoInfos('http://www.youtube.com/watch?v='+vid,0,1,function(datas) {showInfos(datas,next_vid,vid,flink,engine,title)});
+			youtube.getVideoInfos('http://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,function(datas) {
+				item.title.value = title;
+				printYtVideoInfos(datas[25], true, false, '', engine);
+				$("#"+vid).click();
+			});
 		} else if (engine === 'dailymotion'){
-			dailymotion.getVideoInfos(vid,0,1,function(datas) {showInfos(datas,next_vid,vid,flink,engine,title)});
+			dailymotion.getVideoInfos(vid,0,1,function(datas) {
+				item.title.value = title;
+				showInfos(datas,next_vid,vid,flink,engine,title)
+			});
 		}
 	} catch(err) {
 		console.log(err);
@@ -183,9 +193,9 @@ function showInfos(datas,next_vid,vid,flink,engine,title) {
 	link.next = next_vid;
 	link.title = title;
 	if (datas === 'null') {return;}
-    var resolutions_string = ['1080p','720p','480p','360p'];
+    var resolutions_string = ['1080p','720p','480p','360p','240p'];
     if (engine === 'youtube') {
-		var resolutions = datas[25].resolutions;
+		var resolutions = datas.resolutions;
 	} else {
 		var resolutions = datas[0].resolutions;
 	}
@@ -196,7 +206,7 @@ function showInfos(datas,next_vid,vid,flink,engine,title) {
 		if ((resolutions[res] === undefined) || (resolutions[res].link === 'null')){
 			if ( i === 3) {
 				link.link = arr[0];
-				$('video').trigger('loadPlayer',link,'');
+				startPlay(link);
 				break;
 			} else {
 				continue;
@@ -204,7 +214,7 @@ function showInfos(datas,next_vid,vid,flink,engine,title) {
 		} else {
 			if (res === selected_resolution) {
 				link.link = resolutions[res].link
-				$('video').trigger('loadPlayer',link,'');
+				startPlay(link);
 				break;
 			} else {
 				arr[l] = resolutions[res].link;
@@ -212,15 +222,13 @@ function showInfos(datas,next_vid,vid,flink,engine,title) {
 			}
 			if ( i === 3) {
 				link.link = arr[0];
-				$('video').trigger('loadPlayer',link,'');
+				startPlay(link);
 				break;
 			}
 		}
 	}
 	// show the video in the playlist
-	if (engine === 'youtube') {
-		youtube.getVideoInfos(flink,0,1,function(datas) {fillPlaylist(datas,false,'','youtube')});
-	} else if (engine === 'dailymotion'){
+	if (engine === 'dailymotion'){
 		dailymotion.getVideoInfos(vid,0,1,function(datas) {fillPlaylist(datas,false,'','dailymotion')});
 	}
 }

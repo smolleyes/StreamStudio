@@ -593,11 +593,15 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
 function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
     try {
         var title = infos.title.replace(/[\"\[\]\.\)\(\''\*]/g, '').replace(/  /g, ' ');
-        var thumb = infos.thumbnail['sqDefault'];
+        try {
+			var thumb = infos.thumbnail['sqDefault'];
+		} catch(err) {
+			var thumb = infos.thumb;
+		}
         var vid = infos.id;
         var seconds = secondstotime(infos.duration);
-        var views = infos.viewCount;
-        var aut = infos.uploader;
+        var views = infos.viewCount == undefined ? infos.views : infos.viewCount;
+        var aut = infos.uploader == null ? infos.author : infos.uploader;
         if (aut === 'unknown') {
             aut = _("unknown");
         }
@@ -633,6 +637,8 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
         }
 		
 		if($('#items_container div.youtube_item').length === itemsCount) {
+			$('#search_results').empty().html('<p><strong>' + totalResults + '</strong> ' + _("videos found") + '</p>');
+			$('#items_container').show();
 			pageLoading = false;
 		}
 		
