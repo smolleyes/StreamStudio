@@ -45,16 +45,17 @@ function startStreaming(req, res, width, height) {
         var device = deviceType(req.headers['user-agent']);
 		$('.mejs-overlay, .mejs-overlay-loading').show();
 		$('.mejs-overlay-play').hide();
-		console.log('startstreaming parsedlink: ' + parsedLink)
 		res.writeHead(200, { // NOTE: a partial http response
 			// 'Date':date.toUTCString(),
 			'Connection': 'close',
+			"Content-Transfer-Encoding": "binary",
 			'Content-Type': 'video/mpeg',
+			'Accept-Ranges': 'bytes',
 			'Server':'CustomStreamer/0.0.1',
 			'transferMode.dlna.org': 'Streaming',
 			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'
 		});
-		res.setTimeout(100000)
+		res.setTimeout(10000000)
 		currentRes = res;
         var linkParams = parsedLink.split('&');
         var bitrate = 300;
@@ -138,6 +139,19 @@ function startStreaming(req, res, width, height) {
 						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
 					}
 				});
+		}
+		// play youtube dash
+		if(playFromYoutube && !upnpToggleOn) {
+			console.log('Opening youtube link ' + link)
+			if(mediaDuration == 0) {
+				checkDuration(link, device, '', bitrate,res,time);
+			} else {
+				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+                     console.log('child process exited with code ' + code);
+                     res.end();
+                });
+                ffmpeg.stdout.pipe(res);
+			}
 		}
         //if tv/upnp
         if(playFromUpnp){
@@ -273,6 +287,11 @@ function startStreaming(req, res, width, height) {
 }
 
 function checkDuration(link, device, host, bitrate,res,seekTo) {
+	if(playFromYoutube) {
+		var olink = link;
+		var link = link.split('::')[0];
+	}
+	
 	var p;
 	if (process.platform === 'win32') {
 		p = exec(exec_path + '/ffprobe.exe' + " -i '"+decodeURIComponent(link)+"' -show_format -v quiet | sed -n 's/duration=//p'"); 
@@ -289,10 +308,17 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
     p.on('exit',function(code){
 		if(code === 0 && mediaDuration !== 0) {
 			console.log(mediaDuration + " " + secondstotime(mediaDuration))
-			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,seekTo, function(code) { // exit
-					console.log('child process exited with code ' + code);
-					//res.end();
-			});
+			if(playFromYoutube) {
+				var ffmpeg = spawnFfmpeg(olink, device, '', bitrate,seekTo, function(code) { // exit
+						console.log('child process exited with code ' + code);
+						//res.end();
+				});
+			} else {
+				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,seekTo, function(code) { // exit
+						console.log('child process exited with code ' + code);
+						//res.end();
+				});
+			}
 			ffmpeg.stdout.pipe(res);
 		} else {
 			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,seekTo, function(code) { // exit
@@ -312,9 +338,15 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	}
 	if (host === undefined || link !== '') {
 		//local file...
-		args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn', '-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
+			args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn', '-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+		} else {
+			var vlink = link.split('::')[0].trim();
+			var alink = link.split('::')[1].trim().replace('%20','');
+			args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts', '-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+		}
 	} else {
-	    args = ['-re','-i', 'pipe:0', '-sn', '-c:v', 'libx264', '-preset', 'ultrafast', '-profile:v', 'high', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
+		args = ['-re','-i', 'pipe:0', '-sn', '-c:v', 'libx264', '-preset', 'ultrafast', '-profile:v', 'high', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
 	}
 	if (process.platform === 'win32') {
 		ffmpeg = spawn(exec_path + '/ffmpeg.exe', args);

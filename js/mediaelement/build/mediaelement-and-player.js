@@ -3249,8 +3249,9 @@ if (typeof jQuery != 'undefined') {
 						}
 						pos = x - offset.left;
 						percentage = (pos / width);
-						newTime = (percentage <= 0.02) ? 0 : percentage * mediaDuration;
-						
+						try {
+							newTime = (percentage <= 0.02) ? 0 : percentage * mediaDuration;
+						} catch(err) {return;}
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
 							media.setCurrentTime(newTime);
@@ -3265,6 +3266,8 @@ if (typeof jQuery != 'undefined') {
 								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
 							} else if (playFromUpnp) {
 								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+							} else if (playFromYoutube) {
+								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 							}
 							m.title = currentMedia.title;
 							console.log(m)

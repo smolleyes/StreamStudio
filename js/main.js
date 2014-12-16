@@ -136,7 +136,7 @@ var htmlStr = '<div class="row"> \
 			</div> \
 			<div class="tab-pane" id="tabpage_2"> \
 				<p>'+_("Use your mouse right click on Youtube or Dailymotion video's titles to bookmark them in this library.")+'</p> \
-				<div id="nanoContent" class="nano" style="top:10px !important; height: calc(100% - 110px);"> \
+				<div id="nanoContent" class="nano"> \
 					<div id="treeview" class="nano-content"> \
 					</div> \
 				</div> \
@@ -145,20 +145,20 @@ var htmlStr = '<div class="row"> \
 					<a id="file_update" href="#"><img src="images/update.png" id="update_img" /> \
 					<span>' + _("Update files list...") + '</span></a> \
 				<div id="fileBrowser"> \
-					<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 90px);"> \
+					<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 145px);"> \
 						<div id="fileBrowserContent" class="nano-content"> \
 						</div> \
 					</div> \
 				</div> \
 			</div> \
 			 <div class="tab-pane" id="tabpage_4"> \
-				<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 90px);"> \
-					<div id="DownloadsContainer" class="nano-content"> \
+				<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 145px);"> \
+					<div id="DownloadsContainer" class="nano-content" > \
 					</div> \
 				</div> \
 			</div> \
 			<div class="tab-pane" id="tabpage_5"> \
-				<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 90px);"> \
+				<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 135px);"> \
 					<div id="UpnpContainer" class="nano-content"> \
 					</div> \
 				</div> \
@@ -167,7 +167,7 @@ var htmlStr = '<div class="row"> \
 				<div class="container" style="margin-left:0;width:calc(100% - 15px);padding-top:10px;"> \
 					<div class="row"> \
 						<legend><h3>StreamStudio Settings <span style="font-size:12px;float:right;margin-top:10px;"><b>(V'+settings.version+')</b></span>:</h3></legend> \
-						<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 160px);"> \
+						<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 210px);"> \
 				<form role="form" class="nano-content" style="padding-top:10px;"> \
 					<div class="form-group"> \
 						<label>'+_("Language:")+'</label> \
@@ -499,15 +499,23 @@ function main() {
         var vid = current_song.split('youtube_entry_res_')[1];
         if ($('#youtube_entry_res_' + vid + ' a.video_link').length === 0) {
 			$(this).closest('.youtube_item').find('.spiffy').show();
-			youtube.getVideoInfos('http://youtube.com/watch?v='+vid,1,1, function(datas){
+			youtube.getVideoInfos('http://youtube.com/watch?v='+vid,1,1,upnpToggleOn, function(datas){
 				$('.spiffy').hide();
 				var infos = datas[25];
-				var resolutions_string = ['720p', '360p'];
+				mediaDuration = 0;
+				var resolutions_string = ['1080p','720p', '480p','360p','240p'];
 				var resolutions = infos.resolutions;
+				var vlink,vlinka;
 				for (var i = 0; i < resolutions_string.length; i++) {
 					try {
 						var resolution = resolutions_string[i];
 						var vlink = resolutions[resolution]['link'];
+						if(upnpToggleOn) {
+							vlink += '&upnp';
+						} else {
+							vlink = resolutions[resolution]['link'];
+							vlinka = resolutions[resolution]['linka'];
+						}
 						if (vlink === 'null') {
 							continue;
 						}
@@ -522,8 +530,11 @@ function main() {
 						img = 'images/sd.png';
 					}
 					// append links
-					$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink + '" alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
-					
+					if(!upnpToggleOn){
+						$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+'::'+vlinka +' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
+					} else {
+						$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
+					}
 				}
 				startVideo(current_song);
 			})
@@ -547,7 +558,8 @@ function main() {
         video.link = $(this).attr('href');
         video.title = $(this).parent().closest('.youtube_item').find('.start_video').attr('alt');
         video.next = next_vid;
-        $('video').trigger('loadPlayer', video);
+        startPlay(video);
+        //$('video').trigger('loadPlayer', video);
         $(this).closest('.youtube_item').addClass('highlight well');
     });
 
@@ -660,7 +672,7 @@ function main() {
         var link = $(this).attr('href');
         var title = $(this).attr('alt');
         var engine = title.split('::')[2];
-        downloadFileHttps(link, title, engine);
+        downloadFFMpeg(link, title, engine,false);
     });
     
     //cancel download
@@ -1121,58 +1133,62 @@ function main() {
 }
 
 function updateScroller() {
-	setTimeout(function() {
-		try {
-			$(".nano").nanoScroller();
+	if(activeTab == 1) {
+		setTimeout(function() {
 			try {
-				scrollObserver.disconnect();
-			} catch(err) {}
-			scrollObserver = new MutationObserver(function(mutations) {
-				mutations.forEach(function(mutation) {
-					try {
-						var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
-						if(engine) {
-							if(($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && $("#items_container ul li").length == engine.lazyStart) || !$('.nano-slider').is(':visible') && $("#items_container ul li").length == engine.lazyStart){
-								if(engine.lazyStart !== engine.lazyLength) {
-									engine.loadMore();
+				$(".nano").nanoScroller();
+				try {
+					scrollObserver.disconnect();
+				} catch(err) {}
+				scrollObserver = new MutationObserver(function(mutations) {
+					mutations.forEach(function(mutation) {
+						try {
+							var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
+							if(engine) {
+								if(activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && $("#items_container ul li").length == engine.lazyStart) || !$('.nano-slider').is(':visible') && $("#items_container ul li").length == engine.lazyStart){
+									if(engine.lazyStart !== engine.lazyLength) {
+										engine.loadMore();
+									}
+								} else if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !engine.pageLoading ) || $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
+									if($("#items_container ul li").length < engine.totalItems) {
+										engine.loadMore();
+									}
 								}
-							} else if (($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !engine.pageLoading ) || $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
-								if($("#items_container ul li").length < engine.totalItems) {
-									engine.loadMore();
+							} else {
+								if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading ) || $("#items_container div.youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
+									if(search_engine === "youtube" && searchTypes_select === "playlists" && $("#items_container div.youtube_item_playlist").length !== 0 && $("#items_container div.youtube_item_playlist").length < totalResults) {	
+										current_page += 1;
+										pageLoading = true;
+										changePage();
+									} else if( activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container div.youtube_item_channel").length !== 0 && $("#items_container div.youtube_item_channel").length < totalResults) {	
+										current_page += 1;
+										pageLoading = true;
+										changePage();
+									} else if(activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container div.youtube_item").length < totalResults) {	
+										current_page += 1;
+										pageLoading = true;
+										changeChannelPage();
+									} else if(activeTab == 1 && $("#items_container div.youtube_item").length < totalResults) {
+										current_page += 1;
+										pageLoading = true;
+										changePage();
+									} 
 								}
 							}
-						} else {
-							if (($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading ) || $("#items_container div.youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
-								if(search_engine === "youtube" && searchTypes_select === "playlists" && $("#items_container div.youtube_item_playlist").length !== 0 && $("#items_container div.youtube_item_playlist").length < totalResults) {	
-									current_page += 1;
-									pageLoading = true;
-									changePage();
-								} else if(search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container div.youtube_item_channel").length !== 0 && $("#items_container div.youtube_item_channel").length < totalResults) {	
-									current_page += 1;
-									pageLoading = true;
-									changePage();
-								} else if(search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container div.youtube_item").length < totalResults) {	
-									current_page += 1;
-									pageLoading = true;
-									changeChannelPage();
-								} else if($("#items_container div.youtube_item").length < totalResults) {
-									current_page += 1;
-									pageLoading = true;
-									changePage();
-								} 
-							}
+						} catch(err) {
+							console.log(err)
 						}
-					} catch(err) {
-						console.log(err)
-					}
-				});    
-			});
-			var target = document.querySelector('.nano-slider');
-			scrollObserver.observe(target, { attributes : true, attributeFilter : ['style'] });
-	} catch(err) {
+					});    
+				});
+				var target = document.querySelector('.nano-slider');
+				scrollObserver.observe(target, { attributes : true, attributeFilter : ['style'] });
+		} catch(err) {
+			$(".nano").nanoScroller();
+		}
+		},1000);
+	} else {
 		$(".nano").nanoScroller();
 	}
-	},200);
 }
 
 function updatePickers() {

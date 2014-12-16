@@ -1,3 +1,6 @@
+V 1.16
+  * rewrite youtube code, get 1080p/240p and all formats thru direct ffmpeg transcoding and vp9/vorbis links
+
 V 1.15
   * fix youtube 
 

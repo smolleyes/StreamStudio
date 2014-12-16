@@ -421,13 +421,18 @@ video{
 }
 
 #loading {
-    top: 85px;
-    left: 9px;
+    top: 0px;
+    left: 15px;
+    position: relative ;
+    z-index:100001;
+    height:32px;
 }
 
 #loading p {
-	margin-top:5px;
+	margin-top:3px;
 	width:450px;
+	margin: 10px 0 10px 8px;
+    height: 32px ;
 }
 
 #search {
@@ -760,10 +765,12 @@ video{
     height:100%;
 }
 
+/*
 #nanoContent {
     position: relative;
     top:20px !important;
 }
+*/
 #nanoContent a{
     cursor:pointer;
 }

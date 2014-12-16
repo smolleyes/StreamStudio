@@ -24,6 +24,8 @@ var playFromUpnp = false;
 var playFromMega = false;
 var playFromMegaUser = false;
 var playFromTwitch = false;
+var playFromYoutube = false;
+var doNotSwitch = false;
 
 $(document).ready(function() {
 	
@@ -159,14 +161,14 @@ $(document).ready(function() {
 	});
 	
 	// subPlayer show/hide 
-	$("#subPlayer").hide();
+	//$("#subPlayer").hide();
 	
-	$( "#showPlayer" ).mouseover(function() {
-	  $("#subPlayer").show();
-	});
-	$("#subPlayer" ).mouseleave(function() {
-	  $("#subPlayer").hide();
-	});
+	//$( "#showPlayer" ).mouseover(function() {
+	  //$("#subPlayer").show();
+	//});
+	//$("#subPlayer" ).mouseleave(function() {
+	  //$("#subPlayer").hide();
+	//});
 	
 	// subPlayer progress bar
 	mediaPlayer = document.getElementById('videoPlayer');
@@ -177,7 +179,7 @@ $(document).ready(function() {
 		var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
 		console.log(pct + "%")
 		var newTime = Math.round((duree * pct) / 100);
-		if(transcoderEnabled) {
+		if(transcoderEnabled || playFromYoutube) {
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
 			if(playFromFile) {
@@ -188,6 +190,9 @@ $(document).ready(function() {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
 			} else if (playFromUpnp) {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+			} else if (playFromYoutube) {
+				doNotSwitch = true;
+				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 			}
 			m.title = currentMedia.title;
 			console.log(m)
@@ -290,6 +295,7 @@ function startPlay(media) {
     playFromMega = false;
     playFromMegaUser = false;
     playFromTwitch = false;
+    playFromYoutube = false;
     var localLink = null;
     try {
         next_vid = media.next;
@@ -313,7 +319,11 @@ function startPlay(media) {
 			playFromTwitch = true;
 			currentMedia.link = link.replace('&twitch','').replace('&external','');
 			launchPlay();
-		// torrents
+		// youtube dash
+		} else if (link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
+			playFromYoutube = true;
+			currentMedia.link = link;
+			launchPlay();
 		} else if (linkType === 'torrent') {
 			torrentPlaying = true;
 			currentMedia.link = link.replace('&torrent','');
@@ -365,9 +375,13 @@ function launchPlay() {
 	try {
 		var obj = JSON.parse(settings.ht5Player);
 		if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
-			$('#playerToggle').click();
-			$(".mejs-overlay-button").hide();
-			$('.mejs-overlay-play').hide();
+			if(doNotSwitch) {
+				doNotSwitch = false;
+			} else {
+				$('#playerToggle').click();
+				$(".mejs-overlay-button").hide();
+				$('.mejs-overlay-play').hide();
+			}
 		}
 	} catch(err) {}
 	$('#subPlayer-play').hide();
@@ -385,7 +399,7 @@ function launchPlay() {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// add link for transcoding
-	if(transcoderEnabled || playFromTwitch|| currentMedia.link.indexOf('mega.co') !== -1) {
+	if(transcoderEnabled || playFromTwitch|| playFromYoutube|| currentMedia.link.indexOf('mega.co') !== -1) {
 		var link = 'http://'+ipaddress+':8888/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
