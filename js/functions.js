@@ -433,7 +433,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
     var target = download_dir + '/' + title.replace(/  /g, ' ').trim();
     pbar.show();
 	
-	var encoder = child_process.spawn('ffmpeg',['-y','-i', vlink,'-i',alink, '-c:v', 'libx264', '-c:a', 'copy', '-f','matroska',target]);
+	var encoder = child_process.spawn(ffmpegPath,['-y','-i', vlink,'-i',alink, '-c:v', 'libx264', '-c:a', 'copy', '-f','matroska',target]);
 	opt.process = encoder;
 	current_download[vid] = opt;
 	var total_time = 0,
@@ -522,6 +522,12 @@ var wipeTmpFolder = function() {
     rmdir( tmpDir2, function ( err, dirs, files ){
 		console.log( 'file '+files+' removed' );
 	});
+	
+	if(process.platform == 'darwin'){
+    	rmdir('/tmp/torrent-stream', function ( err, dirs, files ){
+			console.log( 'file '+files+' removed' );
+		});
+	}
 	
     if( typeof tmpFolder != 'string' ){ return; }
     fs.readdir(tmpFolder, function(err, files){

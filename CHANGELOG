@@ -1,3 +1,8 @@
+V 1.18
+  * fix osX update
+  * use compiled ffmpeg for osX
+  * bug fix 
+
 V 1.17
   * add preload progress bar in the player when using transcoder
   * many bug fixes

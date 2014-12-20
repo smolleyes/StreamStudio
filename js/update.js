@@ -118,7 +118,7 @@ function downloadUpdate(link,filename) {
  	    } else if (process.platform === 'darwin') {
 			var dest = path.dirname(execDir.match(/(.*)streamstudio.app(.*?)/)[0]);
 			var args = ['-o',filename,'-d',dest];
-			var ls = spawn('stat', ['-c','%U', execDir]);
+			var ls = spawn('stat', ['-LF', dest,'|','awk', "'{print $3}'"]);
 			ls.stdout.on('data', function (data) {
 				console.log('permissions for install dir :' + data.toString())
 			  if(data.toString() === 'root') {
@@ -130,14 +130,10 @@ function downloadUpdate(link,filename) {
 				  },5000);
 			  }
 			});
-
-			ls.stderr.on('data', function (data) {
-			  $.notif({title: 'StreamStudio:',cls:'red',timeout:10000,icon: '&#10006;',content:_("Update error, please report the problem... or try to reinstall manually !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
-			});
  	    } else {
 			console.log('install for linux...')
 		    var args = ['-o',filename,'-d',execDir];
-			var ls = spawn('stat', ['-c','%U', execDir]);
+			var ls = spawn('stat', ['-c', '%U', execDir]);
 			ls.stdout.on('data', function (data) {
 				console.log('permissions for install dir :"' + data.toString()+ '"')
 				if(data.toString().trim() === 'root') {
@@ -148,10 +144,6 @@ function downloadUpdate(link,filename) {
 						installUpdate(args);
 					},5000);
 				}
-			});
-
-			ls.stderr.on('data', function (data) {
-			  $.notif({title: 'StreamStudio:',cls:'red',timeout:10000,icon: '&#10006;',content:_("Update error, please report the problem... or try to reinstall manually !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
 			});
 		}
 	});
@@ -217,10 +209,5 @@ function installUpdate(args) {
 		} else {
 			$.notif({title: 'StreamStudio:',cls:'red',timeout:10000,icon: '&#10006;',content:_("Update error, please report the problem... or try to reinstall manually !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
 		}
-	});
-	update.stderr.on('data', function(data) {
-		$('.notification').click();
-		$.notif({title: 'StreamStudio:',cls:'red',timeout:10000,icon: '&#10006;',content:_("Update error, please report the problem... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
-		console.log('update stderr: ' + data);
 	});
 }

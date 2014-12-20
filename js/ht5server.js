@@ -147,7 +147,7 @@ function startStreaming(req, res, width, height) {
 			} else {
 				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                      console.log('child process exited with code ' + code);
-                     res.end();
+                     //res.end();
                 });
                 ffmpeg.stdout.pipe(res);
 			}
@@ -286,22 +286,26 @@ function startStreaming(req, res, width, height) {
 }
 
 function checkDuration(link, device, host, bitrate,res,seekTo) {
+	var olink = '';
 	if(playFromYoutube) {
-		var olink = link;
+		olink = link;
 		var link = link.split('::')[0];
 	}
 	
 	var p;
 	if (process.platform === 'win32') {
-		p = exec(exec_path + '/ffprobe.exe' + " -i '"+decodeURIComponent(link)+"' -show_format -v quiet | sed -n 's/duration=//p'"); 
+		p = spawn(execDir+'/ffprobe.exe',[''+decodeURIComponent(link)+'', '-show_format','-v', 'quiet']); 
 	} else {
-		p = exec(exec_path + '/ffprobe' + " -i '"+decodeURIComponent(link)+"' -show_format -v quiet | sed -n 's/duration=//p'"); 
+		p = spawn(execDir+'/ffprobe',[''+decodeURIComponent(link)+'', '-show_format','-v', 'quiet']);
 	}
 	p.stdout.on('data',function(data){
-		if(data.indexOf('N/A') !== -1) {
-			mediaDuration = 0;
-		} else {
-			mediaDuration = parseInt(data);
+		if(data.toString().indexOf('duration=') !== -1) {
+			var rep = data.toString().match(/duration=(.*)/)[1];
+			if(rep.indexOf('N/A') !== -1) {
+				mediaDuration = 0;
+			} else {
+				mediaDuration = parseInt(rep);
+			}
 		}
 	}); 
     p.on('exit',function(code){
@@ -331,6 +335,7 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 
 
 function spawnFfmpeg(link, device, host, bitrate,seekTo) {
+	console.log(link)
 	var start = '00:00:00.00'
 	if(seekTo !== 0) {
 		start = seekTo;
@@ -340,7 +345,8 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
 			args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
 		} else {
-			var vlink = link.split('::')[0].trim();
+			//console.log(link)
+			var vlink = link.split('::')[0];
 			var alink = link.split('::')[1].trim().replace('%20','');
 			args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts','-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
 		}
