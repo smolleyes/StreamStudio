@@ -280,13 +280,14 @@ var htmlStr = '<div class="row"> \
 				<a href="#" id="subPlayer-prev"></a> \
 				<a href="#" id="subPlayer-play"></a> \
 				<a href="#" id="subPlayer-pause" style="display:none;"></a> \
+				<a href="#" id="subPlayer-stop"></a> \
 				<a href="#" id="subPlayer-next"></a> \
 			</div> \
 			<div id="subPlayer-progress"> \
 				<progress id="progress-bar" min=\'0\' max=\'100\' value=\'0\'></progress> \
 			</div> \
 			<div id="playlistBtnSub"></div> \
-			<a href="#" id="subPlayer-stop"></a> \
+			<div id="transcodingBtnSub"></div> \
 			<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
 			<div id="subPlayer-title-container">'+_("Playing:")+'<span id="subPlayer-title"><p> '+_('Waiting...')+'</p></span></div> \
 	</div> \
@@ -466,6 +467,12 @@ function main() {
 	$('button[aria-label="playlist"]').attr('style', 'background-position-y:0px !important');
 	$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
 	$('button[aria-label="playlist"]').attr('title',_('play and stop mode (click to change)'));
+	
+	$("#transcodeBtnContainer").bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
+		$("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
+	});
+	$("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
+	
     // fullscreen signal and callback
     var left;
     var right;
@@ -496,10 +503,12 @@ function main() {
         current_song_page = current_page;
         var title = $(this).attr('alt');
         current_song = $(this).closest('.youtube_item').find('.downloads_container').attr('id');
-        var vid = current_song.split('youtube_entry_res_')[1];
+        var vid = $(this).attr('id');
+        ytId = vid;
         if ($('#youtube_entry_res_' + vid + ' a.video_link').length === 0) {
 			$(this).closest('.youtube_item').find('.spiffy').show();
-			youtube.getVideoInfos('http://youtube.com/watch?v='+vid,1,1,upnpToggleOn, function(datas){
+			youtube.getVideoInfos('https://youtube.com/watch?v='+vid,1,1,upnpToggleOn, function(datas){
+				console.log(datas)
 				$('.spiffy').hide();
 				$('#youtube_entry_res_' + vid).empty()
 				var infos = datas[25];

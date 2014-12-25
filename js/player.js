@@ -69,7 +69,7 @@ $(document).ready(function() {
         }
     });
     //transcoder button
-     $(document).on('click','#transcodeBtnContainer',function(e) {
+     $(document).on('click','#transcodeBtnContainer,#transcodingBtnSub',function(e) {
 		e.preventDefault();
 		if(transcoderEnabled) {
 			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
@@ -275,7 +275,15 @@ function initPlayer() {
 
 function startPlay(media) {
 	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false) {
-		initPlayer();
+		if (media.link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
+			if(currentMedia && currentMedia.ytId !== ytId) {
+				initPlayer();
+			} else {
+				cleanffar();
+			}
+		} else {
+			initPlayer();
+		}
 	}
     if(extPlayerRunning) {
 		try {
@@ -323,6 +331,7 @@ function startPlay(media) {
 		} else if (link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
 			playFromYoutube = true;
 			currentMedia.link = link;
+			currentMedia.ytId = ytId;
 			launchPlay();
 		} else if (linkType === 'torrent') {
 			torrentPlaying = true;
@@ -531,8 +540,7 @@ function getNext() {
 					$('.highlight').closest('li').next().find('a.preload')[0].click();
 				} catch (err) {
 					try {
-						var vid_id = $('.highlight').closest('div.youtube_item').next().find('.downloads_container').attr('id');
-						startVideo(vid_id);
+						$('.highlight').closest('div.youtube_item').next().find('a.start_video').click()
 					} catch (err) {
 						playNextVideo(next_vid);
 					}
@@ -569,8 +577,7 @@ function getPrev() {
 			$('.highlight').closest('li').prev().find('a')[0].click();
 		} catch (err) {
 			try {
-				var vid_id = $('.highlight').closest('div.youtube_item').prev().find('.downloads_container').attr('id');
-				startVideo(vid_id);
+				$('.highlight').closest('div.youtube_item').prev().find('a.start_video').click()
 			} catch(err) {}
 		}
 	} else {

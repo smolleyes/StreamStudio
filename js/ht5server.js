@@ -47,9 +47,8 @@ function startStreaming(req, res, width, height) {
 		$('.mejs-overlay-play').hide();
 		res.writeHead(200, { // NOTE: a partial http response
 			// 'Date':date.toUTCString(),
-			'Connection': 'keep-alive',
-			"Content-Transfer-Encoding": "binary",
-			'Content-Type': 'video/mpeg',
+			'Connection': 'closed',
+			'Content-Type': 'video/mp4',
 			'Server':'CustomStreamer/0.0.1',
 			'transferMode.dlna.org': 'Streaming',
 			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'
@@ -304,7 +303,7 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 			if(rep.indexOf('N/A') !== -1) {
 				mediaDuration = 0;
 			} else {
-				mediaDuration = parseInt(rep);
+				mediaDuration = parseFloat(rep);
 			}
 		}
 	}); 
@@ -362,7 +361,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	
 	try {
 		img = $('.highlight img')[0].src;
-		if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
+		if (img !== $('#subPlayer-img').attr('src') && img !== null) {
 			$('#subPlayer-img').attr('src',img);
 		} else {
 			$('#subPlayer-img').attr('src','images/play-overlay.png');

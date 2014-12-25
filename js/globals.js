@@ -1,4 +1,4 @@
-var VERSION = "1.18";
+var VERSION = "1.19";
 
 var path = require('path');
 var fs = require('fs');
@@ -80,6 +80,7 @@ var itemsCount = 0;
 var pageLoading = false;
 var totalResults = 0;
 var ffmpegPath;
+var ytId='';
 //storedb
 var sdb = storedb('std');
 

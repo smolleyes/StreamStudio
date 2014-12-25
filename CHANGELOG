@@ -1,3 +1,7 @@
+V 1.19
+  * fix videos not completely readed
+  * small gui changes
+
 V 1.18
   * fix osX update
   * use compiled ffmpeg for osX

@@ -312,10 +312,19 @@ font-weight:bold;
 
 #playlistBtnSub button {
 	width: 16px;
+	height: 14px;
+	position: absolute;
+	left: 220px;
+	top: 34px;
+	border: 0;
+}
+
+#transcodingBtnSub button {
+	width: 16px;
 	height: 16px;
 	position: absolute;
-	right: 63px;
-	top: 33px;
+	left: 243px;
+	top: 32px;
 	border: 0;
 }
 
@@ -422,27 +431,24 @@ video{
 
 #loading {
     top: 0px;
-    left: 15px;
     position: relative ;
     z-index:100001;
-    height:32px;
+    height:50px;
 }
 
 #loading p {
-	margin-top:3px;
 	width:450px;
-	margin: 10px 0 10px 8px;
     height: 32px ;
 }
 
 #search {
     z-index: 500;
     overflow:auto;
-    height:50px;
+    height:60px;
 }
 
 #search p {
-    margin: 10px 0 10px 8px;
+    margin: 0px 0 10px 8px;
     height: 32px ;
 }
 
@@ -505,7 +511,7 @@ video{
 }
 
 #subPlayer-title-container {
-	margin-left: 180px;
+	margin-left: 270px;
 	margin-top: 5px;
 	float:left;
 }
@@ -563,17 +569,18 @@ video{
 	height: 9px;
 	margin: -1;
 	padding: 1;
+	cursor: pointer;
 }
 
 #subPlayer-stop {
 	background: url(../images/stop-icon.png);
-	background-repeat: no-repeat;
-	display: inline-block;
+	background-repeat:no-repeat;
+    display: block;
 	width: 37px;
 	height: 32px;
-	position: absolute;
-	right: 78px;
-	top: 23px;
+	float:left;
+	top: -23px;
+	left: 37px;
 	z-index: 10001;
 }
 

@@ -2568,6 +2568,9 @@ if (typeof jQuery != 'undefined') {
 				
 				// resize on the first play
 				t.media.addEventListener('loadedmetadata', function(e) {
+					if(t.media.duration == Infinity) {
+						t.options.duration = mediaDuration;
+					}
 					if (t.updateDuration) {
 						t.updateDuration();
 					}
@@ -2733,7 +2736,7 @@ if (typeof jQuery != 'undefined') {
 			rail.width(railWidth);
 			// dark space
 			total.width(railWidth - (total.outerWidth(true) - total.width()));
-			total.width = window.innerWidth - 415;
+			total.width = window.innerWidth;
 			if (t.setProgressRail)
 				t.setProgressRail();
 			if (t.setCurrentRail)
@@ -3242,6 +3245,7 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
+						
 						if (x < offset.left) {
 							x = offset.left;
 						} else if (x > width + offset.left) {
@@ -3249,6 +3253,7 @@ if (typeof jQuery != 'undefined') {
 						}
 						pos = x - offset.left;
 						percentage = (pos / width);
+						
 						try {
 							newTime = (percentage <= 0.02) ? 0 : percentage * mediaDuration;
 						} catch(err) {return;}
@@ -3270,7 +3275,6 @@ if (typeof jQuery != 'undefined') {
 								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 							}
 							m.title = currentMedia.title;
-							console.log(m)
 							startPlay(m);
 						}
 
@@ -3387,9 +3391,7 @@ if (typeof jQuery != 'undefined') {
 							t.loaded.width(t.total.width() * percent);
 						}
 					}
-				} catch(err) {
-					
-				}
+				} catch(err) {}
 			}
 		},
 		setCurrentRail: function() {
@@ -3409,7 +3411,7 @@ if (typeof jQuery != 'undefined') {
 				}
 			} else {
 				if (t.media.currentTime != undefined && t.media.duration) {
-
+						
 					// update bar and handle
 					if (t.total && t.handle) {
 						var 
@@ -3439,10 +3441,6 @@ if (typeof jQuery != 'undefined') {
 	$.extend(MediaElementPlayer.prototype, {
 		buildcurrent: function(player, controls, layers, media) {
 			var t = this;
-			if(t.media.duration == Infinity) {
-				t.media.duration = mediaDuration;
-				t.options.duration = mediaDuration;
-			}
 			$('<div class="mejs-time">'+
 					'<span class="mejs-currenttime">' + (player.options.alwaysShowHours ? '00:' : '')
 					+ (player.options.showTimecodeFrameCount? '00:00':'00:00')+ '</span>'+
@@ -3460,7 +3458,6 @@ if (typeof jQuery != 'undefined') {
 		buildduration: function(player, controls, layers, media) {
 			var t = this;
 			if(t.media.duration == Infinity) {
-				t.media.duration = mediaDuration;
 				t.options.duration = mediaDuration;
 			}
 			if (controls.children().last().find('.mejs-currenttime').length > 0) {
@@ -3497,25 +3494,33 @@ if (typeof jQuery != 'undefined') {
 		updateCurrent:  function() {
 			var t = this;
 			if(t.media.duration == Infinity) {
-				t.media.duration = mediaDuration;
 				t.options.duration = mediaDuration;
-			}
-			if (t.currenttime) {
-				t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+				if (t.currenttime) {
+					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+				}
+			} else {
+				if (t.currenttime) {
+					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+				}
 			}
 		},
 		
 		updateDuration: function() {
 			var t = this;
 			if(t.media.duration == Infinity) {
-				t.media.duration = mediaDuration;
 				t.options.duration = mediaDuration;
+				//Toggle the long video class if the video is longer than an hour.
+				t.container.toggleClass("mejs-long-video", mediaDuration > 3600);
+				if (t.durationD && (t.options.duration > 0 || t.media.duration)) {
+					t.durationD.html(mejs.Utility.secondsToTimeCode(mediaDuration > 0 ? mediaDuration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
+				}
+			} else {
+				//Toggle the long video class if the video is longer than an hour.
+				t.container.toggleClass("mejs-long-video", t.media.duration > 3600);
+				if (t.durationD && (t.options.duration > 0 || t.media.duration)) {
+					t.durationD.html(mejs.Utility.secondsToTimeCode(t.options.duration > 0 ? t.options.duration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
+				}		
 			}
-			//Toggle the long video class if the video is longer than an hour.
-			t.container.toggleClass("mejs-long-video", t.media.duration > 3600);
-			if (t.durationD && (t.options.duration > 0 || t.media.duration)) {
-				t.durationD.html(mejs.Utility.secondsToTimeCode(t.options.duration > 0 ? t.options.duration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
-			}		
 		}
 	});
 
