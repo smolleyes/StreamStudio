@@ -1,3 +1,7 @@
+V 1.20
+  * fix osX ffmpeg
+  * fix youtube videos not playing
+
 V 1.19
   * fix videos not completely readed
   * small gui changes
