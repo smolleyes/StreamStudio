@@ -140,7 +140,7 @@ $(document).ready(function() {
     player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
-		$('.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+		$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     });
     
 	//SubPlayer controls

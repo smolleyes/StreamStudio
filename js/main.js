@@ -381,17 +381,27 @@ function main() {
     };
     // navigation setup
     $(document).on("click", "#tab .btn", function(e){
+		try {
+			$(".nano").nanoScroller();
+			engine.pageLoading = false;
+			current_page = engine.currentPage;
+		} catch(err) {
+			
+		}
 	  try {
 		  var id = $(this).attr('href').split('_')[1];
 		  if (id) {
 			activeTab = parseInt(id);
 			if(activeTab !== 1) {
 				updateLazy = false;
+				engine.pageLoading = false;
+				current_page = engine.currentPage;
 			} else {
 				updateLazy = true;
 			}
 		  }
-	  } catch(err) {}
+	  } catch(err) {
+	  }
 	  $('#tab .btn.active').removeClass('active');
 		setTimeout(function() {
 			$(this).addClass('active');
@@ -1222,7 +1232,9 @@ function updatePickers() {
 }
 
 function changePage() {
-    startSearch(current_search);
+	if(activeTab == 1) {
+		startSearch(current_search);
+	}
 }
 
 function onKeyPress(key) {
