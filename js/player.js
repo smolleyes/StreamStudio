@@ -236,6 +236,7 @@ function initPlayer() {
 		$(".mejs-layer").show();
 		$(".mejs-overlay-loading").hide();
 		$('#subPlayer-title').empty().append(_('Waiting...'));
+		mediaDuration = 0;
 	},100);
 		$('#infosPage').remove();
 		$('#song-title').empty().append(_('Waiting...'));

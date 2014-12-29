@@ -242,7 +242,7 @@ function startStreaming(req, res, width, height) {
                     $('#song-title').empty().html(_('Playing: ') + megaName);
                     if (transcoderEnabled) {
                         console.log('playing movie with transcoding');
-                        var ffmpeg = spawnFfmpeg('', device, host, bitrate, function(code) { // exit
+                        var ffmpeg = spawnFfmpeg('', device, '', bitrate, function(code) { // exit
                             console.log('child process exited with code ' + code);
                             //res.end();
                         });

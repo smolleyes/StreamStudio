@@ -383,12 +383,17 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 	var child_process = require('child_process');
 	var sys = require('sys');
 	
-	var vlink = link.split('::')[0];
-	var alink = link.split('::')[1].replace('%20','');
-	
 	if (activeTab !== 4) {
         $("#downloads_tab").click();
     }
+	
+	var vlink = link.split('::')[0];
+	try {
+		var alink = link.split('::')[1].replace('%20','');
+	} catch(err) {
+		return downloadFileHttps(link,title,vid,toTorrent);
+	}
+	
     var vid = ((Math.random() * 1e6) | 0);
     var title = title.split('::')[0].trim().replace(/\\|\//g,'_').replace('.webm','.mkv');
     var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
