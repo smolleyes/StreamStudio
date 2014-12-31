@@ -347,10 +347,11 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 			//console.log(link)
 			var vlink = link.split('::')[0];
 			try {
+				var vlink = link.split('::')[0];
 				var alink = link.split('::')[1].trim().replace('%20','');
 				args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts','-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
 			} catch(err) {
-				currentMedia.link = vlink.split('?file=')[1];
+				currentMedia.link = link;
 				player.setSrc(currentMedia.link);
 				player.play();
 			}
