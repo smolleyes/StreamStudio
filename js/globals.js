@@ -1,4 +1,4 @@
-var VERSION = "1.22";
+var VERSION = "1.23";
 
 var path = require('path');
 var fs = require('fs');
@@ -63,6 +63,7 @@ var current_channel_link = '';
 var current_channel_engine = '';
 var channelPagination = false;
 var searchDate = 'today';
+var searchDuration = '';
 var videoArray = ["avi", "webm", "mp4", "flv", "mkv", "mpeg", "mp3", "mpg", "wmv", "wma", "mov", "wav", "ogg", "flac", "opus"];
 current_search='';
 var exec_path = execDir;

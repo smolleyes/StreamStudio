@@ -254,7 +254,6 @@ function downloadFileHttps(link, title, vid, toTorrent) {
     } catch (err) {
         console.log(err + ' ' + link);
     }
-    current_download[opt] = opt;
     pbar.show();
 	current_download[vid] = new XMLHttpRequest();
 	current_download[vid].onreadystatechange = function(){
@@ -311,72 +310,6 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 			}, 5000);
 		}
     }
-    
-    
-    
-    //current_download[vid].on('response', function(response) {
-        //if (response.statusCode > 300 && response.statusCode < 400 && response.headers.location) {
-            //// The location for some (most) redirects will only contain the path,  not the hostname;
-            //// detect this and add the host to the path.
-            //$('#progress_' + vid).remove();
-            //return downloadFile(response.headers.location, title, vid, toTorrent);
-            //// Otherwise no redirect; capture the response as normal            
-        //} else {
-            //pbar.show();
-            //$('#progress_' + vid + ' a.cancel').show();
-            //var contentLength = response.headers["content-length"];
-            //if (parseInt(contentLength) === 0) {
-                //$('#progress_' + vid + ' a.cancel').hide();
-                //$('#progress_' + vid + ' strong').html(_("can't download this file..."));
-                //setTimeout(function() {
-                    //pbar.hide()
-                //}, 5000);
-            //}
-            //var file = fs.createWriteStream(target);
-            //response.on('data', function(chunk) {
-                //file.write(chunk);
-                //var bytesDone = file.bytesWritten;
-                //currentTime = (new Date()).getTime();
-                //var transfer_speed = (bytesDone / (currentTime - startTime)).toFixed(2);
-                //var newVal = bytesDone * 100 / contentLength;
-                //var txt = Math.floor(newVal) + '% ' + _('done at') + ' ' + transfer_speed + ' kb/s';
-                //$('#progress_' + vid + ' progress').attr('value', newVal).text(txt);
-                //$('#progress_' + vid + ' strong').html(txt);
-            //});
-            //response.on('end', function() {
-                //file.end();
-                //if (canceled === true) {
-                    //fs.unlink(target, function(err) {
-                        //if (err) {} else {
-                            //console.log('successfully deleted ' + target);
-                        //}
-                    //});
-                    //$('#progress_' + vid + ' a.cancel').hide();
-                    //$('#progress_' + vid + ' strong').html(_("Download canceled!"));
-                    //setTimeout(function() {
-                        //pbar.hide()
-                    //}, 5000);
-                //} else {
-                    //fs.rename(target, download_dir + '/' + title.replace(/  /g, ' ').trim(), function(err) {
-                        //if (err) {} else {
-                            //console.log('successfully renamed ' + download_dir + '/' + title);
-                            //if (toTorrent !== undefined) {
-                                //gui.Shell.openItem(download_dir + '/' + title);
-                            //}
-                        //}
-                    //});
-                    //$('#progress_' + vid + ' strong').html(_('Download ended !'));
-                    //if (title.match('.mp3') === null) {
-                        //$('#progress_' + vid + ' a.convert').attr('alt', download_dir + '/' + title + '::' + vid).show();
-                    //}
-                    //$('#progress_' + vid + ' a.open_folder').show();
-                    //$('#progress_' + vid + ' a.hide_bar').show();
-                    //$('#progress_' + vid + ' a.cancel').hide();
-                //}
-            //});
-        //}
-    //});
-    //current_download[vid].end();
 }
 
 function downloadFFMpeg(link,title,vid,toTorrent) {

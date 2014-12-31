@@ -84,7 +84,7 @@ var htmlStr = '<div class="row"> \
 					<option id="topRatedOpt" value = "topRated">' + _("Top rated") + '</option> \
 					<option id="mostViewed" value = "mostViewed">' + _("Most viewed") + '</option> \
 				</select> \
-				<label id="dateTypes_label">' + _("Date:") + '</label> \
+				<label id="dateTypes_label" style="margin-top: 5px;">' + _("Date:") + '</label> \
 				<select id="dateTypes_select" class="selectpicker" data-style="btn-default btn-sm" data-hide-disabled="true"> \
 					<option value = "today">' + _("Today") + '</option> \
 					<option value = "this_week">' + _("This week") + '</option> \
@@ -101,7 +101,14 @@ var htmlStr = '<div class="row"> \
 					<option value = "viewCount">' + _("Views") + '</option> \
 					<option value = "rating">' + _("Rating") + '</option> \
 				</select> \
-				<label id="searchFilters_label">' + _("Filters:") + '</label> \
+				<label id="duration_label" style="margin-top: 5px;">' + _("Duration:") + '</label> \
+				<select id="duration_select" class="selectpicker" data-style="btn-default btn-sm" data-hide-disabled="true"> \
+					<option data-hidden="true"></option> \
+					<option value = "short">' + _("Short (<4 min)") + '</option> \
+					<option value = "medium">' + _("Medium (4 <-> 20 min)") + '</option> \
+					<option value = "long">' + _("Long (>20 min)") + '</option> \
+				</select> \
+				<label id="searchFilters_label" style="margin-top: 5px;">' + _("Filters:") + '</label> \
 				<select id="searchFilters_select" class="selectpicker" data-style="btn-default btn-sm" data-hide-disabled="true"> \
 					<option data-hidden="true"></option> \
 					<option value = "hd">HD</option> \
@@ -749,6 +756,8 @@ function main() {
             $("#searchTypes_label").hide();
             $("#dateTypes_select").empty().hide();
             $("#dateTypes_label").hide();
+            $("#duration_select").empty().hide();
+            $("#duration_label").hide();
             $("#searchFilters_label").hide();
             $("#searchFilters_select").empty().hide();
             $("#categories_label").hide();
@@ -872,6 +881,10 @@ function main() {
                     $('#searchFilters_label').show();
                     $('#searchFilters_select').show();
                 }
+                if (search_engine === 'youtube') {
+					$("#duration_select").show();
+                    $('#duration_label').show();
+				}
                 $(".nano").nanoScroller({ destroy: true });
 				$('.selectpicker').selectpicker('refresh');
             }
@@ -887,6 +900,18 @@ function main() {
             current_search_page = 1;
             itemsCount = 0;
             searchDate = $(this).val();
+        });
+    });
+    // search date select
+    $("select#duration_select").change(function() {
+        $("select#duration_select option:selected").each(function() {
+            pagination_init = false;
+            current_start_index = 1;
+            current_prev_start_index = 1;
+            current_page = 1;
+            current_search_page = 1;
+            itemsCount = 0;
+            searchDuration = $(this).val();
         });
     });
     // search order
@@ -949,6 +974,12 @@ function main() {
                 $('.selectpicker').selectpicker('refresh');
             } catch (err) {
                 console.log(err);
+                $('#searchFilters_label').show();
+                $('#searchFilters_select').show();
+                if(search_engine === 'youtube') {
+					$('#duration_label').show();
+					$('#duration_select').show();
+				}
                 if ((searchTypes_select === 'topRated') || (searchTypes_select === 'mostViewed')) {
                     $('#video_search_query').prop('disabled', true);
                     $('#orderBy_label').hide();
@@ -959,9 +990,10 @@ function main() {
 								<option value = "this_week">' + _("This week") + '</option> \
 								<option value = "this_month">' + _("This month") + '</option> \
 								<option value = "all_time">' + _("All time") + '</option>';
-                    $('#dateTypes_select').empty().append(html);
+                    $('#dateTypes_select').empty().append(html).show();
                     $('#dateTypes_label').show();
-                    $('#dateTypes_select').show();
+                    $('#duration_label').hide();
+                    $('#duration_select').hide();
                 } else {
                     $('#video_search_query').prop('disabled', false);
                     $('#searchTypes_label').show();
@@ -982,6 +1014,16 @@ function main() {
                     $('#categories_label').hide();
                     $('#categories_select').hide();
                 }
+                
+                if (searchTypes_select === 'playlists' || searchTypes_select === 'channels') {
+					$('#dateTypes_label').hide();
+                    $('#dateTypes_select').hide();
+                    $('#duration_label').hide();
+                    $('#duration_select').hide();
+                    $('#searchFilters_label').hide();
+                    $('#searchFilters_select').hide();
+				}
+                
                 $('.selectpicker').selectpicker('refresh');
             }
         });
@@ -1331,7 +1373,7 @@ function startSearch(query) {
             }
         } else if (search_engine === 'youtube') {
             if (searchTypes_select === 'videos') {
-                youtube.searchVideos(query, current_page, searchFilters, search_order, function(datas) {
+                youtube.searchVideos(query, current_page, searchFilters, search_order, searchDuration, function(datas) {
                     getVideosDetails(datas, 'youtube', false);
                 });
             } else if (searchTypes_select === 'playlists') {
@@ -1339,7 +1381,7 @@ function startSearch(query) {
                     getPlaylistInfos(datas, 'youtube');
                 });
             } else if (searchTypes_select === 'category') {
-                youtube.categories(query, current_page, searchFilters, selected_category, function(datas) {
+                youtube.categories(query, current_page, searchFilters, selected_category, duration, function(datas) {
                     getVideosDetails(datas, 'youtube', false);
                 });
             } else if (searchTypes_select === 'channels') {

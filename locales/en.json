@@ -161,5 +161,9 @@
 	"Can't open this url, please retry !": "Can't open this url, please retry !",
 	"done" : "done",
 	"Bandwith problem please try a lower quality !": "Bandwith problem please try a lower quality !",
-	"You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html": "You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html"
+	"You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html": "You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html",
+	"Duration:": "Duration:",
+	"Short (<4 min)": "Short (<4 min)",
+	"Medium (4 <-> 20 min)": "Medium (4 <-> 20 min)",
+	"Long (>20 min)": "Long (>20 min)"
 }

@@ -162,7 +162,11 @@
 	"No streams available for this channel !": "Aucun flux disponible pour cette chaîne !",
 	"Ok": "Ok",
 	"Can't open this url, please retry !": "Impossible d'ouvrir cette url, merci de réessayer !",
-	"done" : "effectué",
+	"done": "effectué",
 	"Bandwith problem please try a lower quality !": "Problème réseau, baissez la qualité du flux ou réessayez !",
-	"You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html": "Vous devez voir Livestreamer version 1.11.1 minimum installé dans /usr/bin ou /usr/local/bin pour utiliser ce plugin ! \n\n Merci de suivre les instructions d'installation ici: \n http://livestreamer.readthedocs.org/en/latest/install.html"
+	"You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html": "Vous devez voir Livestreamer version 1.11.1 minimum installé dans /usr/bin ou /usr/local/bin pour utiliser ce plugin ! \n\n Merci de suivre les instructions d'installation ici: \n http://livestreamer.readthedocs.org/en/latest/install.html",
+	"Duration:": "Durée:",
+	"Short (<4 min)": "Courte (<4 min)",
+	"Medium (4 <-> 20 min)": "Moyenne (4 <-> 20 min)",
+	"Long (>20 min)": "Longue (>20 min)"
 }

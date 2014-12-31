@@ -3391,7 +3391,24 @@ if (typeof jQuery != 'undefined') {
 							t.loaded.width(t.total.width() * percent);
 						}
 					}
-				} catch(err) {}
+				} catch(err) {
+					//try {
+						//var target = (e != undefined) ? e.target : t.media,
+						//percent = null;			
+
+						//percent = target.buffered.end(0) / mediaDuration;
+
+						//// finally update the progress bar
+						//if (percent !== null) {
+							//percent = Math.min(1, Math.max(0, percent));
+							//// update loaded bar
+							//if (t.loaded && t.total) {
+								//t.loaded.width(t.total.width() * percent);
+							//}
+						//}
+					//} catch(err) {}
+					
+				}
 			}
 		},
 		setCurrentRail: function() {
