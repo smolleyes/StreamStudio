@@ -346,8 +346,14 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 		} else {
 			//console.log(link)
 			var vlink = link.split('::')[0];
-			var alink = link.split('::')[1].trim().replace('%20','');
-			args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts','-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+			try {
+				var alink = link.split('::')[1].trim().replace('%20','');
+				args = ['-ss' , start, '-i', vlink, '-ss', start, '-i', alink, '-copyts','-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+			} catch(err) {
+				currentMedia.link = vlink.split('?file=')[1];
+				player.setSrc(currentMedia.link);
+				player.play();
+			}
 		}
 	} else {
 		args = ['-re','-i', 'pipe:0', '-sn', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
