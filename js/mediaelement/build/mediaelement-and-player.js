@@ -3476,6 +3476,8 @@ if (typeof jQuery != 'undefined') {
 			var t = this;
 			if(t.media.duration == Infinity) {
 				t.options.duration = mediaDuration;
+			} else {
+				t.options.duration = media.duration;
 			}
 			if (controls.children().last().find('.mejs-currenttime').length > 0) {
 				$(t.options.timeAndDurationSeparator +

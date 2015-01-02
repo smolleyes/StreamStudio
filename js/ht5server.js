@@ -342,7 +342,11 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
-			args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+			if(link.indexOf('.mp3') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
+				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-codec:v', 'libx264', '-crf', '18', '-preset', 'ultrafast', '-codec:a', 'libvorbis','-threads', '0','-copyts','-sn','-f', 'matroska','pipe:1'];
+			} else {
+				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+			}
 		} else {
 			//console.log(link)
 			var vlink = link.split('::')[0];

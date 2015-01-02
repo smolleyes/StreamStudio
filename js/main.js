@@ -512,6 +512,9 @@ function main() {
         } catch (err) {}
         try {
 			$(this).closest('.youtube_item').addClass('highlight well');
+			try {
+				$('#items_container').scrollTop($('#items_container').scrollTop() + $('.highlight').position().top);
+			} catch(err) {}
 			// save current song/page and search for back btn
 			try {
 				prev_vid = current_song;

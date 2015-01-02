@@ -1,3 +1,7 @@
+V 1.24
+  * fix songza bugs
+  * add audio visualisations when transcoder enabled for audio files
+
 V 1.23
   * add duration filter for youtube search
   * update ffmpeg linux

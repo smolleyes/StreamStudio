@@ -236,7 +236,7 @@ function initPlayer() {
 		$(".mejs-layer").show();
 		$(".mejs-overlay-loading").hide();
 		$('#subPlayer-title').empty().append(_('Waiting...'));
-		mediaDuration = 0;
+		//mediaDuration = 0;
 	},100);
 		$('#infosPage').remove();
 		$('#song-title').empty().append(_('Waiting...'));
@@ -438,6 +438,9 @@ function launchPlay() {
 		} else {
 			return playUpnpRenderer(currentMedia);
 		}
+		try {
+			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
+		} catch(err) {}
 	} else {
 		var obj = JSON.parse(settings.ht5Player);
 		if(obj.name === 'StreamStudio') {
@@ -446,6 +449,9 @@ function launchPlay() {
 		} else {
 			startExtPlayer(obj);
 		}
+		try {
+			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
+		} catch(err) {}
 	}
 }
 
