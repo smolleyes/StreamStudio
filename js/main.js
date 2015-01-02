@@ -759,7 +759,7 @@ function main() {
             $("#searchTypes_label").hide();
             $("#dateTypes_select").empty().hide();
             $("#dateTypes_label").hide();
-            $("#duration_select").empty().hide();
+            $("#duration_select").hide();
             $("#duration_label").hide();
             $("#searchFilters_label").hide();
             $("#searchFilters_select").empty().hide();
