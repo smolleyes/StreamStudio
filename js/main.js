@@ -343,7 +343,7 @@ $(document).ready(function() {
     // load plugins
     ipaddress = nodeip.address();
 	initPlugins();
-	
+	wipeTmpFolder();
 });
 
 function main() {

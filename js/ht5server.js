@@ -413,6 +413,8 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 }
 
 function cleanffar() {
+	mediaDuration = 0;
+	player.options.duration = 0;
     $.each(ffar, function(index, ff) {
         try {
             ff.kill("SIGKILL");
