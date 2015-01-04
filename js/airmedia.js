@@ -3,9 +3,9 @@ var freeboxAvailable = false;
 // settings
 var token_string = settings.airMediaToken;
 
-var APP_NAME       = 'ht5streamer';
+var APP_NAME       = 'streamstudio';
 var APP_VERSION    = '0.3';
-var APP_ID         = 'fr.freebox.ht5streamer';
+var APP_ID         = 'fr.freebox.streamstudio';
 var FREEBOX_URL    = 'http://mafreebox.freebox.fr/';
 var API_VERSION    = 'api_version';
 var API_BASE_URL   = 'api/';

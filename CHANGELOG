@@ -1,3 +1,11 @@
+V 1.25.1
+  * fix external players not playing youtube videos
+  * fix cursor restore when media finished and play is fullscreen
+  * fix get next media in upnp/local files playlist's when next media is a folder (was stopping before)
+  * exit fullscreen when stop button clicked
+  * better external players system
+  * change temp dir system for torrents
+
 V 1.25
   * fix torrent temp dir 
   * fix player duration not reinitialized

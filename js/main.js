@@ -529,12 +529,17 @@ function main() {
 				$(this).closest('.youtube_item').find('.spiffy').show();
 				if(search_engine === 'youtube') {
 					ytId = vid;
-					youtube.getVideoInfos('https://youtube.com/watch?v='+vid,1,1,upnpToggleOn, function(datas){
+					var obj = JSON.parse(settings.ht5Player);
+					var ext = false;
+					if(obj.name !== 'StreamStudio'){
+						ext = true;
+					}
+					youtube.getVideoInfos('https://youtube.com/watch?v='+vid,1,1,upnpToggleOn,ext, function(datas){
 						$('.spiffy').hide();
 						$('#youtube_entry_res_' + vid).empty()
 						var infos = datas[25];
 						mediaDuration = 0;
-						if(infos.upnp === false) {
+						if(infos.upnp === false && !ext) {
 							var resolutions_string = ['1080p','720p', '480p','360p','240p'];
 						} else {
 							var resolutions_string = ['720p','360p'];
@@ -548,7 +553,7 @@ function main() {
 								if(upnpToggleOn) {
 									vlink += '&upnp';
 								} else {
-									if(infos.upnp === false) {
+									if(infos.upnp === false && !ext) {
 										vlink = resolutions[resolution]['link'];
 										vlinka = resolutions[resolution]['linka'];
 									}
@@ -567,7 +572,7 @@ function main() {
 								img = 'images/sd.png';
 							}
 							// append links
-							if(infos.upnp === false){
+							if(infos.upnp === false && !ext){
 								$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+'::'+vlinka +' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink+'::'+vlinka + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
 							} else {
 								$('#youtube_entry_res_' + vid).append('<div class="resolutions_container"><a class="video_link" style="display:none;" href="' + vlink+' " alt="' + resolution + '"><img src="' + img + '" class="resolution_img" /><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https"><img src="images/down_arrow.png" width="16" height="16" />' + resolution + '</a></div>');
@@ -657,7 +662,8 @@ function main() {
         } else {
             $('video').trigger('loadPlayer', video, '');
         }
-        if(videoCodecs.indexOf(video.title.split('.').pop()) !== -1) {
+        var obj = JSON.parse(settings.ht5Player);
+        if(videoCodecs.indexOf(video.title.split('.').pop()) !== -1 && obj.name === 'StreamStudio') {
 			$('#playerToggle').click();
 		}
     });

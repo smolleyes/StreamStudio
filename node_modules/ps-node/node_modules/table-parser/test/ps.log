@@ -1,0 +1,27 @@
+  PID TTY           TIME CMD
+49692 ttys000    0:00.06 login -pfl neekey /bin/bash -c exec -la bash /bin/bash
+49693 ttys000    0:00.06 -bash
+54195 ttys000    0:00.09 node run
+54196 ttys000    0:00.27 /usr/local/bin/node /Users/neekey/Dropbox/nodejs/app/windTest/run.mac.js node /Users/neekey/Dropbox/nodejs/app/windTest/run
+54200 ttys000    0:12.36 /usr/bin/java -jar /Users/neekey/Dropbox/nodejs/app/windTest/Selenium/selenium-server-standalone-2.24.1.jar -Dwebdriver.chrome.driver=/Users/neekey/Dropbox/nodejs/app/windTest/Selenium/chromedriver
+54201 ttys000    0:01.30 node /Users/neekey/Dropbox/nodejs/app/windTest/socketServer/app.js
+54202 ttys000    0:47.81 /Users/neekey/Dropbox/nodejs/app/windTest/Redis/mac_linux/src/redis-server
+52300 ttys001    0:00.05 login -pfl neekey /bin/bash -c exec -la bash /bin/bash
+52301 ttys001    0:00.17 -bash
+52767 ttys002    0:00.04 login -pfl neekey /bin/bash -c exec -la bash /bin/bash
+52768 ttys002    0:00.03 -bash
+52895 ttys002    0:00.45 node /usr/local/bin/ki web
+52896 ttys002    0:00.81 /usr/local/bin/node /usr/local/lib/node_modules/kissy-pie/server/app.js
+53185 ttys003    0:00.05 login -pfl neekey /bin/bash -c exec -la bash /bin/bash
+53186 ttys003    0:00.03 -bash
+55569 ttys004    0:00.09 login -pfl neekey /bin/bash -c exec -la bash /bin/bash
+55570 ttys004    0:00.05 -bash
+56254 ttys004    0:00.01 man ps
+56255 ttys004    0:00.03 sh -c (cd '/usr/share/man' && (echo ".ll 8.7i"; echo ".nr LL 8.7i"; /bin/cat '/usr/share/man/man1/ps.1') | /usr/bin/tbl | /usr/bin/groff -Wall -mtty-char -Tascii -mandoc -c | (/usr/bin/less -is || true))
+56256 ttys004    0:00.01 sh -c (cd '/usr/share/man' && (echo ".ll 8.7i"; echo ".nr LL 8.7i"; /bin/cat '/usr/share/man/man1/ps.1') | /usr/bin/tbl | /usr/bin/groff -Wall -mtty-char -Tascii -mandoc -c | (/usr/bin/less -is || true))
+56260 ttys004    0:00.00 sh -c (cd '/usr/share/man' && (echo ".ll 8.7i"; echo ".nr LL 8.7i"; /bin/cat '/usr/share/man/man1/ps.1') | /usr/bin/tbl | /usr/bin/groff -Wall -mtty-char -Tascii -mandoc -c | (/usr/bin/less -is || true))
+56261 ttys004    0:00.03 /usr/bin/less -is
+56266 ttys005    0:00.06 login -pfl neekey /bin/bash -c exec -la bash /bin/bash
+56269 ttys005    0:00.04 -bash
+56463 ttys005    0:00.09 node test.js
+56464 ttys005    0:00.01 ps -a

@@ -1,4 +1,4 @@
-var VERSION = "1.25";
+var VERSION = "1.25.1";
 
 var path = require('path');
 var fs = require('fs');
@@ -7,7 +7,7 @@ var util = require('util');
 var os = require('os');
 var wrench = require('wrench');
 var nodeip = require("node-ip");
-var temp = require('temp');
+var temp = require('fs-temp');
 var spawn = require('child_process').spawn;
 var sudo = require('sudo');
 var request = require('request');
@@ -29,6 +29,7 @@ var cli = new upnpClient();
 var parseString = require('xml2js').parseString;
 var __ = require('underscore');
 var rmdir = require('rmdir');
+var psnode = require('ps-node');
 
 //engines
 var dailymotion = require('dailymotion');
@@ -86,8 +87,13 @@ var ytId='';
 var sdb = storedb('std');
 
 //checks
-var tmpFolder = path.join(os.tmpDir(), 'ht5Torrents');
-if( ! fs.existsSync(tmpFolder) ) { fs.mkdir(tmpFolder); }
+temp.mkdir(function(err,path){
+	if(err) {
+		alert("can t create temp dir, please report the problem!")
+	} else {
+		tmpFolder = path;
+	}
+});
 
 // get confdir
 if (process.platform === 'win32') {

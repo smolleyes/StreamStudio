@@ -90,8 +90,13 @@ function onSelectedItem(data) {
 		}
 		totalResults += 1;
 		itemsCount +=1;
+		var obj = JSON.parse(settings.ht5Player);
+		var ext = false;
+		if(obj.name !== 'StreamStudio'){
+			ext = true;
+		}
 		if (engine === 'youtube') {
-			youtube.getVideoInfos('http://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,function(datas) {
+			youtube.getVideoInfos('http://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,ext,function(datas) {
 				item.title.value = title;
 				printYtVideoInfos(datas[25], true, false, '', engine);
 				$("#"+vid).click();

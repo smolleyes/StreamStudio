@@ -13,7 +13,7 @@ var totalBuffered = 0;
 
 var statsUpdater = null;
 var active = function(wire) {
-    return !wire.peerChoking;
+  return !wire.peerChoking;
 };
 
 var stateModel = {};
@@ -37,9 +37,9 @@ var torrentName = '';
 
 $(document).ready(function(){
 	$(document).on('click','#saveTorrentBtn',function(e) {
-        e.preventDefault();
-        saveToDisk(torrentSrc,torrentName);
-    });
+    e.preventDefault();
+    saveToDisk(torrentSrc,torrentName);
+  });
 });
 
 function getTorrent(link) {
@@ -53,50 +53,50 @@ function getTorrent(link) {
   playStarted = false;
   downloadedPct = 0;
   rTorrent(link, function(err, torrent) {
-      if(err) {
-         console.log(err);
-      } else {
-          title = torrent.name;
-          var torrentInfo = {
-              info: torrent,
-              title: title
-          };
-          var obj = JSON.parse(settings.ht5Player);
-		  if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
-			  $('#playerToggle').click();
-		  }
-          handleTorrent(torrentInfo, stateModel);
-      }
-  });
+    if(err) {
+     console.log(err);
+   } else {
+    title = torrent.name;
+    var torrentInfo = {
+      info: torrent,
+      title: title
+    };
+    var obj = JSON.parse(settings.ht5Player);
+    if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
+     $('#playerToggle').click();
+   }
+   handleTorrent(torrentInfo, stateModel);
+ }
+});
 }
 
 var watchState = function(stateModel) {
-    if (videoStreamer != null) {
-        var swarm = videoStreamer.swarm;
-        var state = 'connecting';
+  if (videoStreamer != null) {
+    var swarm = videoStreamer.swarm;
+    var state = 'connecting';
 
-        if(swarm.downloaded > BUFFERING_SIZE) {
-            state = 'ready';
-        } else if(swarm.downloaded) {
-            state = 'downloading';
-        } else if(swarm.wires.length) {
-            state = 'startingDownload';
-        }
-
-        stateModel.state = state;
-        stateModel.numTry += 1;
-        if(state != 'ready') {
-            ___.delay(watchState, 1000, stateModel);
-        } else {
-            clearTimeout(___.delay(watchState, 1000, stateModel));
-        }
+    if(swarm.downloaded > BUFFERING_SIZE) {
+      state = 'ready';
+    } else if(swarm.downloaded) {
+      state = 'downloading';
+    } else if(swarm.wires.length) {
+      state = 'startingDownload';
     }
+
+    stateModel.state = state;
+    stateModel.numTry += 1;
+    if(state != 'ready') {
+      ___.delay(watchState, 1000, stateModel);
+    } else {
+      clearTimeout(___.delay(watchState, 1000, stateModel));
+    }
+  }
 };
 
 app.updateStats = function(streamInfo) {
-			$(".mejs-overlay-button").hide();
-			var active = function(wire) {return !wire.peerChoking;};
-			var swarm = streamInfo.swarm;
+ $(".mejs-overlay-button").hide();
+ var active = function(wire) {return !wire.peerChoking;};
+ var swarm = streamInfo.swarm;
 
 			var upload_speed = swarm.uploadSpeed(); // upload speed
 			var final_upload_speed = '0 B/s';
@@ -122,30 +122,30 @@ app.updateStats = function(streamInfo) {
 			this.downloaded = (swarm.downloaded) ? swarm.downloaded : 0;
 			this.percent = (swarm.downloaded / (BUFFERING_SIZE / 100)).toFixed(2);
       if(stateModel.state != 'ready') {
-          if(stateModel.state === 'connecting') {
-              if(parseInt(stateModel.numTry) >= 90) {
-                setTimeout(function() {$('#preloadProgress').empty().append(_('Corrupted torrent or no seeders, can\'t open your torrent file'));},5000);
-                clearTimeout(statsUpdater);
-                return;
-              } else {
-                $('#preloadProgress').empty().append(_('Connecting... please wait (test %s/%s)',stateModel.numTry,maxTry));
-              }
-          } else if (stateModel.state === 'downloading' || stateModel.state === 'startingDownload') {
-              if (parseInt(this.percent) > 0 && parseInt(this.percent) < 100) {
-                  $('#preloadProgress').empty().append(_('Downloading %s%% done at %s',this.percent,this.downloadSpeed));
-                  $('#preloadTorrent progress').attr('value',this.percent).text(this.percent);
-              }
+        if(stateModel.state === 'connecting') {
+          if(parseInt(stateModel.numTry) >= 90) {
+            setTimeout(function() {$('#preloadProgress').empty().append(_('Corrupted torrent or no seeders, can\'t open your torrent file'));},5000);
+            clearTimeout(statsUpdater);
+            return;
+          } else {
+            $('#preloadProgress').empty().append(_('Connecting... please wait (test %s/%s)',stateModel.numTry,maxTry));
           }
+        } else if (stateModel.state === 'downloading' || stateModel.state === 'startingDownload') {
+          if (parseInt(this.percent) > 0 && parseInt(this.percent) < 100) {
+            $('#preloadProgress').empty().append(_('Downloading %s%% done at %s',this.percent,this.downloadSpeed));
+            $('#preloadTorrent progress').attr('value',this.percent).text(this.percent);
+          }
+        }
       } else {
-		  if (playStarted === false) {
-			  $('#preloadTorrent').remove();
-			  var stream = {};
-			  stream.link = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/&torrent';
-			  stream.next = '';
-			  stream.title = streamInfo.server.index.name;
-        sdb.insert({"title":itemTitle},function(err,result){
+        if (playStarted === false) {
+         $('#preloadTorrent').remove();
+         var stream = {};
+         stream.link = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/&torrent';
+         stream.next = '';
+         stream.title = streamInfo.server.index.name;
+         sdb.insert({"title":itemTitle},function(err,result){
           if(!err){
-            console.log('std database updated succssfully!');
+            console.log('std database updated successfully!');
           } else {
             console.log(err);
           }
@@ -153,35 +153,35 @@ app.updateStats = function(streamInfo) {
 			  //clearTimeout(statsUpdater);
 			  startPlay(stream);
 			  playStarted = true;
-		 } else {
-			 torrentSrc = videoStreamer.path;
-			 torrentName = videoStreamer.server.index.name;
-			 try {
-				downloadedPct = (swarm.downloaded / streamInfo.server.index.length * 100).toFixed(2);
-			 } catch(err) {return;}
-			 if(parseInt(downloadedPct) >= 100){
-				clearTimeout(statsUpdater);
-				var t = _('(%s%% downloaded)',100);
-				$("#song-title").empty().text(_('Playing: ')+torrentName+" "+t);
-				$.notif({title: 'StreamStudio:',cls:'green',icon: '&#59256;',timeout:0,content:_('Your torrent download is terminated, save it ?'),btnId:'saveTorrentBtn',btnTitle:_('Yes'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-				statsUpdater = null
-			 } else {
-				var t = _('(%s%% downloaded)',downloadedPct);
-				if(player.media.paused) {
-					totalBuffered = swarm.downloaded;
-					totalBytes = streamInfo.server.index.length;
-				} else {
-					totalBuffered = 0;
-					totalBytes = 0;
-				}
-				if(upnpToggleOn) {
-					$('.mejs-time-loaded').width(downloadedPct+'%')
-				}
-				$("#song-title").empty().text(_('Playing: ')+torrentName+" "+t);
-			 }
-		 }
-      }
-      
+     } else {
+      torrentSrc = videoStreamer.path;
+      torrentName = videoStreamer.server.index.name;
+      try {
+        downloadedPct = (swarm.downloaded / streamInfo.server.index.length * 100).toFixed(2);
+      } catch(err) {return;}
+      if(parseInt(downloadedPct) >= 100){
+        clearTimeout(statsUpdater);
+        var t = _('(%s%% downloaded)',100);
+        $("#song-title").empty().text(_('Playing: ')+torrentName+" "+t);
+        $.notif({title: 'StreamStudio:',cls:'green',icon: '&#59256;',timeout:0,content:_('Your torrent download is terminated, save it ?'),btnId:'saveTorrentBtn',btnTitle:_('Yes'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+        statsUpdater = null
+      } else {
+        var t = _('(%s%% downloaded)',downloadedPct);
+        if(player.media.paused) {
+         totalBuffered = swarm.downloaded;
+         totalBytes = streamInfo.server.index.length;
+       } else {
+         totalBuffered = 0;
+         totalBytes = 0;
+       }
+       if(upnpToggleOn) {
+         $('.mejs-time-loaded').width(downloadedPct+'%')
+       }
+       $("#song-title").empty().text(_('Playing: ')+torrentName+" "+t);
+     }
+   }
+ }
+ 
 };
 
 function saveToDisk(src,name) {
@@ -219,23 +219,23 @@ function handleTorrent(torrent, stateModel) {
 
   $('#preloadTorrent').empty().remove();
   setTimeout(function() {
-	  $('.mejs-container').append('<div id="preloadTorrent" \
-	  style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;"> \
-	  <p><b id="preloadProgress">'+_("Connecting... please wait")+'</b></p> \
-	  <progress value="5" min="0" max="100">0%</progress> \
-	  </div>');
-	  $(".mejs-overlay-button").hide();
-  },1000);
+   $('.mejs-container').append('<div id="preloadTorrent" \
+     style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;"> \
+     <p><b id="preloadProgress">'+_("Connecting... please wait")+'</b></p> \
+     <progress value="5" min="0" max="100">0%</progress> \
+     </div>');
+   $(".mejs-overlay-button").hide();
+ },1000);
   videoStreamer = peerflix(torrent.info, {
       connections: 100, // Max amount of peers to be connected to.
       path: tmpFile, // we'll have a different file name for each stream also if it's same torrent in same session
       buffer: (1.5 * 1024 * 1024).toString() // create a buffer on torrent-stream
-  });
-      
-      streamInfo = new app.updateStats(videoStreamer);
-      statsUpdater = setInterval(___.bind(app.updateStats, streamInfo, videoStreamer), 1000);
-      stateModel.streamInfo = streamInfo;
-      watchState(stateModel);
+    });
+  
+  streamInfo = new app.updateStats(videoStreamer);
+  statsUpdater = setInterval(___.bind(app.updateStats, streamInfo, videoStreamer), 1000);
+  stateModel.streamInfo = streamInfo;
+  watchState(stateModel);
   
   var checkReady = function() {
     if(stateModel.state === 'ready') {
@@ -244,40 +244,40 @@ function handleTorrent(torrent, stateModel) {
 
         stateModel.state = 'ready';
         stateModel.destroy();
-    }
-  };
+      }
+    };
 
-  videoStreamer.server.on('listening', function(){
-	  torrentPlaying = true;
-      streamInfo.src = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/';
-      streamInfo.type = 'video/mp4';
-      var item = {};
-      item.name = videoStreamer.files[0].name;
-      item.obj = videoStreamer;
-      torrentsArr.push(item);
-      console.log('peerrlifx listening on http://'+ipaddress+':' + videoStreamer.server.address().port + '/')
+    videoStreamer.server.on('listening', function(){
+     torrentPlaying = true;
+     streamInfo.src = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/';
+     streamInfo.type = 'video/mp4';
+     var item = {};
+     item.name = videoStreamer.files[0].name;
+     item.obj = videoStreamer;
+     torrentsArr.push(item);
+     console.log('peerrlifx listening on http://'+ipaddress+':' + videoStreamer.server.address().port + '/')
 
       // TEST for custom NW
       //streamInfo.set('type', mime.lookup(videoStreamer.server.index.name));
       //stateModel.on('change:state', checkReady);
       checkReady();
-  });
-  
-  
+    });
+    
+    
   // not used anymore
   videoStreamer.on('ready', function() {});
 
   videoStreamer.on('uninterested', function() {
-      if (videoStreamer) {
-          videoStreamer.swarm.pause();
-      }
-      
+    if (videoStreamer) {
+      videoStreamer.swarm.pause();
+    }
+    
   });
 
   videoStreamer.on('interested', function() {
-      if (videoStreamer) {
-          videoStreamer.swarm.resume();
-      }            
+    if (videoStreamer) {
+      videoStreamer.swarm.resume();
+    }            
   });
 }
 

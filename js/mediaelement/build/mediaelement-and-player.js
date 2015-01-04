@@ -2302,7 +2302,7 @@ if (typeof jQuery != 'undefined') {
 		hideControls: function(doAnimation) {
 			var t = this;
 			
-			if(t.isFullScreen) {
+			if(t.isFullScreen && $('#playerContainer').is(':visible')) {
 				$('body').css('cursor','none');
 			}
 			doAnimation = typeof doAnimation == 'undefined' || doAnimation;
@@ -2329,7 +2329,9 @@ if (typeof jQuery != 'undefined') {
 						.css('display','block');
 				});	
 			} else {
-				$('body').css('cursor','none');
+				if(t.isFullScreen && $('#playerContainer').is(':visible')) {
+					$('body').css('cursor','none');
+				}
 				// hide main controls
 				$('#playerTopBar').hide();
 				t.controls
