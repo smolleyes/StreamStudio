@@ -3371,7 +3371,7 @@ if (typeof jQuery != 'undefined') {
 				}
 
 				// finally update the progress bar
-				if (percent !== null) {
+				if (percent !== null && t.media && !t.media.paused) {
 					percent = Math.min(1, Math.max(0, percent));
 					// update loaded bar
 					if (t.loaded && t.total) {
@@ -3386,7 +3386,7 @@ if (typeof jQuery != 'undefined') {
 					percent = totalBuffered / totalBytes;
 
 					// finally update the progress bar
-					if (percent !== null) {
+					if (percent !== null && t.media && !t.media.paused) {
 						percent = Math.min(1, Math.max(0, percent));
 						// update loaded bar
 						if (t.loaded && t.total) {

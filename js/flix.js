@@ -174,7 +174,7 @@ app.updateStats = function(streamInfo) {
          totalBuffered = 0;
          totalBytes = 0;
        }
-       if(upnpToggleOn) {
+       if(upnpToggleOn && upnpMediaPlaying && !upnpStoppedAsked) {
          $('.mejs-time-loaded').width(downloadedPct+'%')
        }
        $("#song-title").empty().text(_('Playing: ')+torrentName+" "+t);

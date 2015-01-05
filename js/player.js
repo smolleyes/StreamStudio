@@ -43,6 +43,7 @@ $(document).ready(function() {
 		try {
 			upnpMediaPlaying = false;
 			continueTransition = false;
+			upnpContinuePlay = false;
 			mediaRenderer.stop();
 			stopUpnp();
 		} catch(err) {}
@@ -210,11 +211,8 @@ function initPlayer() {
 	// restore curosr if player is fulscreen
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	//stop upnp
-    if (upnpMediaPlaying && playFromUpnp) {
-		upnpMediaPlaying = false;
-		playFromUpnp = false;
+    if (upnpMediaPlaying || playFromUpnp) {
 		mediaRenderer.stop();
-		continueTransition = false;
 	}
 	//clean ffmpeg process
 	try {
@@ -263,7 +261,9 @@ function initPlayer() {
     player.setSrc('');
     player.currentTime = 0;
     player.durationD.text('00:00:00');
+    player.currenttime.text('00:00:00')
     player.loaded.width(0);
+    player.current.width(0);
     $("#subPlayer-img").attr('src',"images/play-overlay.png");
     $('#infosPage').remove();
 	$('#song-title').empty().append(_('Waiting...'));
@@ -451,6 +451,7 @@ function launchPlay() {
 	if(upnpToggleOn) {
 		upnpMediaPlaying = false;
 		continueTransition = false;
+		upnpContinuePlay = true;
 		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
 		if(currentMedia.type === undefined) {
 			try {
@@ -669,15 +670,23 @@ function on_media_finished(){
 	if (playlistMode === 'normal') {
 		initPlayer();
 	} else if (playlistMode === 'loop') {
-		if(upnpMediaPlaying) {
-			playUpnpRenderer(currentMedia)
+		if(upnpToggleOn) {
+			if(upnpContinuePlay){
+				playUpnpRenderer(currentMedia)
+			}
 		} else {
 			startPlay(currentMedia);
 		}
 	} else if (playlistMode === 'shuffle') {
 		
 	} else if (playlistMode === 'continue') {
-		getNext();
+		if(upnpToggleOn) {
+			if(upnpContinuePlay){
+				getNext();
+			}
+		} else {
+			getNext();
+		}
 	} 
 }
 

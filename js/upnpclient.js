@@ -8,7 +8,7 @@ function getUpnpPosition() {
 			$('span.mejs-currenttime').text(response.data.RelTime);
 			$('span.mejs-duration').text(response.data.TrackDuration);
 		} else {
-			console.log(response);
+			console.log("Upnp stopping...");
 		}
     }).then( null, function( error) { // Handle any errors
 		var pct = (hmsToSecondsOnly(relTime) * 100 / hmsToSecondsOnly(trackDuration)).toFixed(2);

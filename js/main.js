@@ -584,6 +584,7 @@ function main() {
 					startVideo(current_song);
 				}
 			} else {
+				console.log(current_song)
 				startVideo(current_song);
 			}
 		} catch(err) {

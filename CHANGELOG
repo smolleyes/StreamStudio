@@ -1,3 +1,6 @@
+V 1.25.2
+  * rewrite upnp functions
+
 V 1.25.1
   * fix external players not playing youtube videos
   * fix cursor restore when media finished and play is fullscreen

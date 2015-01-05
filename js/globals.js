@@ -1,4 +1,4 @@
-var VERSION = "1.25.1";
+var VERSION = "1.25.2";
 
 var path = require('path');
 var fs = require('fs');
@@ -83,6 +83,7 @@ var pageLoading = false;
 var totalResults = 0;
 var ffmpegPath;
 var ytId='';
+var upnpContinuePlay = true;
 //storedb
 var sdb = storedb('std');
 
