@@ -389,8 +389,7 @@ function startPlay(media) {
 		} else if (playFromFile == false) {
 			fs.readdir(download_dir, function(err, filenames) {
 				var i;
-				count = filenames.length;
-				if ((err) || (count === 0)) {
+				if (!filenames || filenames.length == 0 || err) {
 					launchPlay();
 				} else {
 					for (i = 0; i < filenames.length; i++) {
