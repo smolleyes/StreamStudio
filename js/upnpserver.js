@@ -363,7 +363,7 @@ function playUpnpRenderer(obj) {
 				getRendererState('PLAYING');
 			});
 		} else {
-			console.log("ERROR UPNP " + reesponse)
+			console.log("ERROR UPNP " + response)
 			mediaRenderer.stop().then(function(response) {
 				continueTransition = false;
 				upnpMediaPlaying = false;
@@ -404,6 +404,7 @@ function getRendererState(state) {
 					upnpMediaPlaying = false;
 					continueTransition = false;
 					initPlayer()
+                    getRendererState('STOPPED');
 				} else {
 					$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
 					setTimeout(function(){ 

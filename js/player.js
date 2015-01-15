@@ -119,6 +119,7 @@ $(document).ready(function() {
     
     // player signals
     player.media.addEventListener('ended', function() {
+        updateMiniPlayer();
         on_media_finished();
 		$('.mejs-overlay-play').show();
 		$(".mejs-overlay-loading").hide();
@@ -127,6 +128,7 @@ $(document).ready(function() {
     player.media.addEventListener('pause', function() {
 		$('#subPlayer-play').show();
 		$('#subPlayer-pause').hide();
+		updateMiniPlayer();
     });
     player.media.addEventListener('seeking', function() {
 		$(".mejs-overlay-loading").show();
@@ -142,6 +144,7 @@ $(document).ready(function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
 		$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+		updateMiniPlayer();
     });
     
 	//SubPlayer controls
@@ -165,6 +168,9 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
+		if(engine && engine.engine_name === 'Grooveshark') {
+			return;
+		}
 		var pos = e.offsetX;
 		var pct = (( pos * 100) / $('#progress-bar').width()).toFixed(2);
 		var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
@@ -186,7 +192,6 @@ $(document).ready(function() {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 			}
 			m.title = currentMedia.title;
-			console.log(m)
 			startPlay(m);
 		} else {
 			player.setCurrentTime(newTime)
@@ -264,7 +269,6 @@ function initPlayer() {
     player.currenttime.text('00:00:00')
     player.loaded.width(0);
     player.current.width(0);
-    $("#subPlayer-img").attr('src',"images/play-overlay.png");
     $('#infosPage').remove();
 	$('#song-title').empty().append(_('Waiting...'));
 	$('.mejs-container #fbxMsg').remove();
@@ -279,9 +283,30 @@ function initPlayer() {
 	$('#subPlayer-play').show();
 	$('#subPlayer-pause').hide();
 	$('#subPlayer-Progress progress').val(0);
+	$('#subPlayer-Timer .mejs-duration,.mejs-currenttime').text('00:00:00')
+	$('#subPlayer-img').attr('src','images/play-overlay.png');
+}
+
+function updateMiniPlayer() {
+	var img = null;
+	try {
+		try {
+			img = $('.highlight img')[0].src;
+		}catch(err) {
+			img = $('.list-row.well img')[0].src;
+		}
+		if (img && img !== $('#subPlayer-img').attr('src') && activeTab !== 3 && activeTab !== 5) {
+			$('#subPlayer-img').attr('src',img);
+		} else {
+			$('#subPlayer-img').attr('src','images/play-overlay.png');
+		}
+	} catch(err) {
+		$('#subPlayer-img').attr('src','images/play-overlay.png');
+	}
 }
 
 function startPlay(media) {
+	updateMiniPlayer();
 	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false) {
 		if (media.link && media.link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
 			if(currentMedia && currentMedia.ytId !== ytId) {
@@ -290,7 +315,11 @@ function startPlay(media) {
 				cleanffar();
 			}
 		} else {
-			initPlayer();
+			if (currentMedia && media.link.indexOf(currentMedia.link) !== -1) {
+				cleanffar();
+			} else {
+				initPlayer();
+			}
 		}
 	}
     if(extPlayerRunning) {
@@ -387,6 +416,11 @@ function startPlay(media) {
 			launchPlay();
 		// else look for link already downloaded, if yes play it from hdd
 		} else if (playFromFile == false) {
+			if(currentMedia.link.match('http://|https://') !== null) {
+				playFromHttp = true;
+				launchPlay();
+				return;
+			}
 			fs.readdir(download_dir, function(err, filenames) {
 				var i;
 				if (!filenames || filenames.length == 0 || err) {
@@ -427,22 +461,11 @@ function launchPlay() {
 	} catch(err) {}
 	$('#subPlayer-play').hide();
 	$('#subPlayer-pause').show();
-	var img = null;
-	try {
-		img = $('.highlight img')[0].src;
-		if (img !== $('#subPlayer-img').attr('src') && img !== null && activeTab !== 3 && activeTab !== 5) {
-			$('#subPlayer-img').attr('src',img);
-		} else {
-			$('#subPlayer-img').attr('src','images/play-overlay.png');
-		}
-	} catch(err) {
-		$('#subPlayer-img').attr('src','images/play-overlay.png');
-	}
 	if($('#subPlayer-title').text() !== currentMedia.title) {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// add link for transcoding
-	if(transcoderEnabled || playFromTwitch|| playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8888/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
 		var link = 'http://'+ipaddress+':8888/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}

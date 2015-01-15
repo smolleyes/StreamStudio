@@ -1,3 +1,7 @@
+V 1.25.3
+  * all plugins can be used thru transcoder
+  * bug fixes
+
 V 1.25.2
   * rewrite upnp functions
 

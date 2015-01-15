@@ -31,7 +31,7 @@ $(document).ready(function() {
         } else if (text.indexOf('magnet:?xt') !== -1){
             $('#custom-menu ol').empty().append('<li><a id="magnet_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open Magnet")+'</a></li>');
         } else {
-			if(text !== '' && text.match(/^(http|https)/) !== null) {
+			if(text !== '' && text.match(/^(http|https)/) !== null && text.indexOf('watch?v=') == -1) {
 				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
 			}
 		}
@@ -110,8 +110,26 @@ $(document).ready(function() {
     // paste yt link
     $(document).on('click','#paste_ytlink',function(e) {
 		e.preventDefault();
-		var ytlink = getYtlinkFromClipboard();
-		youtube.getVideoInfos(ytlink,0,1,function(datas) {fillPlaylist(datas,false,'','youtube')});
+		var ytlink = clipboard.get('text');
+		var obj = JSON.parse(settings.ht5Player);
+		var ext = false;
+		if(obj.name !== 'StreamStudio'){
+			ext = true;
+		}
+		youtube.getVideoInfos(ytlink,1,1,upnpToggleOn,ext, function(datas){
+			console.log(datas)
+			printYtVideoInfos(datas[25], true, false, '', engine);
+			try {
+				vid = ytlink.match('.*v=(.*)?&')[1]
+			} catch(err) {
+				try {
+					vid = ytlink.match('.*v=(.*)')[1];
+				} catch(err) {
+					return null;
+				}
+			}
+			$("#"+vid).click();
+		});
 		$('#custom-menu').slideUp();
 	});
   // open mega link
@@ -131,7 +149,6 @@ $(document).ready(function() {
     if(vlink.indexOf('file://') !== -1) {
       vlink = decodeURIComponent(vlink).replace("file://",'');
     }
-    console.log(vlink);
     getAuthTorrent(vlink,true,false)
 		$('#custom-menu').slideUp();
 	});
@@ -210,6 +227,7 @@ $(document).ready(function() {
 function getYtlinkFromClipboard() {
 	var vid='';
 	var text = clipboard.get('text');
+	console.log(text)
 	try {
 		vid = text.match('.*v=(.*)?&')[1]
 		return "www.youtube.com/watch?v="+vid;

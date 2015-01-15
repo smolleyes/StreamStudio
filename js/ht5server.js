@@ -163,7 +163,15 @@ function startStreaming(req, res, width, height) {
 		// external link
 		if(playFromHttp){
 			console.log('Opening external link ' + link)
-			checkDuration(link, device, '', bitrate,res,time);
+			if(link.indexOf('grooveshark.com/stream.php') !== -1) {
+				var ffmpeg = spawnFfmpeg(link, device, '', bitrate, 0, function(code) { // exit
+                    console.log('child process exited with code ' + code);
+                    res.end();
+                });
+                ffmpeg.stdout.pipe(res);
+			} else {
+				checkDuration(link, device, '', bitrate,res,time);
+			}
 		}
         // torrent link
         if (torrentPlaying) {
@@ -342,10 +350,10 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
-			if(link.indexOf('.mp3') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
+			if(link.indexOf('.mp3') !== -1 || link.indexOf('.mp4') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
 				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-codec:v', 'libx264', '-crf', '18', '-preset', 'ultrafast', '-codec:a', 'libvorbis','-threads', '0','-copyts','-sn','-f', 'matroska','pipe:1'];
 			} else {
-				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
 			}
 		} else {
 			//console.log(link)
@@ -361,7 +369,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 			}
 		}
 	} else {
-		args = ['-re','-i', 'pipe:0', '-sn', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
+		args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
 	}
 	if (process.platform === 'win32') {
 		ffmpeg = spawn(ffmpegPath, args);
@@ -369,17 +377,6 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 		ffmpeg = spawn(ffmpegPath, args);
 	}
 	ffar.push(ffmpeg);
-	
-	try {
-		img = $('.highlight img')[0].src;
-		if (img !== $('#subPlayer-img').attr('src') && img !== null) {
-			$('#subPlayer-img').attr('src',img);
-		} else {
-			$('#subPlayer-img').attr('src','images/play-overlay.png');
-		}
-	} catch(err) {
-		$('#subPlayer-img').attr('src','images/play-overlay.png');
-	}
 	
 	console.log('Spawning ffmpeg ' + args.join(' '));
 	var total_time = 0,
@@ -393,6 +390,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 				total_data = '';
 				total_time = seconds;
+				mediaDuration = parseFloat(seconds);
 			}
 			console.log('grep stderr: ' + data);
 			

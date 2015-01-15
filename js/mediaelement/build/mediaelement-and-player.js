@@ -3247,7 +3247,9 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
-						
+						if(engine && engine.engine_name === 'Grooveshark') {
+							return;
+						}
 						if (x < offset.left) {
 							x = offset.left;
 						} else if (x > width + offset.left) {
