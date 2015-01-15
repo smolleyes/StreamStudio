@@ -82,7 +82,7 @@ function downloadUpdate(link,filename) {
 		$('#updateProgress strong').html(_("can't download this file..."));
 		setTimeout(function(){pbar.hide()},5000);
     }
-    temp.mkdir('StreamStudio', function(err, dirPath) {
+    temp.mkdir(function(err, dirPath) {
 	tmpPath = dirPath;
 	var target;
 	if (process.platform === 'win32') {
