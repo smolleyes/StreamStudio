@@ -165,5 +165,10 @@
 	"Duration:": "Duration:",
 	"Short (<4 min)": "Short (<4 min)",
 	"Medium (4 <-> 20 min)": "Medium (4 <-> 20 min)",
-	"Long (>20 min)": "Long (>20 min)"
+	"Long (>20 min)": "Long (>20 min)",
+	"Lives": "Lives",
+	"lives found...": "lives found...",
+	"Viewers:": "Viewers:",
+	"Availables streams:": "Availables streams:",
+	"No streams found for this channel !": "No streams found for this channel !"
 }

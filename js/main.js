@@ -854,7 +854,8 @@ function main() {
                     $('#orderBy_select').empty().append(html);
                     var html = '<option value = "videos">' + _("Videos") + '</option> \
 								<option value = "playlists">' + _("Playlists") + '</option> \
-								<option value = "category">' + _("Categories") + '</option>';
+								<option value = "category">' + _("Categories") + '</option> \
+								<option value = "live">' + _("Lives") + '</option>';
                     $('#searchTypes_select').empty().append(html);
                     var html = '<option value = ""></option> \
 									<option value = "hd">HD</option> \
@@ -1371,15 +1372,19 @@ function startSearch(query) {
             if (searchTypes_select === 'videos') {
                 dailymotion.searchVideos(query, current_page, searchFilters, search_order, function(datas) {
                     getVideosDetails(datas, 'dailymotion', false);
-                });
+            	});
             } else if (searchTypes_select === 'playlists') {
                 dailymotion.searchPlaylists(query, current_page, function(datas) {
                     getPlaylistInfos(datas, 'dailymotion');
-                });
+            });
             } else if (searchTypes_select === 'category') {
                 dailymotion.categories(query, current_page, searchFilters, selected_category, function(datas) {
                     getVideosDetails(datas, 'dailymotion', false);
-                });
+            });
+            }  else if (searchTypes_select === 'live') {
+                dailymotion.lives(query, current_page, searchFilters, function(datas) {
+                    getVideosDetails(datas, 'dailymotion', false);
+            	});
             }
         } else if (search_engine === 'youtube') {
             if (searchTypes_select === 'videos') {

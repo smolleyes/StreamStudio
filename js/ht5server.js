@@ -104,6 +104,43 @@ function startStreaming(req, res, width, height) {
         var megaType = megaName.split('.').pop().toLowerCase();
         var x = null;
         
+        if(playFromDailymotionLive) {
+				console.log('play dailymotion live')
+				var l = parsedLink.replace('/?file=','');
+				var link, quality;
+				if(l.indexOf('&quality') !== -1) {
+					quality = link.split('&quality=')[1];
+					link = link.split('&')[0]
+				} else {
+					quality = "best";
+				}
+				console.log('Starting dailymotion streaming '+ link + " with quality " + quality);
+				var st = spawn(livestreamerPath, ['-O',link, quality]);
+				var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
+                            console.log('child process exited with code ' + code);
+                            res.end();
+                        });
+                st.stdout.pipe(ffmpeg.stdin);
+                stArr.push(st);
+				ffmpeg.stdout.pipe(res);
+				st.stderr.on('data', function(data) {
+					console.log('grep stderr: ' + data);
+					if(data.toString().match(/Failed to open segment/) !== null) {
+						$("#homeToggle").click();
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Bandwith problem please try a lower quality !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+						initPlayer();
+					} else if(data.toString().match(/No streams found on this URL/) !== null || data.toString().match(/requires a subscription/) !== null) {
+						$("#homeToggle").click();
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams available for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+						initPlayer();
+					} else if(data.toString().match(/Unable to open URL/) !== null) {
+						$("#homeToggle").click();
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+						initPlayer();
+					}
+				});
+		}
+
         if(playFromTwitch) {
 				console.log('play twitch stream')
 				var l = parsedLink.replace('/?file=','');

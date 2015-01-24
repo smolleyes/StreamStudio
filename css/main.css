@@ -23,6 +23,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	src: url('../fonts/Ripper.ttf');
 }
 
+.preload_dailymotion_live {
+	top: -8px;
+	position: relative;
+}
+
 .myBrand {
 	font-family: Ripper;
 	color: white;
@@ -936,6 +941,24 @@ position: absolute;
 left: 54px;
 padding: 2px 5px;
 top: 66px;
+}
+
+.online {
+	background: rgba(0, 200, 0, 0.6);
+	color: white;
+	position: absolute;
+	left: 69px;
+	padding: 2px 5px;
+	top: 66px;
+}
+
+.offline {
+	background: rgba(200, 0, 0, 0.6);
+	color: white;
+	position: absolute;
+	left: 69px;
+	padding: 2px 5px;
+	top: 66px;
 }
 
 .downloads_container {

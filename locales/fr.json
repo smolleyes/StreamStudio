@@ -168,5 +168,10 @@
 	"Duration:": "Durée:",
 	"Short (<4 min)": "Courte (<4 min)",
 	"Medium (4 <-> 20 min)": "Moyenne (4 <-> 20 min)",
-	"Long (>20 min)": "Longue (>20 min)"
+	"Long (>20 min)": "Longue (>20 min)",
+	"Lives": "Directs",
+	"lives found...": "directs trouvés...",
+	"Viewers:": "Spectateurs:",
+	"Availables streams:": "Flux disponibles:",
+	"No streams found for this channel !": "Aucun flux trouvé pour cette chaîne !"
 }

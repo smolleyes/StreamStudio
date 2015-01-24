@@ -25,6 +25,7 @@ var playFromMega = false;
 var playFromMegaUser = false;
 var playFromTwitch = false;
 var playFromYoutube = false;
+var playFromDailymotionLive = false;
 var doNotSwitch = false;
 
 $(document).ready(function() {
@@ -365,6 +366,7 @@ function startPlay(media) {
     playFromMega = false;
     playFromMegaUser = false;
     playFromTwitch = false;
+    playFromDailymotionLive = false;
     playFromYoutube = false;
     var localLink = null;
     try {
@@ -390,6 +392,10 @@ function startPlay(media) {
 			currentMedia.link = link.replace('&twitch','').replace('&external','');
 			launchPlay();
 		// youtube dash
+		} else if (link.indexOf('dailymotion.com') !== -1 && link.indexOf('&quality=') !== -1) {
+			playFromDailymotionLive = true;
+			currentMedia.link = link;
+			launchPlay();
 		} else if (link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
 			playFromYoutube = true;
 			currentMedia.link = link;
@@ -465,7 +471,7 @@ function launchPlay() {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8888/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8888/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
 		var link = 'http://'+ipaddress+':8888/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}

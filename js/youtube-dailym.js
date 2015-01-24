@@ -1,3 +1,53 @@
+// start dailymotion live
+$(document).on('click', '.preload_dailymotion_live', function(e) {
+    var obj = {};
+    obj.link = $(this).attr('data-link');
+    obj.title = $(this).text();
+    obj.id = $(this).closest('div.youtube_item').find('.downloads_container').attr('id');
+    $('.highlight').removeClass('highlight well');
+    $(this).closest('div.youtube_item').addClass('highlight well');
+    var spiffy = $(this).closest('div.youtube_item').find('.spiffy');
+    spiffy.show();
+    var st = spawn(livestreamerPath, ['--stream-url',obj.link]);
+    var out = '';
+    st.stdout.on('data',function(data){
+        out  = data.toString();
+        console.log(out)
+    });
+    st.on('exit', function(code) {
+        spiffy.hide();
+        if(code == 0) {
+            if(out.indexOf('Available streams:') !== -1) {
+                if($('#'+obj.id+' a').length > 0) {
+                    $('#'+obj.id).empty();
+                }
+                $('#'+obj.id).append('<p><b>'+_("Availables streams:")+'</b></p>');
+                var list = out.replace('Available streams:','').replace(/\(.*?\)/g,'').split(',');
+                Iterator.iterate(list).forEach(function(item) {
+                    var item = item.trim();
+                    if(item !== 'audio') {
+                        $('#'+obj.id).append('<a class="playChannel dailyLiveQualityLink" href="#" data="'+obj.title+'::'+obj.link+'&quality='+item+'">'+item+' </a>')
+                    }
+                });
+            } else {
+                $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams found for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+            }
+        } else {
+            $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams found for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+        }
+    });
+});
+
+$(document).on('click', '.dailyLiveQualityLink', function(e) {
+    e.preventDefault();
+    e.preventDefault();
+    var obj = $(this).attr("data").split('::');
+    var video = {};
+    video.title = obj[0];
+    video.link = obj[1];
+    startPlay(video);
+});
+
 function getCategories() {
     $('#categories_label').hide();
     $('#categories_select').hide();
@@ -142,9 +192,33 @@ function getVideosDetails(datas, engine, sublist, vid) {
     switch (engine) {
         case 'dailymotion':
             for (var i = 0; i < items.length; i++) {
-                dailymotion.getVideoInfos(items[i].id, i, items.length, function(datas) {
-                    fillPlaylist(datas, sublist, vid, 'dailymotion')
-                });
+                if(items[i].hasOwnProperty('onair')) {
+                    var text = '' 
+                    if(items[i].title.length > 45){
+                        text = items[i].title.substring(0,45)+'...';
+                    } else {
+                        text = items[i].title;
+                    }
+                    vid = items[i].id;
+                    title = items[i].title;
+                    var online = 'Online';
+                    var css = "online";
+                    if(!items[i].onair) {
+                        online = 'Offline';
+                        css = "offline";
+                    }
+                    $('#items_container').append('<div class="youtube_item" ><img class="video_thumbnail" src="' + items[i].thumbnail_240_url + '" /><img src="images/spiffygif_30x30.gif" class="spiffy" /><div class="'+css+'"><span>' + online + '</span></div><div class="item-info"><p><a class="preload_dailymotion_live" data-link="http://www.dailymotion.com/video/'+vid+'" alt="'+title+'"><b>' + text + '</b></a></p></div><div class="item-info"><span><b>' + _("Viewers:") + '</b> ' + items[i].audience + ' </span></div><div id="'+ vid +'" class="downloads_container"></div></div></div></div>');
+                    if(i+1 == items.length) {
+                        pageLoading = false;
+                        $('#search_results').html('<p><strong>' + totalResults + ' </strong>' + _("lives found...") + '</p>');
+                        $('#search').show();
+                        $('#loading').hide();
+                    }
+                } else {
+                    dailymotion.getVideoInfos(items[i].id, i, items.length, function(datas) {
+                        fillPlaylist(datas, sublist, vid, 'dailymotion')
+                    });
+                }
             }
             break;
         case 'youtube':

@@ -1,4 +1,4 @@
-var VERSION = "1.25.4";
+var VERSION = "1.26";
 
 var path = require('path');
 var fs = require('fs');
@@ -30,6 +30,7 @@ var parseString = require('xml2js').parseString;
 var __ = require('underscore');
 var rmdir = require('rmdir');
 var psnode = require('ps-node');
+var Iterator = require('iterator').Iterator;
 
 //engines
 var dailymotion = require('dailymotion');
