@@ -400,7 +400,7 @@ function getRendererState(state) {
 							getRendererState(state);
 						},1000);
 					}
-				} else if (response.data.CurrentTransportState === "NO_MEDIA_PRESENT") {
+				} else if (response.data.CurrentTransportState === "NO_MEDIA_PRESENT" && transitionCount > 10) {
 					upnpMediaPlaying = false;
 					continueTransition = false;
 					initPlayer()

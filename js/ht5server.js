@@ -104,6 +104,10 @@ function startStreaming(req, res, width, height) {
         var megaType = megaName.split('.').pop().toLowerCase();
         var x = null;
         
+        if(os.platform == "win32") {
+        	link = link.replace(/ /g,'\ ');
+        }
+
         if(playFromDailymotionLive) {
 				console.log('play dailymotion live')
 				var l = parsedLink.replace('/?file=','');
@@ -330,6 +334,10 @@ function startStreaming(req, res, width, height) {
 }
 
 function checkDuration(link, device, host, bitrate,res,seekTo) {
+	if(!upnpToggleOn) {
+		link = decodeURIComponent(link);
+	}
+	
 	var olink = '';
 	if(playFromYoutube) {
 		olink = link;
@@ -378,17 +386,21 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 
 
 function spawnFfmpeg(link, device, host, bitrate,seekTo) {
+	console.log(link)
 	var start = '00:00:00.00'
 	if(seekTo !== 0) {
 		start = seekTo;
+	}
+	if(!upnpToggleOn) {
+		link = decodeURIComponent(link);
 	}
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
 			if(link.indexOf('.mp3') !== -1 || link.indexOf('.mp4') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
-				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-codec:v', 'libx264', '-crf', '18', '-preset', 'ultrafast', '-codec:a', 'libvorbis','-threads', '0','-copyts','-sn','-f', 'matroska','pipe:1'];
+				args = ['-ss' , start,'-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-codec:v', 'libx264', '-crf', '18', '-preset', 'ultrafast', '-codec:a', 'libvorbis','-threads', '0','-copyts','-sn','-f', 'matroska','pipe:1'];
 			} else {
-				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
+				args = ['-ss' , start,'-i', ''+link+'', '-copyts','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
 			}
 		} else {
 			var vlink = link.split('::')[0];

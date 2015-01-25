@@ -411,7 +411,7 @@ function startPlay(media) {
 			currentMedia.link = link.replace('&external','');
 			launchPlay();
 		// local files links
-		} else if (link.indexOf('file:///') !== -1) {
+		} else if (link.indexOf('file://') !== -1) {
 			playFromFile = true;
 			currentMedia.link = link.replace('file://','');
 			launchPlay();
