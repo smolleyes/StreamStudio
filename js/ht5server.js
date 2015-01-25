@@ -177,7 +177,7 @@ function startStreaming(req, res, width, height) {
 		}
 		// play youtube dash
 		if(playFromYoutube && !upnpToggleOn) {
-			console.log('Opening youtube link ' + link)
+			console.log('Opening youtube link')
 			if(mediaDuration == 0) {
 				checkDuration(link, device, '', bitrate,res,time);
 			} else {
@@ -354,7 +354,6 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 	}); 
     p.on('exit',function(code){
 		if(code === 0 && mediaDuration !== 0) {
-			console.log(mediaDuration + " " + secondstotime(mediaDuration))
 			if(playFromYoutube) {
 				var ffmpeg = spawnFfmpeg(olink, device, '', bitrate,seekTo, function(code) { // exit
 						console.log('child process exited with code ' + code);
@@ -379,7 +378,6 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 
 
 function spawnFfmpeg(link, device, host, bitrate,seekTo) {
-	console.log(link)
 	var start = '00:00:00.00'
 	if(seekTo !== 0) {
 		start = seekTo;
@@ -393,7 +391,6 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 				args = ['-ss' , start,'-i', ''+decodeURIComponent(link)+'', '-copyts','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
 			}
 		} else {
-			//console.log(link)
 			var vlink = link.split('::')[0];
 			try {
 				var vlink = link.split('::')[0];
@@ -415,7 +412,6 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	}
 	ffar.push(ffmpeg);
 	
-	console.log('Spawning ffmpeg ' + args.join(' '));
 	var total_time = 0,
 		total_data = '';
 		
