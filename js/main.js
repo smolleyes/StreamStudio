@@ -525,7 +525,8 @@ function main() {
 			var title = $(this).attr('alt');
 			current_song = $(this).closest('.youtube_item').find('.downloads_container').attr('id');
 			var vid = $(this).attr('id');
-			if ($('#youtube_entry_res_' + vid + ' a.video_link').length === 0) {
+			if ($('#youtube_entry_res_' + vid + ' a.video_link').length === 0 || $('#youtube_entry_res_' + vid + ' a.video_link').length !== 0 && upnpToggleOn && $('#youtube_entry_res_' + vid + ' a.video_link')[0].href.indexOf('::') !== -1) {
+				$('#youtube_entry_res_' + vid).empty();
 				$(this).closest('.youtube_item').find('.spiffy').show();
 				if(search_engine === 'youtube') {
 					ytId = vid;

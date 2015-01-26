@@ -330,64 +330,49 @@ var transitionCount = 0;
 upnpStoppedAsked = false;
 var upnpDeviceState = '';
 function playUpnpRenderer(obj) {
-    mediaRenderer.getTransportInfo().then(function(response) {
-        console.log(response)
-        if (response && response.data) {
-            upnpDeviceState = response.data.CurrentTransportState;
-            console.log(upnpDeviceState)
-            if(upnpDeviceState !== 'STOPPED' && upnpDeviceState !== 'TRANSITIONING' && upnpDeviceState !== 'NO_MEDIA_PRESENT') {
-                console.log("Media en cours, stop")
-                upnpMediaPlaying = false;
-                continueTransition = false;
-                upnpStoppedAsked = false;
-                cleanffar();
-                mediaRenderer.stop().then(function(response) {
-                    setTimeout(function() {
-                        playUpnpRenderer(obj);
-                    },4000);
-                });
-            } else {
-                // stop upnp file loading if needed
-                upnpMediaPlaying = false;
-                continueTransition = false;
-                timeUpdater = null;
-                transitionCount = 0;
-                if(obj.type === undefined) {
-                    obj.type = "object.item.videoItem";
-                }
-                var uri = XMLEscape.xmlEscape(obj.link.replace('&upnp','').replace('&torrent','').replace('&direct',''));
-                var infos = JSON.parse(obj.data).protocolInfo;
-                var title = XMLEscape.escape(obj.title);
-                var type = obj.type;
-                currentMedia = obj;
-                
-                var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*\"&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
-                mediaRenderer.setAVTransportURI("0",uri,metaString).then(function(response) {
-                    if (response && response.data) {
-                        console.log('UPNP: Ok playing' + uri);
-                        // start watching for PLAYING state
-                        mediaRenderer.play().then(function(response) {
-                            continueTransition = true;
-                            transitionCount = 0;
-                            getRendererState('PLAYING');
-                        });
-                    } else {
-                        console.log("ERROR UPNP " + response)
-                        mediaRenderer.stop().then(function(response) {
-                            continueTransition = false;
-                            upnpMediaPlaying = false;
-                            console.log('UPNP: No response for' + uri)
-                            getRendererState('STOPPED');
-                        });
-                    }
-                    
-                }).then( null, function( error ) { // Handle any errors
-
-                    console.log( "An error occurred: " + error.description );
-
-                });
+    stopUpnp();
+    cleanffar();
+    mediaRenderer.stop().then(function(response) {
+        setTimeout(function() {
+            // stop upnp file loading if needed
+            continueTransition = false;
+            timeUpdater = null;
+            transitionCount = 0;
+            if(obj.type === undefined) {
+                obj.type = "object.item.videoItem";
             }
-        }
+            var uri = XMLEscape.xmlEscape(obj.link.replace('&upnp','').replace('&torrent','').replace('&direct',''));
+            var infos = JSON.parse(obj.data).protocolInfo;
+            var title = XMLEscape.escape(obj.title);
+            var type = obj.type;
+            currentMedia = obj;
+            
+            var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*\"&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
+            mediaRenderer.setAVTransportURI("0",uri,metaString).then(function(response) {
+                if (response && response.data) {
+                    console.log('UPNP: Ok playing' + uri);
+                    // start watching for PLAYING state
+                    mediaRenderer.play().then(function(response) {
+                        continueTransition = true;
+                        transitionCount = 0;
+                        getRendererState('PLAYING');
+                    });
+                } else {
+                    console.log("ERROR UPNP " + response)
+                    mediaRenderer.stop().then(function(response) {
+                        continueTransition = false;
+                        upnpMediaPlaying = false;
+                        console.log('UPNP: No response for' + uri)
+                        getRendererState('STOPPED');
+                    });
+                }
+                
+            }).then( null, function( error ) { // Handle any errors
+
+                console.log( "An error occurred: " + error.description );
+
+            });
+        },2000);
     });
 }
 
@@ -408,7 +393,7 @@ function getRendererState(state) {
 						$('span.mejs-currenttime').text('--:--');
 						$('span.mejs-duration').text('--:--');
 						$('.mejs-overlay-play').hide();
-						$('.mejs-overlay-loading').show();
+                        $('.mejs-overlay,.mejs-overlay-loading').show()
 						setTimeout(function(){ 
 							getRendererState(state);
 						},1000);
@@ -434,9 +419,6 @@ function getRendererState(state) {
 					transitionCount = 0;
 					upnpMediaPlaying = true;
 					continueTransition = true;
-					if(upnpStoppedAsked) {
-						return;
-					};
 					setTimeout(function(){
 						$('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
 						$('.mejs-overlay-button').hide();
@@ -455,12 +437,18 @@ function getRendererState(state) {
 					upnpMediaPlaying = false;
 					continueTransition = false;
 					upnpStoppedAsked = false;
-					setTimeout(function(){
-						on_media_finished()
-					},2000);
+                    if(!play_next && !play_prev) {
+    					setTimeout(function(){
+    						on_media_finished()
+    					},2000);
+                    } else {
+                        play_next = false;
+                        play_prev = false;
+                    }
 				}
 			}
 		} else {
+
 			console.log("Service is reporting no response");
 		}
 	}).then( null, function( error ) { // Handle any errors
@@ -470,26 +458,24 @@ function getRendererState(state) {
 
 function stopUpnp() {
 	continueTransition = false;
-	setTimeout(function(){
 	// if user asked stop
-		if(upnpMediaPlaying === false) {
-			console.log("upnp stopped")
-			continueTransition = false;
+	if(upnpMediaPlaying === false) {
+		console.log("upnp stopped")
+		continueTransition = false;
 		// else continue
-		} else {
-			console.log('upnp finished playing...')
-			continueTransition = false;
-			upnpMediaPlaying = false;
-			playFromUpnp = false;
-			upnpStoppedAsked = false;
-		}
-		try {
-			if(torrentPlaying) {
-			   stopTorrent();
-			}
-		} catch (err) {}
-	},2000);
-    initPlayer();
+	} else {
+		console.log('upnp finished playing...')
+		continueTransition = false;
+		upnpMediaPlaying = false;
+		playFromUpnp = false;
+		upnpStoppedAsked = false;
+        $("#subPlayer-title").text(' '+_('Waiting...'));
+        $('#subPlayer-play').show();
+        $('#subPlayer-pause').hide();
+        $('#subPlayer-Progress progress').val(0);
+        $('#subPlayer-Timer .mejs-duration,.mejs-currenttime').text('00:00:00')
+        $('#subPlayer-img').attr('src','images/play-overlay.png');
+	}
 }
 
 function startUPNPserver() {

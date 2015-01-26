@@ -37,6 +37,7 @@ $(document).ready(function() {
     // next signal and callback
     $(document).on('click', '.mejs-next-btn', function(e) {
 		e.preventDefault();
+		play_next = true;
         getNext();
     });
     // stop button
@@ -115,6 +116,7 @@ $(document).ready(function() {
     // previous signal and callback
     $(document).on('click', '.mejs-back-btn', function(e) {
         e.preventDefault();
+        play_prev = true;
         getPrev();
     });
     
@@ -150,6 +152,7 @@ $(document).ready(function() {
     
 	//SubPlayer controls
 	$('#subPlayer-next').click(function() {
+		play_next = true;
 		getNext();
 	});
 	
@@ -162,6 +165,7 @@ $(document).ready(function() {
 	});
 	
 	$('#subPlayer-prev').click(function() {
+		play_prev = true;
 		getPrev();
 	});
 	
@@ -572,7 +576,6 @@ function startVideo(vid_id, title) {
 }
 
 function playNextVideo(vid_id) {
-	initPlayer()
     try {
         var elem_id = '';
         // if page was changed
@@ -595,7 +598,6 @@ function playNextVideo(vid_id) {
 }
 
 function getNext() {
-	//initPlayer();
     if (activeTab == 1) {
 		try {
 			engine.play_next();
@@ -649,7 +651,6 @@ function getNext() {
 }
 
 function getPrev() {
-	//initPlayer()
     if (activeTab == 1) {
 		try {
 			$('.highlight').closest('li').prev().find('a')[0].click();

@@ -328,8 +328,7 @@ function startStreaming(req, res, width, height) {
     res.on("close", function() {
 		currentRes= null;
 		console.log('request end!!!!!!!!!!!!!!!!')
-        ffar[0].kill('SIGKILL');
-        stArr[0].kill('SIGKILL');
+        cleanffar();
     });
 }
 
