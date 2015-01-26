@@ -382,7 +382,7 @@ function getRendererState(state) {
 			console.log(response.data.CurrentTransportState, state, continueTransition , transitionCount)
 			if(response.data.CurrentTransportState !== state && continueTransition) {
 				if(response.data.CurrentTransportState === 'TRANSITIONING') {
-					if (transitionCount === 120) {
+					if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
 						upnpMediaPlaying = false;
 						continueTransition = false;
                         upnpStoppedAsked = true;
