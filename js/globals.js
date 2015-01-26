@@ -1,4 +1,4 @@
-var VERSION = "1.26.1";
+var VERSION = "1.26.2";
 
 var path = require('path');
 var fs = require('fs');
@@ -31,6 +31,7 @@ var __ = require('underscore');
 var rmdir = require('rmdir');
 var psnode = require('ps-node');
 var Iterator = require('iterator').Iterator;
+var sanitize = require("sanitize-filename");
 
 //engines
 var dailymotion = require('dailymotion');

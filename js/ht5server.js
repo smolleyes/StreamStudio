@@ -386,7 +386,6 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 
 
 function spawnFfmpeg(link, device, host, bitrate,seekTo) {
-	console.log(link)
 	var start = '00:00:00.00'
 	if(seekTo !== 0) {
 		start = seekTo;
@@ -417,6 +416,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	} else {
 		args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
 	}
+	console.log("spawn : " + args)
 	if (process.platform === 'win32') {
 		ffmpeg = spawn(ffmpegPath, args);
 	} else {

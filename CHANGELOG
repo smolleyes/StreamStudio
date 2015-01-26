@@ -1,3 +1,7 @@
+V 1.26.2
+  * fix youtube audio
+  * fix upnp
+
 V 1.26.1
   * update ffmpeg windows
   * fix local files playing thru upnp on windows

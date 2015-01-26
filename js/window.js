@@ -1,5 +1,8 @@
 onload = function() {
     try {
+        cleanffar();
+    } catch(err) {}
+    try {
         win.on('close', function() {
             try {
                 var pid = extPlayerProc.pid+1;
@@ -12,6 +15,7 @@ onload = function() {
                         extPlayerRunning = false;
                     }
                 });
+
             } catch(err) {}
             
             if (playAirMedia === true) {

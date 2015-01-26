@@ -437,8 +437,7 @@ function startPlay(media) {
 						if ((title + '.mp4' === ftitle) || (title + '.webm' === ftitle) || (title + '.mp3' === ftitle)) {
 							currentMedia.link = 'file://' + encodeURI(download_dir + '/' + ftitle);
 						}
-						count--;
-						if (count === 0) {
+						if (i+1 === filenames.length) {
 							launchPlay();
 						}
 					}
@@ -596,7 +595,7 @@ function playNextVideo(vid_id) {
 }
 
 function getNext() {
-	initPlayer();
+	//initPlayer();
     if (activeTab == 1) {
 		try {
 			engine.play_next();
@@ -650,7 +649,7 @@ function getNext() {
 }
 
 function getPrev() {
-	initPlayer()
+	//initPlayer()
     if (activeTab == 1) {
 		try {
 			$('.highlight').closest('li').prev().find('a')[0].click();

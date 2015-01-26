@@ -71,7 +71,7 @@ function downloadFile(link, title, vid, toTorrent) {
 	if (vid === undefined) {
 		var vid = title.split('::')[1];
 	}
-	var title = title.split('::')[0];
+	var title = sanitize(title.split('::')[0]);
 	var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
 	<p><b>' + title + '</b></p> \
 	<p> \
@@ -201,7 +201,7 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 		$("#downloads_tab").click();
 	}
 	var vid = ((Math.random() * 1e6) | 0);
-	var title = title.split('::')[0];
+	var title = sanitize(title.split('::')[0]);
 	var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
 	<p><b>' + title + '</b></p> \
 	<p> \
@@ -328,7 +328,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 	}
 
 	var vid = ((Math.random() * 1e6) | 0);
-	var title = title.split('::')[0].trim().replace(/\\|\//g,'_').replace('.webm','.mkv');
+	var title = sanitize(title.split('::')[0].trim().replace(/\\|\//g,'_').replace('.webm','.mkv'));
 	var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
 	<p><b>' + title + '</b></p> \
 	<p> \
