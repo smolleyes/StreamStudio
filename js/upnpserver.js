@@ -335,7 +335,7 @@ function playUpnpRenderer(obj) {
         if (response && response.data) {
             upnpDeviceState = response.data.CurrentTransportState;
             console.log(upnpDeviceState)
-            if(upnpDeviceState !== 'STOPPED' && upnpDeviceState !== 'TRANSITIONING') {
+            if(upnpDeviceState !== 'STOPPED' && upnpDeviceState !== 'TRANSITIONING' && upnpDeviceState !== 'NO_MEDIA_PRESENT') {
                 console.log("Media en cours, stop")
                 upnpMediaPlaying = false;
                 continueTransition = false;
