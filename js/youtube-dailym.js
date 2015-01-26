@@ -40,7 +40,7 @@ $(document).on('click', '.preload_dailymotion_live', function(e) {
 
 $(document).on('click', '.dailyLiveQualityLink', function(e) {
     e.preventDefault();
-    e.preventDefault();
+    console.log('DAILYMOTION LIVE CLICKED')
     var obj = $(this).attr("data").split('::');
     var video = {};
     video.title = obj[0];

@@ -173,7 +173,7 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(engine && engine.engine_name === 'Grooveshark') {
+		if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega) {
 			return;
 		}
 		var pos = e.offsetX;
@@ -311,6 +311,9 @@ function updateMiniPlayer() {
 }
 
 function startPlay(media) {
+	if(upnpMediaPlaying || playFromUpnp) {
+		play_next = true;
+	}
 	updateMiniPlayer();
 	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false) {
 		if (media.link && media.link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
@@ -480,9 +483,6 @@ function launchPlay() {
 	}
 	
 	if(upnpToggleOn) {
-		upnpMediaPlaying = false;
-		continueTransition = false;
-		upnpContinuePlay = true;
 		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
 		if(currentMedia.type === undefined) {
 			try {
@@ -495,12 +495,7 @@ function launchPlay() {
 				currentMedia.type = "object.item.videoItem";
 			}
 		}
-		if (upnpMediaPlaying) {
-			mediaRenderer.stop();
-			setTimeout(function() { return playUpnpRenderer(currentMedia);},2000);
-		} else {
-			return playUpnpRenderer(currentMedia);
-		}
+		playUpnpRenderer(currentMedia);
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}

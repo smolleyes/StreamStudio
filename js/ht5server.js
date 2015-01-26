@@ -35,6 +35,9 @@ function startProxyServer() {
 }
 
 function startStreaming(req, res, width, height) {
+	if(ffmpegLive) {
+		return;
+	}
     try {
         var baseLink = url.parse(req.url).href;
         var megaKey;
@@ -119,6 +122,7 @@ function startStreaming(req, res, width, height) {
 					quality = "best";
 				}
 				console.log('Starting dailymotion streaming '+ link + " with quality " + quality);
+				ffmpegLive = true;
 				var st = spawn(livestreamerPath, ['-O',link, quality]);
 				var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
                             console.log('child process exited with code ' + code);
@@ -156,6 +160,7 @@ function startStreaming(req, res, width, height) {
 					quality = "best";
 				}
 				console.log('Starting twitch streaming '+ link + " with quality " + quality);
+				ffmpegLive = true;
 				var st = spawn(livestreamerPath, ['-O',link, quality]);
 				var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
                             console.log('child process exited with code ' + code);
@@ -249,6 +254,7 @@ function startStreaming(req, res, width, height) {
                         }
                     });
                     ffmpeg.stdout.pipe(res);
+                    playFromMegaUser = true;
                 } else {
                     console.log('playing movie without transcoding');
                     downloadFromMega(decodeURIComponent(link), megaKey).pipe(res);
@@ -266,6 +272,7 @@ function startStreaming(req, res, width, height) {
                     megaSize = file.size;
                     megaName = file.name.replace(/ /g, '_');
                     megaType = megaName.split('.').pop().toLowerCase();
+                    currentMedia.title = megaName;
                 } catch (err) {
                     $.notif({
                         title: 'StreamStudio:',
@@ -296,7 +303,7 @@ function startStreaming(req, res, width, height) {
                             //res.end();
                         });
                         	
-                        megaDownload = file.download().pipe(res);
+                        megaDownload = file.download().pipe(ffmpeg.stdin);
 						megaDownload.on('error', function(err) {
 							console.log('ffmpeg stdin error...' + err);
 							if (err.stack.indexOf('codec') === -1) {
@@ -311,6 +318,7 @@ function startStreaming(req, res, width, height) {
 							}
 						});
 						ffmpeg.stdout.pipe(res);
+						playFromMega = true;
 						
                     } else {
                         console.log('playing movie without transcoding');
@@ -328,6 +336,7 @@ function startStreaming(req, res, width, height) {
     res.on("close", function() {
 		currentRes= null;
 		console.log('request end!!!!!!!!!!!!!!!!')
+		ffmpegLive = false;
         cleanffar();
     });
 }
@@ -416,11 +425,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 		args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a', 'libvorbis', '-threads', '0','-f', 'matroska', 'pipe:1'];
 	}
 	console.log("spawn : " + args)
-	if (process.platform === 'win32') {
-		ffmpeg = spawn(ffmpegPath, args);
-	} else {
-		ffmpeg = spawn(ffmpegPath, args);
-	}
+	ffmpeg = spawn(ffmpegPath, args);
 	ffar.push(ffmpeg);
 	
 	var total_time = 0,

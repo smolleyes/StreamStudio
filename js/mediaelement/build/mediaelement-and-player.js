@@ -3247,7 +3247,7 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
-						if(engine && engine.engine_name === 'Grooveshark') {
+						if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega) {
 							return;
 						}
 						if (x < offset.left) {

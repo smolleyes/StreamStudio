@@ -1,3 +1,7 @@
+V 1.26.4
+  * add upnp functions
+  * fix mega.co streaming
+
 V 1.26.3
   * rewrite upnp 
 
