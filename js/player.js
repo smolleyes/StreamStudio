@@ -31,7 +31,7 @@ var doNotSwitch = false;
 $(document).ready(function() {
 	
 	player = MediaElementPlayer('#videoPlayer', {
-        features: ['playpause', 'progress', 'current', 'duration', 'stop', 'volume', 'fullscreen']
+        features: ['playpause', 'progress', 'current', 'duration', 'tracks','stop', 'volume', 'fullscreen']
     });
     
     // next signal and callback
@@ -218,6 +218,12 @@ $(document).ready(function() {
 
 
 function initPlayer() {
+	// clean subtitles
+	try {
+		$('.mejs-captions-button').remove();
+		$('#videoPlayer').empty();
+		player.tracks = [];
+	} catch(err) {}
 	// restore curosr if player is fulscreen
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	//stop upnp
@@ -421,7 +427,38 @@ function startPlay(media) {
 		} else if (link.indexOf('file://') !== -1) {
 			playFromFile = true;
 			currentMedia.link = link.replace('file://','');
-			launchPlay();
+			try {
+				var l = decodeURIComponent(link.replace('file://',''));
+				var dir = path.dirname(l);
+				var list = dirTree(dir);
+				var i = 1;
+				$('#videoPlayer').empty();
+				Iterator.iterate(list.children).forEach(function (item,index) {
+					var ext = path.extname(item.path);
+					if(item.type == "file" && ext == ".srt" || ext == ".vtt") {
+						fs.createReadStream(item.path).pipe(fs.createWriteStream(execDir+'/subtitles/'+_("Track")+i+ext));
+						$('#videoPlayer').append('<track kind="subtitles" src="subtitles/'+_("Track")+i+ext+'" srclang="'+_("Track")+i+'" label="'+_("Track")+i+'" />');
+						i+=1;
+					}
+				});
+				player.findTracks();
+				Iterator.iterate(player.tracks).forEach(function (item,index) { 
+					player.loadTrack(index);
+				});
+				if($('.mejs-captions-button').length == 0 ) {
+					setTimeout(function() {
+						player.buildtracks(player,player.controls,player.layers,player.media)
+						launchPlay();
+					},1000);
+				} else {
+					setTimeout(function() {
+						launchPlay();
+					},1000);
+				}
+			} catch(err) {
+				console.log(err)
+				launchPlay();
+			}
 		// play from upnp server
 		} else if (linkType === 'upnp' || upnpToggleOn) {
 			playFromUpnp = true;

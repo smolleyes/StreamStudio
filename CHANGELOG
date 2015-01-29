@@ -1,3 +1,6 @@
+V 1.26.5
+  * add srt and vtt subtitles support for local files in local player
+ 
 V 1.26.4
   * add upnp functions
   * fix mega.co streaming

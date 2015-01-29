@@ -484,6 +484,20 @@ var wipeTmpFolder = function() {
 	});
 }
 
+var cleanSubtitles = function() {
+	fs.readdir(exec_path+'/subtitles', function(err, files){
+		$.each(files,function(index,dir) {
+			try {
+				rmdir( tmpFolder+'/'+dir, function ( err, dirs, files ){
+					console.log( 'file '+files+' removed' );
+				});
+			} catch(err) {
+				console.log('can t remove file '+files)
+			}
+		});
+	});
+}
+
 function stopTorrent(res) {
 	wipeTmpFolder();
 	if(torrentsArr.length > 0) {

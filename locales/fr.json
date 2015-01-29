@@ -173,5 +173,7 @@
 	"lives found...": "directs trouvés...",
 	"Viewers:": "Spectateurs:",
 	"Availables streams:": "Flux disponibles:",
-	"No streams found for this channel !": "Aucun flux trouvé pour cette chaîne !"
+	"No streams found for this channel !": "Aucun flux trouvé pour cette chaîne !",
+	"Track": "Piste",
+	"Disabled": "Désactivé"
 }

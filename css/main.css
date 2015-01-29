@@ -197,7 +197,7 @@ pre {
 
 
 .mejs-time-total, .mejs-time-rail {
-	width: calc(100% - 310px) !important;
+	width: calc(100% - 335px) !important;
 	margin-right: 20px !important;
 }
 
@@ -1698,16 +1698,18 @@ position: relative;
 }
 
 
+/**.mejs-captions-selector{
+	height: 40px !important;
+}**/
+.mejs-captions-text {
+	font-size:24px !important;
+}
+
+.mejs-captions-selector li {
+	display:inline-flex !important;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
+.mejs-captions-selector li > label {
+	padding: 2px 0 0 0 !important;
+}

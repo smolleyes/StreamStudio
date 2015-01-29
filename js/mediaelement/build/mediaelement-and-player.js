@@ -4252,7 +4252,7 @@ if (typeof jQuery != 'undefined') {
 	// add extra default options 
 	$.extend(mejs.MepDefaults, {
 		// this will automatically turn on a <track>
-		startLanguage: '',
+		startLanguage: 'fr',
 
 		tracksText: 'Captions/Subtitles',
 		
@@ -4292,7 +4292,7 @@ if (typeof jQuery != 'undefined') {
 							'<ul>'+
 								'<li>'+
 									'<input type="radio" name="' + player.id + '_captions" id="' + player.id + '_captions_none" value="none" checked="checked" />' +
-									'<label for="' + player.id + '_captions_none">None</label>'+
+									'<label for="' + player.id + '_captions_none">'+_("Disabled")+'</label>'+
 								'</li>'	+
 							'</ul>'+
 						'</div>'+
