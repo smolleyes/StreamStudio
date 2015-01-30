@@ -1,3 +1,6 @@
+V 1.27
+  * fix live streaming
+
 V 1.26.5
   * add srt and vtt subtitles support for local files in local player
  

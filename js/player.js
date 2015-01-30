@@ -317,6 +317,7 @@ function updateMiniPlayer() {
 }
 
 function startPlay(media) {
+	ffmpegLive = false;
 	if(upnpMediaPlaying || playFromUpnp) {
 		play_next = true;
 	}

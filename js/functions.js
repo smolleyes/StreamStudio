@@ -197,7 +197,7 @@ current_download[vid].end();
 }
 
 function downloadFileHttps(link, title, vid, toTorrent) {
-	if (activeTab !== 4 && (toTorrent === undefined)) {
+	if (activeTab !== 4 && toTorrent === undefined || toTorrent === false) {
 		$("#downloads_tab").click();
 	}
 	var vid = ((Math.random() * 1e6) | 0);

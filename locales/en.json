@@ -170,5 +170,7 @@
 	"lives found...": "lives found...",
 	"Viewers:": "Viewers:",
 	"Availables streams:": "Availables streams:",
-	"No streams found for this channel !": "No streams found for this channel !"
+	"No streams found for this channel !": "No streams found for this channel !",
+	"Track": "Track",
+	"Disabled": "Disabled"
 }

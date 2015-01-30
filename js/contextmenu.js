@@ -31,8 +31,8 @@ $(document).ready(function() {
         } else if (text.indexOf('magnet:?xt') !== -1){
             $('#custom-menu ol').empty().append('<li><a id="magnet_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open Magnet")+'</a></li>');
         } else {
-			if(text !== '' && text.match(/^(http|https)/) !== null && text.indexOf('watch?v=') == -1) {
-				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
+			if(text !== '' && decodeURIComponent(text).match(/^(http|https)/) !== null && decodeURIComponent(text).indexOf('watch?v=') == -1) {
+				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
 			}
 		}
   });
