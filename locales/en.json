@@ -172,5 +172,6 @@
 	"Availables streams:": "Availables streams:",
 	"No streams found for this channel !": "No streams found for this channel !",
 	"Track": "Track",
-	"Disabled": "Disabled"
+	"Disabled": "Disabled",
+	"StreamStudio Settings": "StreamStudio settings"
 }

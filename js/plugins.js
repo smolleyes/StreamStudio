@@ -45,9 +45,10 @@ function loadApp() {
                             return true;
                         }
                         if (pluginsList.indexOf(eng.engine_name.toLowerCase()) == -1 || settings.plugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
-                            engines[eng.engine_name] = eng;
+                            engines[eng.engine_name.toLowerCase()] = eng;
+                            enginesList.push(eng.engine_name.toLowerCase())
                             // add entry to main gui menu
-                            $('#engines_select').append('<option value="' + eng.engine_name + '">' + eng.engine_name + '</option>');
+                            $('#engines_select').append('<option value="' + eng.engine_name.toLowerCase() + '">' + eng.engine_name + '</option>');
                             $('.selectpicker').selectpicker('refresh');
                         }
                     } catch (err) {
@@ -71,11 +72,33 @@ function updatePlugins(url) {
         var file = fs.createWriteStream(confDir + '/master.zip', {
             flags: 'w'
         });
+        $.notif({title: 'StreamStudio update:',icon: '&#128229;',timeout:0,content:'',btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'block'});
+        var pbar = $('#updateProgress');
+        $('#updateProgress strong').html(_('Waiting for connection...'));
+        var val = $('#updateProgress progress').attr('value');
+        var currentTime;
+        var startTime = (new Date()).getTime();
+        var contentLength = resp.headers["content-length"];
+        if (parseInt(contentLength) === 0) {
+            $('#updateProgress strong').html(_("can't download this file..."));
+            setTimeout(function(){pbar.hide()},5000);
+        }
         resp.on('data', function(chunk) {
             file.write(chunk);
+            var bytesDone = file.bytesWritten;
+            currentTime = (new Date()).getTime();
+            var transfer_speed = (bytesDone / ( currentTime - startTime)).toFixed(2);
+            var newVal= bytesDone*100/contentLength;
+            var txt = Math.floor(newVal)+'% '+ _('done at')+' '+transfer_speed+' kb/s';
+            $('#updateProgress progress').attr('value',newVal).text(txt);
+            $('#updateProgress strong').html(txt);
         }).on("end", function(e) {
             console.log("update terminated");
             file.end();
+            $('#updateProgress b').empty();
+            $('#updateProgress strong').html(_('Download ended !'));
+            $('#updateProgress progress').hide();
+             $('#updateProgress strong').html(_('Installing update...'));
             try {
                 if (!fs.existsSync(confDir + "/plugins")) {
                     fs.mkdir(confDir + "/plugins");
@@ -83,6 +106,7 @@ function updatePlugins(url) {
                 setTimeout(function() {
                     var zip = new AdmZip(confDir + '/master.zip');
                     zip.extractAllTo(confDir + "/plugins", true);
+                    $('.notification').click();
                     loadApp();
                 }, 5000);
             } catch (err) {
@@ -119,7 +143,8 @@ function reloadPlugins() {
                             return true;
                         }
                         if (pluginsList.indexOf(eng.engine_name.toLowerCase()) == -1 || settings.plugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
-                            engines[eng.engine_name] = eng;
+                            engines[eng.engine_name.toLowerCase()] = eng;
+                            enginesList.push(eng.engine_name.toLowerCase())
                             // add entry to main gui menu
                             $('#engines_select').append('<option value="' + eng.engine_name + '">' + eng.engine_name + '</option>');
                             updatePickers()

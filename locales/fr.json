@@ -175,5 +175,6 @@
 	"Availables streams:": "Flux disponibles:",
 	"No streams found for this channel !": "Aucun flux trouvé pour cette chaîne !",
 	"Track": "Piste",
-	"Disabled": "Désactivé"
+	"Disabled": "Désactivé",
+	"StreamStudio Settings": "Configuration de StreamStudio"
 }

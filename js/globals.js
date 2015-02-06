@@ -1,4 +1,4 @@
-var VERSION = "1.27";
+var VERSION = "1.27.1";
 
 var path = require('path');
 var fs = require('fs');
@@ -33,6 +33,7 @@ var psnode = require('ps-node');
 var Iterator = require('iterator').Iterator;
 var sanitize = require("sanitize-filename");
 
+var Jq = $;
 //engines
 var dailymotion = require('dailymotion');
 var youtube = require('yt-streamer');
@@ -40,7 +41,7 @@ var youtube = require('yt-streamer');
 //localize
 var i18n = require("i18n");
 var _ = i18n.__;
-var localeList = ['en', 'fr', 'es', 'gr','it'];
+var localeList = ['en', 'fr', 'es', 'gr','it','de'];
 var locale = 'en';
 var locale_changed = false;
 var shares_changed = false;
@@ -89,6 +90,7 @@ var upnpContinuePlay = true;
 var play_next = false;
 var play_prev = false;
 var ffmpegLive = false;
+var enginesList = [];
 //storedb
 var sdb = storedb('std');
 

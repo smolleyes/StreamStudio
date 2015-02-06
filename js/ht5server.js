@@ -7,7 +7,7 @@ function startHt5Server() {
 			startStreaming(req, res)
 		}
 	}).listen(8888);
-	console.log('StreamStudio Server ready on port 8888');
+	console.log('StreamStudio Transcoding Server ready on port 8888');
 }
 
 function startProxyServer() {
@@ -43,7 +43,7 @@ function startStreaming(req, res, width, height) {
         var megaKey;
         var link;
         var megaSize;
-        var mediaExt = currentMedia.title.split('.').slice(-1)[0];
+        //var mediaExt = currentMedia.title.split('.').slice(-1)[0];
         var parsedLink = url.parse(req.url).href.replace(/&amp;/g,'&');
         var device = deviceType(req.headers['user-agent']);
 		$('.mejs-overlay, .mejs-overlay-loading').show();
@@ -75,6 +75,7 @@ function startStreaming(req, res, width, height) {
             sheight = 480;
         }
         var link = parsedLink.split('?file=')[1];
+        console.log("LINKKKKKKKKKKKKKKK " + link)
 		
         if (parsedLink.indexOf('&key') !== -1) {
             megaKey = linkParams[1].replace('key=', '');
@@ -207,7 +208,10 @@ function startStreaming(req, res, width, height) {
 			checkDuration(link, device, '', bitrate,res,time);
 		}
 		// external link
-		if(playFromHttp){
+		if(playFromHttp || link.indexOf('&ext') !== -1){
+			if(link.indexOf('&ext') !== -1) {
+				var link = link.split('&ext')[0];
+			}
 			console.log('Opening external link ' + link)
 			if(link.indexOf('grooveshark.com/stream.php') !== -1) {
 				var ffmpeg = spawnFfmpeg(link, device, '', bitrate, 0, function(code) { // exit
@@ -404,7 +408,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
-			if(link.indexOf('.mp3') !== -1 || link.indexOf('.mp4') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
+			if(link.indexOf('.mp3') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1) {
 				args = ['-ss' , start,'-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-codec:v', 'libx264', '-crf', '18', '-preset', 'ultrafast', '-codec:a', 'libvorbis','-threads', '0','-copyts','-sn','-f', 'matroska','pipe:1'];
 			} else {
 				args = ['-ss' , start,'-i', ''+link+'', '-copyts','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];
@@ -480,6 +484,39 @@ function cleanffar() {
     });
 }
 
+function startWebServer() {
+	ht5Server = http.createServer(function(req, res) {
+		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
+			if(req.url.indexOf("getAirMediaDevices") !== -1) {
+				var list = $(cli._renderers).map(function(i){ 
+					return {
+						"ip":$(this)[0].baseUrl,
+						"id":$(this)[0]._index,
+						"name":$(this)[0].friendlyName
+						}
+					}).get();
+				var body = JSON.stringify(list);
+                res.end(body);
+			}
+			// get engines list
+			else if(req.url.indexOf("getEngines") !== -1) {
+				var body = JSON.stringify(enginesList);
+				res.end(body);
+			}
+			// change engine
+			else if(req.url.indexOf("loadEngine") !== -1) {
+				var engine = req.url.split('&engine=')[1];
+				console.log('changing to engine ' + engine)
+				$('#engines_select').val(engine).change();
+				res.writeHead(200,{'Content-type': 'text/html','Access-Control-Allow-Origin' : '*'});
+				res.end('ok');
+			}
+		}
+	}).listen(8898);
+	console.log('StreamStudio WebServer ready on port 8898');
+}
+
 // start
 startHt5Server();
 startProxyServer();
+startWebServer();

@@ -64,7 +64,7 @@ var htmlStr = '<div class="row"> \
 <div class="col-xs-4 col-md-3 col-lg-2 well" id="menuContainer" style="height:100%;margin-bottom:5px;">\
 <div id="menu"> \
 	<div class="panel panel-default" id="searchPanel"> \
-			<select id="engines_select" class="selectpicker" data-style="btn-default btn-sm" data-hide-disabled="true"> \
+			<select id="engines_select" class="selectpicker" data-hide-disabled="true"> \
 				<option value = "youtube">Youtube</option> \
 				<option value = "dailymotion">Dailymotion</option> \
 			</select> \
@@ -173,7 +173,7 @@ var htmlStr = '<div class="row"> \
 			<div class="tab-pane" id="tabpage_7"> \
 				<div class="container" style="margin-left:0;width:calc(100% - 15px);padding-top:10px;"> \
 					<div class="row"> \
-						<legend><h3>StreamStudio Settings <span style="font-size:12px;float:right;margin-top:10px;"><b>(V'+settings.version+')</b></span>:</h3></legend> \
+						<legend><h3>'+_("StreamStudio Settings")+'<span style="font-size:12px;float:right;margin-top:10px;"><b>(V'+settings.version+')</b></span>:</h3></legend> \
 						<div id="nanoContent" class="nano" style="top:0px !important; height: calc(100% - 210px);"> \
 				<form role="form" class="nano-content" style="padding-top:10px;"> \
 					<div class="form-group"> \
@@ -184,6 +184,7 @@ var htmlStr = '<div class="row"> \
 						  <option value="es" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag es" data-title="Spain">Spanish</option> \
 						  <option value="gr" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gr" data-title="Greek">Greek</option> \
 						  <option value="it" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag it" data-title="Italia">Italia</option> \
+						  <option value="de" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag de" data-title="Deutsch">Deutsch</option> \
 						</select> \
 					</div> \
 					<div class="form-group"> \
@@ -1397,7 +1398,7 @@ function startSearch(query) {
                     getPlaylistInfos(datas, 'youtube');
                 });
             } else if (searchTypes_select === 'category') {
-                youtube.categories(query, current_page, searchFilters, selected_category, duration, function(datas) {
+                youtube.categories(query, current_page, searchFilters, selected_category, searchDuration, function(datas) {
                     getVideosDetails(datas, 'youtube', false);
                 });
             } else if (searchTypes_select === 'channels') {
