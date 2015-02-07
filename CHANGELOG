@@ -1,3 +1,8 @@
+v 1.27.3
+  * add yes/no popup to save torrents
+  * fix torrents stats
+  * update translations
+
 V 1.27.2
   * add torrent stats
   * add volume percentage

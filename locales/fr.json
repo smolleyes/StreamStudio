@@ -178,5 +178,11 @@
 	"StreamStudio Settings": "Configuration de StreamStudio",
 	"%s / %s connected peers": "%s / %s pairs connectés",
 	"Connected peers: ": "Pairs connectés: ",
-	"Speed:" : "Vitesse:"
+	"Speed:": "Vitesse:",
+	"Save torrent file?": "Sauvegarder votre torrent?",
+	"No": "Non",
+	"Your torrent will be saved once download finished!": "Vos fichiers seront enregistrés une fois le téléchargement terminé!",
+	"Error!": "Erreur!",
+	"Can't get your torrent file, please retry!": "Impossible de télécharger le torrent, merci de réessayer!",
+	"Save torrent file when download finished ?":"Sauvegarder les fichiers une fois le téléchargement terminé ?"
 }

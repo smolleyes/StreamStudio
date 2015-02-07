@@ -150,8 +150,8 @@ function reloadPlugins() {
                             engines[eng.engine_name.toLowerCase()] = eng;
                             enginesList.push(eng.engine_name.toLowerCase())
                             // add entry to main gui menu
-                            $('#engines_select').append('<option value="' + eng.engine_name + '">' + eng.engine_name + '</option>');
-                            updatePickers()
+                            $('#engines_select').append('<option value="' + eng.engine_name.toLowerCase() + '">' + eng.engine_name + '</option>');
+                            $('.selectpicker').selectpicker('refresh');
                         }
                     } catch (err) {
                         console.log("can't load plugin " + file + ", error:" + err)

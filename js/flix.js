@@ -35,13 +35,6 @@ var downloadedPct = 0;
 var torrentSrc = '';
 var torrentName = '';
 
-$(document).ready(function(){
-	$(document).on('click','#saveTorrentBtn',function(e) {
-    e.preventDefault();
-    saveToDisk(torrentSrc,torrentName);
-  });
-});
-
 function getTorrent(link) {
 	console.log('torrent link: '+ link)
   initPlayer();
@@ -55,7 +48,9 @@ function getTorrent(link) {
   rTorrent(link, function(err, torrent) {
     if(err) {
      console.log(err);
+     swal(_("Error!"), _("Can't get your torrent file, please retry!"), "error")
    } else {
+    askSaveTorrent();
     title = torrent.name;
     var torrentInfo = {
       info: torrent,
@@ -161,11 +156,14 @@ app.updateStats = function(streamInfo) {
         downloadedPct = (swarm.downloaded / streamInfo.server.index.length * 100).toFixed(2);
       } catch(err) {return;}
       if(parseInt(downloadedPct) >= 100){
-        clearTimeout(statsUpdater);
         var t = _('(%s%% downloaded)',100);
         $("#song-title").empty().text(_('Playing: ')+torrentName+" "+t);
-        $.notif({title: 'StreamStudio:',cls:'green',icon: '&#59256;',timeout:0,content:_('Your torrent download is terminated, save it ?'),btnId:'saveTorrentBtn',btnTitle:_('Yes'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-        statsUpdater = null
+        console.log("SAVING TORRENT " + saveTorrent)
+        if(saveTorrent) {
+          saveToDisk(torrentSrc,torrentName);
+          torrentSaved = true;
+          saveTorrent = false;
+        }
       } else {
         $('#downloadStats').empty().html('<span style="margin:0 5px;">'+_("Speed:")+'</span><i class="arrow down"></i>' + this.downloadSpeed +' <i class="arrow up"></i>'+ this.uploadSpeed +'<span style="padding:5px;">| '+_("Connected peers: ")+ this.active_peers + ' / ' + this.total_peers + '</span>');
         var t = _('(%s%% downloaded)',downloadedPct);
@@ -193,22 +191,22 @@ function saveToDisk(src,name) {
 				fs.copy(src, download_dir, function (err) {
 					if (err) {
 						console.log(err,src,name)
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:7000,content:_("Can't save torrent to your download dir, error: %s",err),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:5000,content:_("Can't save torrent to your download dir, error: %s",err),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
 					} else {
-						$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:7000,content:_('Torrent successfully saved to your ht5 download directory !'),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+						$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:5000,content:_('Torrent successfully saved to your ht5 download directory !'),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
 					}
 				});
 			});
 		} else {
-			$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:7000,content:_("Can't save torrent to your download dir, error: %s",err),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+			$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:5000,content:_("Can't save torrent to your download dir, error: %s",err),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
 		}
 	} catch(err) {
 		fs.copy(src, download_dir, function (err) {
 			if (err) {
 				console.log(err,src,name)
-				$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:7000,content:_("Can't save torrent to your download dir, error: %s",err),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+				$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:5000,content:_("Can't save torrent to your download dir, error: %s",err),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
 			} else {
-				$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:7000,content:_('Torrent successfully saved to your ht5 download directory !'),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+				$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:5000,content:_('Torrent successfully saved to your ht5 download directory !'),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
 			}
 		});
 	}

@@ -1741,3 +1741,8 @@ position: relative;
    border-top-color: green;
    top: 13px;
 }
+
+.confirm {
+	position: relative;
+	top: -17px;
+}

@@ -1,4 +1,4 @@
-var VERSION = "1.27.2";
+var VERSION = "1.27.3";
 
 var path = require('path');
 var fs = require('fs');
@@ -91,6 +91,8 @@ var play_next = false;
 var play_prev = false;
 var ffmpegLive = false;
 var enginesList = [];
+var saveTorrent = false;
+var torrentSaved = false;
 //storedb
 var sdb = storedb('std');
 

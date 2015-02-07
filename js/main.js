@@ -180,11 +180,11 @@ var htmlStr = '<div class="row"> \
 						<label>'+_("Language:")+'</label> \
 						<select name="countries" id="countries" style="width:300px;"> \
 						  <option value="en" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gb" data-title="England">English</option> \
-						  <option value="fr" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag fr" data-title="France">French</option> \
+						  <option value="fr" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag fr" data-title="France">Français</option> \
 						  <option value="es" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag es" data-title="Spain">Spanish</option> \
 						  <option value="gr" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gr" data-title="Greek">Greek</option> \
-						  <option value="it" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag it" data-title="Italia">Italia</option> \
-						  <option value="de" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag de" data-title="Deutsch">Deutsch</option> \
+						  <option value="it" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag it" data-title="Italia">Italian</option> \
+						  <option value="de" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag de" data-title="Deutsch">German</option> \
 						</select> \
 					</div> \
 					<div class="form-group"> \

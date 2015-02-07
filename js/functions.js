@@ -498,6 +498,26 @@ var cleanSubtitles = function() {
 	});
 }
 
+function askSaveTorrent() {
+	saveTorrent = false;
+	torrentSaved = false;
+	swal({title: _("Save torrent file?"),
+		text: _("Save torrent file when download finished ?"),
+		type: "info",
+		showCancelButton: true,
+		confirmButtonColor: "green",
+		confirmButtonText: _("Yes"),
+		cancelButtonText: _("No"),
+		closeOnConfirm: false,
+		closeOnCancel: true }, 
+		function(isConfirm){   
+			if (isConfirm) {
+				saveTorrent = true;   
+				swal("Ok!", _("Your torrent will be saved once download finished!"), "success");   
+			}
+		});
+}
+
 function stopTorrent(res) {
 	wipeTmpFolder();
 	$('#downloadStats').empty();
