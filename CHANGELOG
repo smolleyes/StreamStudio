@@ -1,3 +1,7 @@
+V 1.27.2
+  * add torrent stats
+  * add volume percentage
+
 v 1.27.1
   * add progress bar for plugins updates
   * add deutsch translation

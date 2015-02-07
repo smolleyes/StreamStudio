@@ -175,6 +175,8 @@
 	"Availables streams:": "Flux disponibles:",
 	"No streams found for this channel !": "Aucun flux trouvé pour cette chaîne !",
 	"Track": "Piste",
-	"Disabled": "Désactivé",
-	"StreamStudio Settings": "Configuration de StreamStudio"
+	"StreamStudio Settings": "Configuration de StreamStudio",
+	"%s / %s connected peers": "%s / %s pairs connectés",
+	"Connected peers: ": "Pairs connectés: ",
+	"Speed:" : "Vitesse:"
 }

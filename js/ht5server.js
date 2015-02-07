@@ -75,7 +75,6 @@ function startStreaming(req, res, width, height) {
             sheight = 480;
         }
         var link = parsedLink.split('?file=')[1];
-        console.log("LINKKKKKKKKKKKKKKK " + link)
 		
         if (parsedLink.indexOf('&key') !== -1) {
             megaKey = linkParams[1].replace('key=', '');

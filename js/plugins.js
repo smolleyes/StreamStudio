@@ -69,6 +69,10 @@ function updatePlugins(url) {
         if (resp.statusCode > 300 && resp.statusCode < 400 && resp.headers.location) {
             return updatePlugins(resp.headers.location);
         }
+        var contentLength = resp.headers["content-length"];
+        if(isNaN(contentLength)) {
+            return updatePlugins(resp.headers.location);
+        }
         var file = fs.createWriteStream(confDir + '/master.zip', {
             flags: 'w'
         });

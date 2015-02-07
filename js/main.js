@@ -64,7 +64,7 @@ var htmlStr = '<div class="row"> \
 <div class="col-xs-4 col-md-3 col-lg-2 well" id="menuContainer" style="height:100%;margin-bottom:5px;">\
 <div id="menu"> \
 	<div class="panel panel-default" id="searchPanel"> \
-			<select id="engines_select" class="selectpicker" data-hide-disabled="true"> \
+			<select id="engines_select" class="selectpicker" data-style="btn-default btn-sm" data-hide-disabled="true"> \
 				<option value = "youtube">Youtube</option> \
 				<option value = "dailymotion">Dailymotion</option> \
 			</select> \

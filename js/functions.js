@@ -500,6 +500,7 @@ var cleanSubtitles = function() {
 
 function stopTorrent(res) {
 	wipeTmpFolder();
+	$('#downloadStats').empty();
 	if(torrentsArr.length > 0) {
 		$.each(torrentsArr,function(index,torrent) {
 			try {

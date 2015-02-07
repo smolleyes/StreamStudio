@@ -134,6 +134,7 @@ app.updateStats = function(streamInfo) {
           if (parseInt(this.percent) > 0 && parseInt(this.percent) < 100) {
             $('#preloadProgress').empty().append(_('Downloading %s%% done at %s',this.percent,this.downloadSpeed));
             $('#preloadTorrent progress').attr('value',this.percent).text(this.percent);
+            $('#peerStats').empty().append(_('%s / %s connected peers',this.active_peers,this.total_peers));
           }
         }
       } else {
@@ -166,6 +167,7 @@ app.updateStats = function(streamInfo) {
         $.notif({title: 'StreamStudio:',cls:'green',icon: '&#59256;',timeout:0,content:_('Your torrent download is terminated, save it ?'),btnId:'saveTorrentBtn',btnTitle:_('Yes'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
         statsUpdater = null
       } else {
+        $('#downloadStats').empty().html('<span style="margin:0 5px;">'+_("Speed:")+'</span><i class="arrow down"></i>' + this.downloadSpeed +' <i class="arrow up"></i>'+ this.uploadSpeed +'<span style="padding:5px;">| '+_("Connected peers: ")+ this.active_peers + ' / ' + this.total_peers + '</span>');
         var t = _('(%s%% downloaded)',downloadedPct);
         if(player.media.paused) {
          totalBuffered = swarm.downloaded;
@@ -223,7 +225,7 @@ function handleTorrent(torrent, stateModel) {
      style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;"> \
      <p><b id="preloadProgress">'+_("Connecting... please wait")+'</b></p> \
      <progress value="5" min="0" max="100">0%</progress> \
-     </div>');
+     <div id="peerStats"></div></div>');
    $(".mejs-overlay-button").hide();
  },1000);
   videoStreamer = peerflix(torrent.info, {

@@ -3588,6 +3588,7 @@ if (typeof jQuery != 'undefined') {
 						'<div class="mejs-volume-total"></div>'+ // line background
 						'<div class="mejs-volume-current"></div>'+ // current volume
 						'<div class="mejs-volume-handle"></div>'+ // handle
+						'<div class="mejs-volume-pct" style="margin-top:-12px;margin-left:-1px;"></div>'+ // handle
 					'</div>'+
 				'</div>')
 					.appendTo(controls),
@@ -3595,6 +3596,7 @@ if (typeof jQuery != 'undefined') {
 			volumeTotal = t.container.find('.mejs-volume-total, .mejs-horizontal-volume-total'),
 			volumeCurrent = t.container.find('.mejs-volume-current, .mejs-horizontal-volume-current'),
 			volumeHandle = t.container.find('.mejs-volume-handle, .mejs-horizontal-volume-handle'),
+			volumePct = t.container.find('.mejs-volume-pct'),
 
 			positionVolumeHandle = function(volume, secondTry) {
 
@@ -3636,6 +3638,9 @@ if (typeof jQuery != 'undefined') {
 					// show the current visibility
 					volumeCurrent.height(totalHeight - newTop );
 					volumeCurrent.css('top', totalPosition.top + newTop);
+
+					newTop = totalHeight + (totalHeight * volume);
+					volumePct.empty().append(Math.round(newTop - 100)+"%").show();
 				} else {
 					var 
 					

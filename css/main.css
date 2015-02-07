@@ -1713,3 +1713,31 @@ position: relative;
 .mejs-captions-selector li > label {
 	padding: 2px 0 0 0 !important;
 }
+
+
+
+#downloadStats {
+	font-size:13px;
+	font-weight:bold;
+	margin-top:7px;
+}
+
+#peerStats {
+	font-weight:bold;
+}
+
+.arrow {
+    height: 0;
+	width: 0;
+	border: 6px solid transparent;
+	position: relative;
+	margin-right: 5px;
+}
+.arrow.up {
+   border-bottom-color: red;
+   top: -11px;
+}
+.arrow.down {
+   border-top-color: green;
+   top: 13px;
+}

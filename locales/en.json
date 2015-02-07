@@ -173,5 +173,8 @@
 	"No streams found for this channel !": "No streams found for this channel !",
 	"Track": "Track",
 	"Disabled": "Disabled",
-	"StreamStudio Settings": "StreamStudio settings"
+	"StreamStudio Settings": "StreamStudio settings",
+	"%s / %s connected peers": "%s / %s connected peers",
+	"Connected peers: ": "Connected peers: ",
+	"Speed:" : "Speed:"
 }
