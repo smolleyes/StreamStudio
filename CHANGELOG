@@ -1,3 +1,6 @@
+v 1.27.5
+  * fix 
+
 V 1.27.4
   * add transcoding thru ffmpeg by default
   * fix subtitles

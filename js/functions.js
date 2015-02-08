@@ -140,10 +140,10 @@ function downloadFile(link, title, vid, toTorrent) {
 			// Otherwise no redirect; capture the response as normal            
 		} else {
 			pbar.show();
-			$('#progress_' + vid + ' a.cancel').show();
+			$('#progress_' + vid + ' a.cancelD').show();
 			var contentLength = response.headers["content-length"];
 			if (parseInt(contentLength) === 0) {
-				$('#progress_' + vid + ' a.cancel').hide();
+				$('#progress_' + vid + ' a.cancelD').hide();
 				$('#progress_' + vid + ' strong').html(_("can't download this file..."));
 				setTimeout(function() {
 					pbar.hide()
@@ -168,7 +168,7 @@ function downloadFile(link, title, vid, toTorrent) {
 							console.log('successfully deleted ' + target);
 						}
 					});
-					$('#progress_' + vid + ' a.cancel').hide();
+					$('#progress_' + vid + ' a.cancelD').hide();
 					$('#progress_' + vid + ' strong').html(_("Download canceled!"));
 					setTimeout(function() {
 						pbar.hide()
@@ -188,7 +188,7 @@ function downloadFile(link, title, vid, toTorrent) {
 					}
 					$('#progress_' + vid + ' a.open_folder').show();
 					$('#progress_' + vid + ' a.hide_bar').show();
-					$('#progress_' + vid + ' a.cancel').hide();
+					$('#progress_' + vid + ' a.cancelD').hide();
 				}
 			});
 }
@@ -277,10 +277,10 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 
 	current_download[vid].onprogress = function(e) {
 		if (e.lengthComputable) {
-			$('#progress_' + vid + ' a.cancel').show();
+			$('#progress_' + vid + ' a.cancelD').show();
 			if (canceled === true) {
 				current_download[vid].abort();
-				$('#progress_' + vid + ' a.cancel').hide();
+				$('#progress_' + vid + ' a.cancelD').hide();
 				$('#progress_' + vid + ' strong').html(_("Download canceled!"));
 				setTimeout(function() {
 					pbar.hide()
@@ -299,11 +299,11 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 					}
 					$('#progress_' + vid + ' a.open_folder').show();
 					$('#progress_' + vid + ' a.hide_bar').show();
-					$('#progress_' + vid + ' a.cancel').hide();
+					$('#progress_' + vid + ' a.cancelD').hide();
 				}
 			}
 		} else {
-			$('#progress_' + vid + ' a.cancel').hide();
+			$('#progress_' + vid + ' a.cancelD').hide();
 			$('#progress_' + vid + ' strong').html(_("can't download this file..."));
 			setTimeout(function() {
 				pbar.hide()
@@ -381,7 +381,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 		if (data) {
 			total_data += data.toString();
 			if (total_data.toString().match(/Duration:\s\d\d:\d\d:\d\d\.\d\d/)) {
-				$('#progress_' + vid + ' a.cancel').show();
+				$('#progress_' + vid + ' a.cancelD').show();
 				var time = total_data.toString().match(/Duration:\s(\d\d:\d\d:\d\d\.\d\d)/).toString().substring(10,21);
 				console.log('DATA:' + total_data.toString());
 				console.log('Time:' + time);
@@ -395,7 +395,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 				if (canceled === true) {
 					current_download[vid].process.kill('SIGKILL');
-					$('#progress_' + vid + ' a.cancel').hide();
+					$('#progress_' + vid + ' a.cancelD').hide();
 					$('#progress_' + vid + ' strong').html(_("Download canceled!"));
 					fs.unlink(target, function(err) {
 						if (err) {} else {
@@ -419,7 +419,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 					}
 					$('#progress_' + vid + ' a.open_folder').show();
 					$('#progress_' + vid + ' a.hide_bar').show();
-					$('#progress_' + vid + ' a.cancel').hide();
+					$('#progress_' + vid + ' a.cancelD').hide();
 				}
 			}
 		}
@@ -520,6 +520,7 @@ function askSaveTorrent() {
 
 function stopTorrent(res) {
 	wipeTmpFolder();
+	torrentPlaying = false;
 	$('#downloadStats').empty();
 	if(torrentsArr.length > 0) {
 		$.each(torrentsArr,function(index,torrent) {

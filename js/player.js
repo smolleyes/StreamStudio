@@ -27,6 +27,7 @@ var playFromTwitch = false;
 var playFromYoutube = false;
 var playFromDailymotionLive = false;
 var doNotSwitch = false;
+var currentMedia = {};
 
 $(document).ready(function() {
 	
@@ -325,15 +326,15 @@ function startPlay(media) {
 		play_next = true;
 	}
 	updateMiniPlayer();
-	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false || media.link.indexOf('&start=')) {
+	if(currentMedia.link && playFromUpnp == false && upnpMediaPlaying == false) {
 		if (media.link && media.link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
-			if(currentMedia && currentMedia.ytId !== ytId) {
+			if(!currentMedia.ytId || currentMedia.ytId !== ytId) {
 				initPlayer();
 			} else {
 				cleanffar();
 			}
 		} else {
-			if (currentMedia && player.media.currentSrc.indexOf(currentMedia.link) !== -1) {
+			if (player.media.currentSrc.indexOf(currentMedia.link) !== -1) {
 				cleanffar();
 			} else {
 				initPlayer();
@@ -550,7 +551,7 @@ function launchPlay() {
 	} else {
 		var obj = JSON.parse(settings.ht5Player);
 		var link = currentMedia.link;
-		if(obj.name === 'StreamStudio' || link.indexOf('.mp3') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
+		if(obj.name === 'StreamStudio') {
 			player.setSrc(currentMedia.link);
 			player.play();
 			if(player.tracks.length > 0) {

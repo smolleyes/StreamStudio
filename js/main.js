@@ -741,7 +741,7 @@ function main() {
     });
     
     //cancel download
-    $(document).on('click', '.cancel', function(e) {
+    $(document).on('click', '.cancelD', function(e) {
         canceled = true;
         var id = this.id.replace('cancel_', '');
         try {
