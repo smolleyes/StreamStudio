@@ -148,6 +148,8 @@ app.updateStats = function(streamInfo) {
         })
 			  //clearTimeout(statsUpdater);
 			  startPlay(stream);
+        try { $('#fbxMsg2').remove(); } catch(err) {}
+        $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:59%;position: relative;"><p style="font-weight:bold;text-align: center;">'+_("Your video is loading, please wait...! (Could be long)")+'</p></div></div>');
 			  playStarted = true;
      } else {
       torrentSrc = videoStreamer.path;

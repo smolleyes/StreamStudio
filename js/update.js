@@ -1,5 +1,8 @@
 
 function checkUpdates() {
+	if(VERSION.indexOf('testing') !== -1) {
+		return;
+	}
 	try {
 		http.get('http://ubukey.fr/StreamStudio/update.html',function(res,err){
 			var datas = [];

@@ -147,6 +147,7 @@ $(document).ready(function() {
     player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
+		try { $('#fbxMsg2').remove(); } catch(err) {}
 		$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
 		updateMiniPlayer();
     });
@@ -334,10 +335,13 @@ function startPlay(media) {
 				cleanffar();
 			}
 		} else {
+			console.log('here ' + player.media.currentSrc.indexOf(currentMedia.link) !== -1, player.media.currentSrc,currentMedia.link); 
 			if (player.media.currentSrc.indexOf(currentMedia.link) !== -1) {
 				cleanffar();
 			} else {
-				initPlayer();
+				if(!player.media.paused) {
+					initPlayer();
+				}
 			}
 		}
 	}

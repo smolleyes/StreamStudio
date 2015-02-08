@@ -185,5 +185,6 @@
 	"Error!": "Erreur!",
 	"Can't get your torrent file, please retry!": "Impossible de télécharger le torrent, merci de réessayer!",
 	"Save torrent file when download finished ?": "Sauvegarder les fichiers une fois le téléchargement terminé ?",
-	"Enable transcoding": "Activer le transcodage"
+	"Enable transcoding": "Activer le transcodage",
+	"Your video is loading, please wait...! (Could be long)": "Votre vidéos est en chargement, merci de patienter ! (Peut être long)"
 }
