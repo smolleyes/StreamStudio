@@ -3141,7 +3141,7 @@ if (typeof jQuery != 'undefined') {
 	// STOP BUTTON
 	$.extend(MediaElementPlayer.prototype, {
 		buildstop: function(player, controls, layers, media) {
-			$('<div class="mejs-button mejs-transcode-button" id="transcodeBtnContainer">' +
+			$('<div class="mejs-button mejs-transcode-button" id="transcodeBtnContainer" style="display:none;">' +
 					'<button aria-controls="transcodeBtn" class="transcoder-disabled" type="button" title="'+_("transcoding disabled")+'"></button>' +
 				'</div>')
 				.appendTo(controls)

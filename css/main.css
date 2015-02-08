@@ -197,7 +197,7 @@ pre {
 
 
 .mejs-time-total, .mejs-time-rail {
-	width: calc(100% - 335px) !important;
+	width: calc(100% - 315px) !important;
 	margin-right: 20px !important;
 }
 
@@ -516,7 +516,7 @@ video{
 }
 
 #subPlayer-title-container {
-	margin-left: 270px;
+	margin-left: 250px;
 	margin-top: 5px;
 	float:left;
 }
@@ -1702,19 +1702,22 @@ position: relative;
 	height: 40px !important;
 }**/
 .mejs-captions-text {
-	font-size:24px !important;
+	font-size: 38px !important;
+	font-weight: bold;
+	-webkit-text-stroke: 7;
+	-webkit-text-fill-color: white;
+	-webkit-text-stroke-color: black;
+	-webkit-text-stroke-width: 2px;
+	background:none !important;
 }
 
 .mejs-captions-selector li {
 	display:inline-flex !important;
 }
 
-
 .mejs-captions-selector li > label {
 	padding: 2px 0 0 0 !important;
 }
-
-
 
 #downloadStats {
 	font-size:13px;
@@ -1745,4 +1748,10 @@ position: relative;
 .confirm {
 	position: relative;
 	top: -17px;
+}
+
+#transcodingInput {
+	float: right;
+	position: relative !important;
+	right: -2px;
 }

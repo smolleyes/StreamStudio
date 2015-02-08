@@ -6,8 +6,8 @@ function startHt5Server() {
 		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
 			startStreaming(req, res)
 		}
-	}).listen(8888);
-	console.log('StreamStudio Transcoding Server ready on port 8888');
+	}).listen(8887);
+	console.log('StreamStudio Transcoding Server ready on port 8887');
 }
 
 function startProxyServer() {
@@ -204,7 +204,15 @@ function startStreaming(req, res, width, height) {
 				link = parsedLink.replace('/?file=','');
 				currentMedia.link = link;
 			}
-			checkDuration(link, device, '', bitrate,res,time);
+			if(mediaDuration == 0) {
+				checkDuration(link, device, '', bitrate,res,time);
+			} else {
+				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+                     console.log('child process exited with code ' + code);
+                     //res.end();
+                });
+                ffmpeg.stdout.pipe(res);
+            }
 		}
 		// external link
 		if(playFromHttp || link.indexOf('&ext') !== -1){
@@ -219,18 +227,42 @@ function startStreaming(req, res, width, height) {
                 });
                 ffmpeg.stdout.pipe(res);
 			} else {
-				checkDuration(link, device, '', bitrate,res,time);
+				if(mediaDuration == 0) {
+					checkDuration(link, device, '', bitrate,res,time);
+				} else {
+					var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+	                     console.log('child process exited with code ' + code);
+	                     //res.end();
+	                });
+	                ffmpeg.stdout.pipe(res);
+	            }
 			}
 		}
         // torrent link
         if (torrentPlaying) {
 			console.log('Opening torrent link')
-            checkDuration(link, device, '', bitrate,res,time);
+			if(mediaDuration == 0) {
+				checkDuration(link, device, '', bitrate,res,time);
+			} else {
+				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+                     console.log('child process exited with code ' + code);
+                     //res.end();
+                });
+                ffmpeg.stdout.pipe(res);
+            }
         }
         // if local file
         if (playFromFile) {
 			console.log('Opening file link')
-			checkDuration(link, device, '', bitrate,res,time);
+			if(mediaDuration == 0) {
+				checkDuration(link, device, '', bitrate,res,time);
+			} else {
+				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+                     console.log('child process exited with code ' + code);
+                     //res.end();
+                });
+                ffmpeg.stdout.pipe(res);
+            }
         }
         //if mega userstorage link
         if (link.indexOf('userstorage.mega.co.nz') !== -1) {
@@ -250,7 +282,7 @@ function startStreaming(req, res, width, height) {
                             res.end();
                         } else {
                             var f = {};
-                            f.link = 'http://' + ipaddress + ':8888' + req.url + '&direct';
+                            f.link = 'http://' + ipaddress + ':8887' + req.url + '&direct';
                             f.title = megaName;
                             res.end();
                             startPlay(f);
@@ -314,7 +346,7 @@ function startStreaming(req, res, width, height) {
 								//res.end();
 							} else {
 								var f = {};
-								f.link = 'http://' + ipaddress + ':8888' + req.url + '&direct';
+								f.link = 'http://' + ipaddress + ':8887' + req.url + '&direct';
 								f.title = megaName;
 								res.end();
 								startPlay(f);
@@ -407,7 +439,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
-			if(link.indexOf('.mp3') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1) {
+			if(link.indexOf('.mp3') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.mp4?e=') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1) {
 				args = ['-ss' , start,'-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-codec:v', 'libx264', '-crf', '18', '-preset', 'ultrafast', '-codec:a', 'libvorbis','-threads', '0','-copyts','-sn','-f', 'matroska','pipe:1'];
 			} else {
 				args = ['-ss' , start,'-i', ''+link+'', '-copyts','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'libvorbis','-threads', '0','-f', 'matroska','pipe:1'];

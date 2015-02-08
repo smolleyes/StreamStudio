@@ -182,5 +182,6 @@
 	"Your torrent will be saved once download finished!": "Your torrent will be saved once download finished!",
 	"Error!": "Error!",
 	"Can't get your torrent file, please retry!": "Can't get your torrent file, please retry!",
-	"Save torrent file when download finished ?": "Save torrent file when download finished ?"
+	"Save torrent file when download finished ?": "Save torrent file when download finished ?",
+	"Enable transcoding": "Enable transcoding"
 }

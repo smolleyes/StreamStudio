@@ -137,7 +137,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		var vlink = $(this).attr('alt');
     f={}
-    f.link='http://'+ipaddress+':8888/?file='+encodeURIComponent(vlink);
+    f.link='http://'+ipaddress+':8887/?file='+encodeURIComponent(vlink);
     f.title='';
     startPlay(f);
 		$('#custom-menu').slideUp();
@@ -166,7 +166,7 @@ $(document).ready(function() {
 		var vlink = $(this).attr('alt');
 		console.log(vlink);
 		var media = {};
-		media.link = 'http://'+ipaddress+':8888/?file='+vlink+'&external';
+		media.link = 'http://'+ipaddress+':8887/?file='+vlink+'&external';
 		media.title = vlink.split('/').pop();
 		startPlay(media);
 		$('#custom-menu').slideUp();

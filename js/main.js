@@ -123,6 +123,10 @@ var htmlStr = '<div class="row"> \
 	<div class="panel-body"> \
 		<span>'+_("Play thru Upnp")+'</span> \
 		<div id="upnpRenderersContainer" style="display:none;"><a id="upnp-toggle" class="upnp tiptip upnp-disabled"></a><form id="upnpPopup" style="display:none;"></form></div> \
+		<div id="upnpTranscoding" style="margin-top:10px;display:none;"> \
+			<span>'+_("Enable transcoding")+'</span> \
+			<input type="checkbox" id="transcodingInput" name="enableTranscoding"></input> \
+		</div> \
 	</div> \
 </div> \
 </div> <!-- end lg-3 --> \
@@ -295,7 +299,7 @@ var htmlStr = '<div class="row"> \
 				<progress id="progress-bar" min=\'0\' max=\'100\' value=\'0\'></progress> \
 			</div> \
 			<div id="playlistBtnSub"></div> \
-			<div id="transcodingBtnSub"></div> \
+			<div id="transcodingBtnSub" style="display:none;"></div> \
 			<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
 			<div id="subPlayer-title-container">'+_("Playing:")+'<span id="subPlayer-title"><p> '+_('Waiting...')+'</p></span></div> \
 	</div> \
@@ -490,6 +494,15 @@ function main() {
 		$("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
 	});
 	$("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
+
+
+	$("#transcodingInput").on('click', function(e) {
+		if($('#transcodingInput').is(':checked')) {
+			upnpTranscoding = true;
+		} else {
+			upnpTranscoding = false;
+		}
+	});
 	
     // fullscreen signal and callback
     var left;
@@ -1085,9 +1098,11 @@ function main() {
             upnpToggleOn = true;
             loadUpnpRenderers();
             $('#upnp-toggle').removeClass('upnp-disabled').addClass('upnp-enabled');
+            $('#upnpTranscoding').show();
         } else {
             $('#upnp-toggle').qtip('destroy', true);
             $('#upnp-toggle').removeClass('upnp-enabled').addClass('upnp-disabled');
+            $('#upnpTranscoding').hide();
             upnpToggleOn = false;
             playUpnpMedia = false;
         }
@@ -1339,8 +1354,7 @@ function update_searchOptions() {
 function startSearch(query) {
     $("#search p").empty().append(' ');
     $('#loading p').empty().append(_("Loading..."));
-
-    if ((query === '') && (browse === false) || (query === '') && engine && engine.searchType && engine.searchType == "search") {
+    if ((query === '') && (browse === false) || (query === '') && engine && engine.searchType && engine.searchType == "search" || query === '' && search_engine == 'dailymotion') {
         current_search = '';
         if ((searchTypes_select !== 'category') && (searchTypes_select !== 'topRated') && (searchTypes_select !== 'mostViewed')) {
             $('#video_search_query').attr('placeholder', '').focus();

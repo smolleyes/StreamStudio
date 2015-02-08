@@ -1,3 +1,7 @@
+V 1.27.4
+  * add transcoding thru ffmpeg by default
+  * fix subtitles
+
 v 1.27.3
   * add yes/no popup to save torrents
   * fix torrents stats

@@ -76,18 +76,18 @@ $(document).ready(function() {
         }
     });
     //transcoder button
-     $(document).on('click','#transcodeBtnContainer,#transcodingBtnSub',function(e) {
-		e.preventDefault();
-		if(transcoderEnabled) {
-			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
-			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding disabled'));
-			transcoderEnabled = false;
-		} else {
-			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
-			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding enabled'));
-			transcoderEnabled = true;
-		}
-	 });
+  //    $(document).on('click','#transcodeBtnContainer,#transcodingBtnSub',function(e) {
+		// e.preventDefault();
+		// if(transcoderEnabled) {
+		// 	$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
+		// 	$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding disabled'));
+		// 	transcoderEnabled = false;
+		// } else {
+		// 	$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
+		// 	$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding enabled'));
+		// 	transcoderEnabled = true;
+		// }
+	 // });
     
     //playlist buttons
     $(document).on('click','#playlistBtn,#playlistBtnSub',function(e) {
@@ -221,6 +221,7 @@ function initPlayer() {
 	// clean subtitles
 	try {
 		$('.mejs-captions-button').remove();
+		$('.mejs-captions-layer').remove();
 		$('#videoPlayer').empty();
 		player.tracks = [];
 	} catch(err) {}
@@ -228,7 +229,9 @@ function initPlayer() {
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	//stop upnp
     if (upnpMediaPlaying || playFromUpnp) {
-		mediaRenderer.stop();
+		try {
+			mediaRenderer.stop();
+		} catch(err) { }
 	}
 	//clean ffmpeg process
 	try {
@@ -322,7 +325,7 @@ function startPlay(media) {
 		play_next = true;
 	}
 	updateMiniPlayer();
-	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false) {
+	if(torrentPlaying === false && playFromUpnp == false && upnpMediaPlaying == false || media.link.indexOf('&start=')) {
 		if (media.link && media.link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
 			if(currentMedia && currentMedia.ytId !== ytId) {
 				initPlayer();
@@ -330,7 +333,7 @@ function startPlay(media) {
 				cleanffar();
 			}
 		} else {
-			if (currentMedia && media.link.indexOf(currentMedia.link) !== -1) {
+			if (currentMedia && player.media.currentSrc.indexOf(currentMedia.link) !== -1) {
 				cleanffar();
 			} else {
 				initPlayer();
@@ -386,7 +389,7 @@ function startPlay(media) {
     try {
         next_vid = media.next;
         var link = media.link;
-        if(link.indexOf('http://'+ipaddress+':8888/?file') !== -1) {
+        if(link.indexOf('http://'+ipaddress+':8887/?file') !== -1) {
 			link = link.split('?file=')[1].replace('&tv','');
 		} else {
 			link = link.replace('&tv','');
@@ -514,9 +517,16 @@ function launchPlay() {
 	if($('#subPlayer-title').text() !== currentMedia.title) {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
+	// transcoding by default
+	if(upnpToggleOn && upnpTranscoding || !upnpToggleOn) {
+		transcoderEnabled = true;
+	} else {
+		transcoderEnabled = false;
+	}
+
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8888/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
-		var link = 'http://'+ipaddress+':8888/?file='+currentMedia.link;
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
+		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
 	
@@ -543,6 +553,10 @@ function launchPlay() {
 		if(obj.name === 'StreamStudio' || link.indexOf('.mp3') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || link.indexOf('.ogg') !== -1) {
 			player.setSrc(currentMedia.link);
 			player.play();
+			if(player.tracks.length > 0) {
+				$('input[value="'+_("Track").toLowerCase()+'1"]').attr('checked',true);
+				player.setTrack(''+_("Track").toLowerCase()+'1');
+			}
 		} else {
 			startExtPlayer(obj);
 		}

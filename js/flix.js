@@ -164,6 +164,9 @@ app.updateStats = function(streamInfo) {
           torrentSaved = true;
           saveTorrent = false;
         }
+        $('#downloadStats').empty();
+        clearTimeout(statsUpdater);
+        statsUpdater = null;
       } else {
         $('#downloadStats').empty().html('<span style="margin:0 5px;">'+_("Speed:")+'</span><i class="arrow down"></i>' + this.downloadSpeed +' <i class="arrow up"></i>'+ this.uploadSpeed +'<span style="padding:5px;">| '+_("Connected peers: ")+ this.active_peers + ' / ' + this.total_peers + '</span>');
         var t = _('(%s%% downloaded)',downloadedPct);
