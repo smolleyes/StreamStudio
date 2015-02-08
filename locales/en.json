@@ -184,5 +184,5 @@
 	"Can't get your torrent file, please retry!": "Can't get your torrent file, please retry!",
 	"Save torrent file when download finished ?": "Save torrent file when download finished ?",
 	"Enable transcoding": "Enable transcoding",
-	"Your video is loading, please wait...! (Could be long)":"Your video is loading, please wait...! (Could be long)"
+	"Please wait while loading your video... (Can take a few seconds)":"Please wait while loading your video... (Can take a few seconds)"
 }

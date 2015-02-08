@@ -1,4 +1,4 @@
-var VERSION = "1.28 - testing";
+var VERSION = "1.28";
 
 var path = require('path');
 var fs = require('fs');
