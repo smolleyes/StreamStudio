@@ -62,6 +62,7 @@ function loadApp() {
 }
 
 function updatePlugins(url) {
+    try { 
     console.log("Updating plugins");
     $('#loadingApp p').empty().append(_('Downloading plugins...'));
     var req = https.request(url);
@@ -121,6 +122,11 @@ function updatePlugins(url) {
         console.log("Got error: " + e.message);
     });
     req.end();
+    } catch(err) {
+      setTimeout(function(){
+        updatePlugins(url);
+      },2000)  
+    }
 }
 
 

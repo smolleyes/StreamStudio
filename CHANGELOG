@@ -1,3 +1,7 @@
+V 1.28.1
+  * fix start update on windows
+  * fix bug on plugins update
+
 v 1.28
   * add informatiosn strings
   * fix torrent starting
