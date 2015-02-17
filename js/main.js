@@ -25,7 +25,6 @@ var airMediaPlaying = false;
 var upnpMediaPlaying = false;
 var torrentPlaying = false;
 var continueTransition = false;
-var transcoderEnabled= false;
 var ffmpeg;
 var ffar = [];
 var torrentsArr = [];
@@ -260,7 +259,13 @@ var htmlStr = '<div class="row"> \
 						</div> \
 					</div> \
 					<div class="form-group"> \
-						<div style="height:240px;margin-top:30px;"> \
+						<div class="ItemCheckbox left">\
+						  <label for="transcoding">'+_("Enable transcoding by default:")+'</label>\
+						  <input class="pluginCheckBox" type="checkbox" id="defaultTranscoding" name="defaultTranscoding">\
+						</div>\
+					</div> \
+					<div class="form-group"> \
+						<div style="height:240px;top:25px;clear:both;position:relative;"> \
 							<p><u><b>'+_("Add or remove directories to scan for your local library:")+'</b></u></p> \
 							<select id="shared_dir_select" multiple name="shared_dir" class="well"></select> \
 							<div id="shared_dir_controls"> \
@@ -376,7 +381,7 @@ function main() {
 	$("#settingsContainer").show();
 
 	// show transcoding buttons if less than 4 cores cpu
-	if(os.cpus().length < 4) {
+	if(os.cpus().length < 4 && !transcoderEnabled) {
 		$('#transcodingBtnSub').show();
 		$('#subPlayer-title-container').css('margin-left', '270px');
 	} else {

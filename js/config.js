@@ -32,12 +32,25 @@ $(document).on('ready',function(){
 			saveSettings();
 		}
     });
+
+	$(document).on('change', '#defaultTranscoding', function(e) {
+        if(this.checked) {
+			settings.transcoding = true;
+			saveSettings();
+		} else {
+			settings.transcoding = false;
+			saveSettings();
+		}
+    });
 });
 
 function loadConfig() {
     $('#config_title').empty().append(_("StreamStudio configuration:"));
     // start flags
     $('#download_path').val(settings.download_dir);
+    if(settings.transcoding) {
+    	$('#defaultTranscoding').attr('checked', settings.transcoding)
+    }
     $("select#countries").change(function () {
     $("select#countries option:selected").each(function () {
 			locale = $(this).val();

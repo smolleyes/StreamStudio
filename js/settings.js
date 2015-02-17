@@ -31,6 +31,7 @@ if (localStorage.StdSettings === undefined) {
 	settings.selectedDir="";
 	settings.plugins=[];
 	settings.init=false;
+	settings.transcoding=false;
 	settings.defaultWidth = Math.round(window.screen.availWidth * 0.8);
 	settings.defaultHeight = Math.round(window.screen.availHeight * 0.8);
 	settings.StreamStudioPlayer = {"name":"StreamStudio","path":""};
@@ -43,6 +44,13 @@ ipaddress = settings.ipaddress;
 selected_resolution = settings.resolution;
 download_dir = settings.download_dir;
 locale = settings.locale;
+
+// check transcoding
+if(settings.transcoding && settings.transcoding == true) {
+	transcoderEnabled = true;
+} else {
+	transcoderEnabled = false;
+}
 
 // locale code (for youtube)
 var localeCode = 'US';

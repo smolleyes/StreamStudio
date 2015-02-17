@@ -196,5 +196,7 @@
 	"Status": "Statut",
 	"watched": "déjà vu",
 	"Not seen": "à voir",
-	"already watched": "déjà vu"
+	"already watched": "déjà vu",
+	"Enable transcoding by default": "Activer le transcodage par défaut:",
+	"Enable transcoding by default:": "Enable transcoding by default:"
 }

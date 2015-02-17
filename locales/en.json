@@ -193,5 +193,6 @@
 	"Status": "Status",
 	"watched": "watched",
 	"Not seen": "Not seen",
-	"already watched": "already watched"
+	"already watched": "already watched",
+	"Enable transcoding by default":"Enable transcoding by default"
 }
