@@ -28,7 +28,7 @@ $(document).on('ready',function(){
 			settings.plugins.push(this.name);
 			saveSettings();
 		} else {
-			settings.plugins.pop(settings.plugins.indexOf(this.name));
+			settings.plugins.splice(settings.plugins.indexOf(this.name),1);
 			saveSettings();
 		}
     });

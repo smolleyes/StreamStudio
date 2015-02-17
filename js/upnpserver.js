@@ -424,6 +424,9 @@ function getRendererState(state) {
 						$('.mejs-overlay-button').hide();
 						$('.mejs-overlay-loading').hide();
 						$('.mejs-container p#fbxMsg').remove();
+                        if($('.preloadingMsg').length !== 0) {
+                            $('#fbxMsg2').remove()
+                        }
 						if($('#fbxMsg2').length !== 0) {
 							$('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
 						} else {

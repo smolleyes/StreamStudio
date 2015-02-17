@@ -299,7 +299,7 @@ var htmlStr = '<div class="row"> \
 				<progress id="progress-bar" min=\'0\' max=\'100\' value=\'0\'></progress> \
 			</div> \
 			<div id="playlistBtnSub"></div> \
-			<div id="transcodingBtnSub" style="display:none;"></div> \
+			<div id="transcodingBtnSub"></div> \
 			<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
 			<div id="subPlayer-title-container">'+_("Playing:")+'<span id="subPlayer-title"><p> '+_('Waiting...')+'</p></span></div> \
 	</div> \
@@ -374,6 +374,15 @@ function main() {
     $("#navBar").show();
     $(".myBrand").show();
 	$("#settingsContainer").show();
+
+	// show transcoding buttons if less than 4 cores cpu
+	if(os.cpus().length < 4) {
+		$('#transcodingBtnSub').show();
+		$('#subPlayer-title-container').css('margin-left', '270px');
+	} else {
+		$('#transcodingBtnSub').hide();
+		$('#subPlayer-title-container').css('margin-left', '250px');
+	}
 	
 	// update youtube-dl
 	try {
@@ -499,8 +508,12 @@ function main() {
 	$("#transcodingInput").on('click', function(e) {
 		if($('#transcodingInput').is(':checked')) {
 			upnpTranscoding = true;
+			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
+			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding enabled'));
 		} else {
 			upnpTranscoding = false;
+			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
+			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding disabled'));
 		}
 	});
 	

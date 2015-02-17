@@ -58,6 +58,7 @@ $(document).ready(function() {
         $('#playerContainer').hide();
         $('#playerTopBar').hide();
         $('#tab a[href="#tabpage_'+activeTab+'"]').click();
+        stopTorrent();
     });
     // pause/stop button
     $('.mejs-playpause-button').click(function(e) {
@@ -77,18 +78,20 @@ $(document).ready(function() {
         }
     });
     //transcoder button
-  //    $(document).on('click','#transcodeBtnContainer,#transcodingBtnSub',function(e) {
-		// e.preventDefault();
-		// if(transcoderEnabled) {
-		// 	$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
-		// 	$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding disabled'));
-		// 	transcoderEnabled = false;
-		// } else {
-		// 	$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
-		// 	$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding enabled'));
-		// 	transcoderEnabled = true;
-		// }
-	 // });
+     $(document).on('click','#transcodeBtnContainer,#transcodingBtnSub',function(e) {
+		e.preventDefault();
+		if(transcoderEnabled) {
+			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
+			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding disabled'));
+			$('#transcodingInput').prop( "checked", false );
+			transcoderEnabled = false;
+		} else {
+			$('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
+			$('button[aria-controls="transcodeBtn"]').attr('title',_('transcoding enabled'));
+			$('#transcodingInput').prop( "checked", true );
+			transcoderEnabled = true;
+		}
+	 });
     
     //playlist buttons
     $(document).on('click','#playlistBtn,#playlistBtnSub',function(e) {
@@ -523,7 +526,7 @@ function launchPlay() {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// transcoding by default
-	if(upnpToggleOn && upnpTranscoding || !upnpToggleOn) {
+	if(!transcoderEnabled && !upnpToggleOn && os.cpus().length > 2 || upnpToggleOn && upnpTranscoding) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;

@@ -317,7 +317,8 @@
 	top: -26px;
 	margin-left: -18px;
 	text-align: center;
-	color: #111;
+	color: white;
+	background:black;
 }
 
 .mejs-controls .mejs-time-rail .mejs-time-float-current {

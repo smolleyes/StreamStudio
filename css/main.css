@@ -195,10 +195,12 @@ pre {
 }
 */
 
+.mejs-time {
+	margin-left: 20px !important;
+}
 
 .mejs-time-total, .mejs-time-rail {
 	width: calc(100% - 315px) !important;
-	margin-right: 20px !important;
 }
 
 

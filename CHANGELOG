@@ -1,3 +1,8 @@
+V 1.29
+  * add multi files torrent support
+  * fix plugins config
+  * fix torrents peers connexion
+
 V 1.28.1
   * fix start update on windows
   * fix bug on plugins update

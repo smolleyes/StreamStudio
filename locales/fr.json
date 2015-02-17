@@ -186,5 +186,15 @@
 	"Can't get your torrent file, please retry!": "Impossible de télécharger le torrent, merci de réessayer!",
 	"Save torrent file when download finished ?": "Sauvegarder les fichiers une fois le téléchargement terminé ?",
 	"Enable transcoding": "Activer le transcodage",
-	"Please wait while loading your video... (Can take a few seconds)": "Veuillez patienter pendant le chargement de votre vidéo... (Peut prendre quelques secondes)"
+	"Please wait while loading your video... (Can take a few seconds)": "Veuillez patienter pendant le chargement de votre vidéo... (Peut prendre quelques secondes)",
+	"Analysing your torrent file, please wait...": "Analysing your torrent file, please wait...",
+	"Name": "Nom",
+	"Size": "Taille",
+	"Select the file to open...": "Sélectionnez le fichier à streamer...",
+	"Analysing your torrent, please wait...": "Analyse de votre torrent, merci de patienter...",
+	"Loading your torrent, please wait...": "Chargement de votre torrent, merci de patienter...",
+	"Status": "Statut",
+	"watched": "déjà vu",
+	"Not seen": "à voir",
+	"already watched": "déjà vu"
 }

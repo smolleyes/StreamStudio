@@ -36,33 +36,58 @@ var torrentSrc = '';
 var torrentName = '';
 
 function getTorrent(link) {
-	console.log('torrent link: '+ link)
   initPlayer();
   stopTorrent();
-  stateModel = {state: 'connecting', backdrop: '',numTry: 0};
-  streamInfo = {};
-  videoStreamer = null;
-  statsUpdater = null;
-  playStarted = false;
-  downloadedPct = 0;
-  rTorrent(link, function(err, torrent) {
-    if(err) {
-     console.log(err);
-     swal(_("Error!"), _("Can't get your torrent file, please retry!"), "error")
-   } else {
-    askSaveTorrent();
-    title = torrent.name;
-    var torrentInfo = {
-      info: torrent,
-      title: title
-    };
-    var obj = JSON.parse(settings.ht5Player);
-    if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
-     $('#playerToggle').click();
-   }
-   handleTorrent(torrentInfo, stateModel);
- }
-});
+  $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+  var obj = JSON.parse(settings.ht5Player);
+  if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
+    $('#playerToggle').click();
+  }
+  $('#preloadTorrent').remove();
+  $('.mejs-container').append('<div id="preloadTorrent" \
+          style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
+          <p><b id="preloadProgress">'+_("Loading your torrent, please wait...")+'</b></p> \
+          <div id="peerStats"></div></div>');
+	setTimeout(function() {
+      console.log('torrent link: '+ link)
+      stateModel = {state: 'connecting', backdrop: '',numTry: 0};
+      streamInfo = {};
+      videoStreamer = null;
+      statsUpdater = null;
+      playStarted = false;
+      downloadedPct = 0;
+      rTorrent(link, function(err, torrent, raw) {
+        if(err) {
+         console.log(err);
+         swal(_("Error!"), _("Can't get your torrent file, please retry!"), "error")
+         $('#preloadTorrent').empty();
+       } else {
+        saveTorrent = false;
+        torrentSaved = false;
+        swal({title: _("Save torrent file?"),
+          text: _("Save torrent file when download finished ?"),
+          type: "info",
+          showCancelButton: true,
+          confirmButtonColor: "green",
+          confirmButtonText: _("Yes"),
+          cancelButtonText: _("No"),
+          closeOnConfirm: false,
+          closeOnCancel: true }, 
+          function(isConfirm){   
+            if (isConfirm) {
+              saveTorrent = true;   
+              //swal("Ok!", _("Your torrent will be saved once download finished!"), "success");   
+            }
+            title = torrent.name;
+            var torrentInfo = {
+              info: raw,
+              title: title
+            };
+           handleTorrent(torrentInfo, stateModel);
+        });
+     }
+    });
+  },1000);
 }
 
 var watchState = function(stateModel) {
@@ -70,7 +95,7 @@ var watchState = function(stateModel) {
     var swarm = videoStreamer.swarm;
     var state = 'connecting';
 
-    if(swarm.downloaded > BUFFERING_SIZE) {
+    if(swarm.downloaded > 1024) {
       state = 'ready';
     } else if(swarm.downloaded) {
       state = 'downloading';
@@ -87,6 +112,7 @@ var watchState = function(stateModel) {
     }
   }
 };
+
 
 app.updateStats = function(streamInfo) {
  $(".mejs-overlay-button").hide();
@@ -126,11 +152,13 @@ app.updateStats = function(streamInfo) {
             $('#preloadProgress').empty().append(_('Connecting... please wait (test %s/%s)',stateModel.numTry,maxTry));
           }
         } else if (stateModel.state === 'downloading' || stateModel.state === 'startingDownload') {
-          if (parseInt(this.percent) > 0 && parseInt(this.percent) < 100) {
-            $('#preloadProgress').empty().append(_('Downloading %s%% done at %s',this.percent,this.downloadSpeed));
-            $('#preloadTorrent progress').attr('value',this.percent).text(this.percent);
-            $('#peerStats').empty().append(_('%s / %s connected peers',this.active_peers,this.total_peers));
-          }
+          $('#preloadProgress').empty().append(_("Analysing your torrent, please wait..."));
+          //stateModel.state = 'ready';
+          //if (parseInt(this.percent) > 0) {
+            //$('#preloadProgress').empty().append(_('Downloading %s%% done at %s',this.percent,this.downloadSpeed));
+            //$('#preloadTorrent progress').attr('value',this.percent).text(this.percent);
+            //$('#peerStats').empty().append(_('%s / %s connected peers',this.active_peers,this.total_peers));
+          //}
         }
       } else {
         if (playStarted === false) {
@@ -139,17 +167,27 @@ app.updateStats = function(streamInfo) {
          stream.link = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/&torrent';
          stream.next = '';
          stream.title = streamInfo.server.index.name;
-         sdb.insert({"title":itemTitle},function(err,result){
-          if(!err){
-            console.log('std database updated successfully!');
-          } else {
-            console.log(err);
-          }
-        })
+         if(sdb.find({"title":itemTitle}).length == 0) {
+           sdb.insert({"title":itemTitle},function(err,result){
+            if(!err){
+              console.log(itemTitle + ' successfully added to database!');
+            } else {
+              console.log(err);
+            }
+          })
+        } else if(sdb.find({"title":stream.title}).length == 0) {
+          sdb.insert({"title":stream.title},function(err,result){
+            if(!err){
+              console.log(stream.title + ' successfully added to database!');
+            } else {
+              console.log(err);
+            }
+          })
+        }
 			  //clearTimeout(statsUpdater);
 			  startPlay(stream);
         try { $('#fbxMsg2').remove(); } catch(err) {}
-        $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:59%;position: relative;"><p style="font-weight:bold;text-align: center;">'+_("Please wait while loading your video... (Can take a few seconds)")+'</p></div></div>');
+        $('.mejs-container').append('<div id="fbxMsg2" class="preloadingMsg" style="height:calc(100% - 60px);"><div style="top:62%;position: relative;"><p style="font-weight:bold;text-align: center;">'+_("Please wait while loading your video... (Can take a few seconds)")+'</p></div></div>');
 			  playStarted = true;
      } else {
       torrentSrc = videoStreamer.path;
@@ -218,23 +256,20 @@ function saveToDisk(src,name) {
 }
 
 function handleTorrent(torrent, stateModel) {
-  var tmpFilename = torrent.info.infoHash;
-  tmpFilename = tmpFilename.replace(/([^a-zA-Z0-9-_])/g, '_') +'-'+ (new Date()*1);
-  var tmpFile = path.join(tmpFolder, tmpFilename);
+  
+  $('#preloadTorrent').remove();
+  $('.mejs-container').append('<div id="preloadTorrent" \
+          style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
+          <p><b id="preloadProgress"></b></p> \
+          <div id="peerStats"></div></div>');
 
-  $('#preloadTorrent').empty().remove();
-  setTimeout(function() {
-   $('.mejs-container').append('<div id="preloadTorrent" \
-     style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;"> \
-     <p><b id="preloadProgress">'+_("Connecting... please wait")+'</b></p> \
-     <progress value="5" min="0" max="100">0%</progress> \
-     <div id="peerStats"></div></div>');
-   $(".mejs-overlay-button").hide();
- },1000);
   videoStreamer = peerflix(torrent.info, {
-      connections: 100, // Max amount of peers to be connected to.
-      path: tmpFile, // we'll have a different file name for each stream also if it's same torrent in same session
-      buffer: (1.5 * 1024 * 1024).toString() // create a buffer on torrent-stream
+      connections: 150, // Max amount of peers to be connected to.
+      buffer: (1.5 * 1024 * 1024).toString(), // create a buffer on torrent-stream
+      jquery : $,
+      _ : _,
+      dom : document,
+      sdb : sdb
     });
   
   streamInfo = new app.updateStats(videoStreamer);

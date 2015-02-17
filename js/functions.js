@@ -774,3 +774,29 @@ function AnimateRotate(angle) {
 		}
 	});
 }
+
+function bytesToSize(bytes, precision)
+{	
+	var kilobyte = 1024;
+	var megabyte = kilobyte * 1024;
+	var gigabyte = megabyte * 1024;
+	var terabyte = gigabyte * 1024;
+
+	if ((bytes >= 0) && (bytes < kilobyte)) {
+		return bytes + ' Bits';
+
+	} else if ((bytes >= kilobyte) && (bytes < megabyte)) {
+		return (bytes / kilobyte).toFixed(precision) + ' Ko';
+
+	} else if ((bytes >= megabyte) && (bytes < gigabyte)) {
+		return (bytes / megabyte).toFixed(precision) + ' Mo';
+
+	} else if ((bytes >= gigabyte) && (bytes < terabyte)) {
+		return (bytes / gigabyte).toFixed(precision) + ' Go';
+
+	} else if (bytes >= terabyte) {
+		return (bytes / terabyte).toFixed(precision) + ' To';
+	} else {
+		return bytes + 'Bits';
+	}
+}

@@ -184,5 +184,14 @@
 	"Can't get your torrent file, please retry!": "Can't get your torrent file, please retry!",
 	"Save torrent file when download finished ?": "Save torrent file when download finished ?",
 	"Enable transcoding": "Enable transcoding",
-	"Please wait while loading your video... (Can take a few seconds)":"Please wait while loading your video... (Can take a few seconds)"
+	"Please wait while loading your video... (Can take a few seconds)":"Please wait while loading your video... (Can take a few seconds)",
+	"Name": "Name",
+	"Size": "Size",
+	"Select the file to open...": "Select the file to open...",
+	"Analysing your torrent, please wait...": "Analysing your torrent, please wait...",
+	"Loading your torrent, please wait...": "Loading your torrent, please wait...",
+	"Status": "Status",
+	"watched": "watched",
+	"Not seen": "Not seen",
+	"already watched": "already watched"
 }

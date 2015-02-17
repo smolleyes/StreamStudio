@@ -2731,14 +2731,14 @@ if (typeof jQuery != 'undefined') {
 				});
 				
 				// fit the rail into the remaining space
-				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width() + 34);
+				railWidth = t.controls.width() - usedWidth - (rail.outerWidth(true) - rail.width());
 			}
 
 			// outer area
 			rail.width(railWidth);
 			// dark space
 			total.width(railWidth - (total.outerWidth(true) - total.width()));
-			total.width = window.innerWidth;
+			total.width = window.innerWidth + 20;
 			if (t.setProgressRail)
 				t.setProgressRail();
 			if (t.setCurrentRail)
@@ -3233,7 +3233,7 @@ if (typeof jQuery != 'undefined') {
 						}
 						pos = x - offset.left;
 						percentage = (pos / width);
-						newTime = (percentage <= 0.02) ? 0 : percentage * media.duration;
+						newTime = (percentage <= 0.0001) ? 0 : percentage * media.duration;
 
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
@@ -3259,7 +3259,7 @@ if (typeof jQuery != 'undefined') {
 						percentage = (pos / width);
 						
 						try {
-							newTime = (percentage <= 0.02) ? 0 : percentage * mediaDuration;
+							newTime = (percentage <= 0.0001) ? 0 : percentage * mediaDuration;
 						} catch(err) {return;}
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
@@ -3391,7 +3391,7 @@ if (typeof jQuery != 'undefined') {
 					if (percent !== null && t.media && !t.media.paused) {
 						percent = Math.min(1, Math.max(0, percent));
 						// update loaded bar
-						if (t.loaded && t.total) {
+						if (t.loaded && t.total && percent !== null) {
 							t.loaded.width(t.total.width() * percent);
 						}
 					}
@@ -3425,7 +3425,9 @@ if (typeof jQuery != 'undefined') {
 						var 
 							newWidth = Math.round(t.total.width() * t.media.currentTime / mediaDuration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
-
+						if(t.total.width() < newWidth) {
+							return;
+						}
 						t.current.width(newWidth);
 						t.handle.css('left', handlePos);
 					}
@@ -3438,7 +3440,6 @@ if (typeof jQuery != 'undefined') {
 						var 
 							newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
-
 						t.current.width(newWidth);
 						t.handle.css('left', handlePos);
 					}
