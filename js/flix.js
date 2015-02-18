@@ -71,7 +71,7 @@ function getTorrent(link) {
           confirmButtonColor: "green",
           confirmButtonText: _("Yes"),
           cancelButtonText: _("No"),
-          closeOnConfirm: false,
+          closeOnConfirm: true,
           closeOnCancel: true }, 
           function(isConfirm){   
             if (isConfirm) {
