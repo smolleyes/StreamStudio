@@ -327,6 +327,7 @@ function saveConf() {
 		$('#settings').slideToggle();
 		alert(_('Please restart StreamStudio to apply your settings !'));
 		$('#homeToggle').click();
+		reloadPlugins();
 	} else {
 		$('#homeToggle').click();
 		reloadPlugins();

@@ -264,8 +264,6 @@ function handleTorrent(torrent, stateModel) {
           <div id="peerStats"></div></div>');
 
   videoStreamer = peerflix(torrent.info, {
-      connections: 150, // Max amount of peers to be connected to.
-      buffer: (1.5 * 1024 * 1024).toString(), // create a buffer on torrent-stream
       jquery : $,
       _ : _,
       dom : document,

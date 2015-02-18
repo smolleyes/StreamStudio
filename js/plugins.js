@@ -5,6 +5,17 @@ var pluginsList = ['grooveshark','twitch','songza','cpasbien','thepiratebay','om
 
 function initPlugins() {
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
+    fs.exists(pluginsDir, function(exists) {
+        if (!exists) {
+            fs.unlinkSync(confDir + "/rev.txt");
+            checkRev();
+        } else {
+            checkRev();
+        }
+    });
+}
+
+function checkRev() {
     chdir(confDir, function() {
         $.get('https://github.com/smolleyes/streamstudio-plugins/commits/master.atom', function(res) {
             var lastRev;
@@ -116,6 +127,9 @@ function updatePlugins(url) {
                 }, 5000);
             } catch (err) {
                 console.log("plugins update error" + err);
+                setTimeout(function(){
+                    updatePlugins(url);
+                },2000)  
             }
         });
     }).on("error", function(e) {
