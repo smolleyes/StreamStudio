@@ -526,7 +526,7 @@ function launchPlay() {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// transcoding by default
-	if(transcoderEnabled || !upnpToggleOn && os.cpus().length > 2 || upnpToggleOn && upnpTranscoding) {
+	if(transcoderEnabled && !upnpTranscoding || !upnpToggleOn && os.cpus().length > 2 || upnpToggleOn && upnpTranscoding) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
