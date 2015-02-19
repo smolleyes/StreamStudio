@@ -7,8 +7,14 @@ function initPlugins() {
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
     fs.exists(pluginsDir, function(exists) {
         if (!exists) {
-            fs.unlinkSync(confDir + "/rev.txt");
-            checkRev();
+            fs.exists(confDir + '/rev.txt', function(exists) {
+                if(exists) {
+                    fs.unlinkSync(confDir + "/rev.txt");
+                    checkRev();
+                } else {
+                    checkRev();
+                }
+            });
         } else {
             checkRev();
         }
@@ -128,17 +134,21 @@ function updatePlugins(url) {
             } catch (err) {
                 console.log("plugins update error" + err);
                 setTimeout(function(){
-                    updatePlugins(url);
+                    fs.unlinkSync(confDir + "/rev.txt");
+                    initPlugins()
                 },2000)  
             }
         });
     }).on("error", function(e) {
+        fs.unlinkSync(confDir + "/rev.txt");
         console.log("Got error: " + e.message);
     });
     req.end();
     } catch(err) {
+        console.log(err)
       setTimeout(function(){
-        updatePlugins(url);
+        fs.unlinkSync(confDir + "/rev.txt");
+        initPlugins()
       },2000)  
     }
 }

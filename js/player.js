@@ -338,7 +338,6 @@ function startPlay(media) {
 				cleanffar();
 			}
 		} else {
-			console.log('here ' + player.media.currentSrc.indexOf(currentMedia.link) !== -1, player.media.currentSrc,currentMedia.link); 
 			if (player.media.currentSrc.indexOf(currentMedia.link) !== -1) {
 				cleanffar();
 			} else {
@@ -402,6 +401,7 @@ function startPlay(media) {
 		} else {
 			link = link.replace('&tv','');
 		}
+		console.log(link)
         var title = media.title;
         currentMedia = media;
         currentMedia.link = link;
@@ -526,7 +526,7 @@ function launchPlay() {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// transcoding by default
-	if(!transcoderEnabled && !upnpToggleOn && os.cpus().length > 2 || upnpToggleOn && upnpTranscoding) {
+	if(transcoderEnabled || !upnpToggleOn && os.cpus().length > 2 || upnpToggleOn && upnpTranscoding) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;

@@ -3268,7 +3268,7 @@ if (typeof jQuery != 'undefined') {
 							var l = currentMedia.link.replace(/&start=(.*)/,'')
 							$('.mejs-overlay,.mejs-overlay-loading').show();
 							if(playFromFile) {
-								m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								m.link = l.replace('?file=','?file=file://')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 							} else if(playFromHttp) {
 								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
 							} else if (torrentPlaying) {
@@ -3279,6 +3279,7 @@ if (typeof jQuery != 'undefined') {
 								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 							}
 							m.title = currentMedia.title;
+							console.log(m)
 							startPlay(m);
 						}
 
