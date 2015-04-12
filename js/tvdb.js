@@ -116,7 +116,6 @@ function searchTVdb(query, cb, fromSearch) {
                 }
             })
             .catch(function(error) {
-            	console.log(error)
                 results.success = false;
                 results.error = "Can't find results for " + query;
                 swal(_("Error!"), _("Can't find results for %s !",query), "error")
@@ -151,7 +150,6 @@ function searchTVdbAllById(id, cb, query,fromSearch,engine,eztvId) {
     var serie = {};
     serie.eztvId= null;
     serie.engine = engine; 
-    console.log(engine,eztvId)
     tvdb.getSeriesAllById(id)
         .then(function(res) {
             serie.infos = res;
@@ -198,7 +196,6 @@ function *getTVdbBanners(item, query) {
         return item;
     })
     .catch(function(error) {
-    	console.log(error)
         results.success = false;
         results.error = error;
         swal(_("Error!"), _("Can't find results for %s !",query), "error")
@@ -307,7 +304,6 @@ function updateSeriesDb(serie,cb) {
 }
 
 function compareSeasons(update,serie,cb) {
-	console.log(update,serie)
 	try {
 		if(update.infos.fanart && update.infos.fanart !== null) {
 			update.fanart = confDir + '/images/'+update.id+'-fanart'+path.extname(update.infos.fanart);
@@ -335,7 +331,6 @@ function compareSeasons(update,serie,cb) {
 		    	applyChange(serie.seasons, update.seasons, d);
 		    	serie.updated = true;
 		    }
-		    console.log(d)
 		});
 	    if(serie.updated) {
 		    return updateSeriesDb(serie,cb);
