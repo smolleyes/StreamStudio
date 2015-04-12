@@ -142,8 +142,8 @@ button::-moz-focus-inner {
   padding: 0 0 18px 10px;
   color: white;
   font-style: normal;
-  display:none !important;
   font-size: 28px;
+  top:0;
   font-family: Arial, Baskerville, monospace; }
   .mfp-close:hover, .mfp-close:focus {
     opacity: 1;

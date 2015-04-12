@@ -15,13 +15,17 @@
 //~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 var clipboard = gui.Clipboard.get();
+var activElement = null;
 
 $(document).ready(function() {
 	$.event.special.rightclick = {
 		bindType: "contextmenu",
 		delegateType: "contextmenu"
 	};
-  $(document).on("rightclick", "body", function(e) {
+  $(document).on("rightclick", "body, #video_search_query", function(e) {
+  		try {
+  			activElement = document.activeElement.id;
+  		} catch(err) {}
         var text = clipboard.get('text');
         $('#custom-menu ol').empty();
         if (text.indexOf('mega.co.nz') !== -1) {
@@ -35,16 +39,13 @@ $(document).ready(function() {
 				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
 			}
 		}
-  });
-	$(document).on("rightclick", ".start_video", function(e) {
-		var evid = $(this).parent().closest('.youtube_item').find('div')[4].id;
-		var vid = '';
-		var title = $(this)[0].text;
-		if (evid.match('_sub') === null) {
-			vid = evid.replace('youtube_entry_res_','');
-		} else {
-			vid = evid.replace('youtube_entry_res_sub_','');
+		if(clipboard.get('text').trim() !== "" && $('#'+activElement).is("input[type=text]")) {
+			$('#custom-menu ol').empty().append('<li><a id="paste_link" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Paste")+'</a></li>');
 		}
+  });
+	$(document).on("rightclick", ".coverPlayImg", function(e) {
+		var vid = $(this).closest('.youtube_item').attr('id');
+		var title = $(this).closest('.youtube_item').find('.itemTitle').text();
 		if (vid === '') {return;}
 		try {
 			$('#copy_link').parent().remove();
@@ -53,12 +54,12 @@ $(document).ready(function() {
 				var link = "http://www.youtube.com/watch?v="+vid;
 				var engine='youtube';
 				$('#custom-menu ol').append('<li><a id="copy_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Copy youtube link")+'</a></li>');
-				$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Save to playlist")+'</a></li>');
+				//$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Save to playlist")+'</a></li>');
 			} else if (search_engine === 'dailymotion') {
 				var link = "http://www.dailymotion.com/video/"+vid;
 				var engine='dailymotion';
 				$('#custom-menu ol').append('<li><a id="copy_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Copy dailymotion link")+'</a></li>');
-				$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Save to playlist")+'</a></li>');
+				//$('#custom-menu ol').append('<li><a id="save_link" href="#" alt="'+vid+'::'+title+'::'+link+'::'+engine+'" class="btn btn-default ">'+_("Save to playlist")+'</a></li>');
 			}
 		} catch(err) {
 			console.log("can't detect link to copy..." + err);
@@ -70,6 +71,9 @@ $(document).ready(function() {
     try {
 		$(document).bind("contextmenu", function(e) {
 			e.preventDefault();
+			try {
+  				activElement = document.activeElement.id;
+  			} catch(err) {}
 			$('#copy_link').parent().remove();
 			$('#copy').parent().remove();
 			$('#paste_ytlink').parent().remove();
@@ -104,6 +108,18 @@ $(document).ready(function() {
 		var text = getSelectedText();
 		if (text !== null) {
 			clipboard.set(''+text+'','text');
+			$('#custom-menu').slideUp();
+		}
+    });
+    //paste from clipboard
+	$(document).on('click','#paste_link',function() {
+		var text = clipboard.get('text').trim();
+		if (text !== null) {
+			if($('#'+activElement).is("input")){
+				$('#'+activElement).val(text);
+			} else {
+				$('#'+activElement).empty().append(text);
+			}
 			$('#custom-menu').slideUp();
 		}
     });
@@ -227,7 +243,6 @@ $(document).ready(function() {
 function getYtlinkFromClipboard() {
 	var vid='';
 	var text = clipboard.get('text');
-	console.log(text)
 	try {
 		vid = text.match('.*v=(.*)?&')[1]
 		return "www.youtube.com/watch?v="+vid;

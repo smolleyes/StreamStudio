@@ -154,6 +154,7 @@ function setResolution() {
     win.moveTo(x, y);
 }
 
+
 //start 
 setLocale();
 setResolution();

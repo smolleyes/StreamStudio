@@ -1,4 +1,12 @@
-V 1.29.5 - 6
+V 2.0
+  * New gui design
+  * update to nwjs 12 with custom codecs (now support hevc/ac3/dts... natively)
+  * new favorites system to add and manage you series automatically
+  * livestreamer updated
+  * ffmpeg updated
+  * many bug fix and optimisations
+
+V 1.29.5 - 6 -7
   * fix...
 
 V 1.29.4

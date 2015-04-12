@@ -3,11 +3,14 @@
   "main": "index.html",
   "user-agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.157 Safari/537.36",
   "window": {
+    "icon": "setup-images/48x48/streamstudio.png",
     "toolbar": false,
     "position": "center",
     "title": "StreamStudio",
-    "show": false
+    "min_width": 960,
+    "min_height": 550,
+    "show": false,
+    "frame":false
   },
-  "chromium-args": "--ignore-gpu-blacklist",
-  "js-flags": "--harmony"
+  "chromium-args": "--ignore-gpu-blacklist"
 }

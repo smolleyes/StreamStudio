@@ -20,7 +20,6 @@
 	<script src="js/jquery.qtip.min.js"></script>
 	<script src='js/bongo.min.js'></script>
 	<script src='js/bootstrap.min.js'></script>
-	<script src='js/bootstrap-select.js'></script>
 	<script src='js/storedb.js'></script>
 	<!-- <msdropdown> -->
 	<script src="js/jquery.dd.min.js"></script>
@@ -32,7 +31,7 @@
 	<script src="js/plugins.js"></script>
 	<script src="js/update.js"></script>
 	<script src="js/spinner.js"></script>
-
+	<script src="js/jquery.raty.js"></script>
 	<link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="js/tiptip/tipTip.css" />
 	<link rel="stylesheet" href="js/mediaelement/build/mediaelementplayer.css" />
@@ -43,8 +42,8 @@
 	<link rel="stylesheet" href="css/jquery.qtip.min.css" />
 	<link rel="stylesheet" href="css/nanoscroller.css" />
 	<link rel="stylesheet" href="css/bootstrap.min.css" />
-	<link rel="stylesheet" href="css/bootstrap-select.css" />
 	<link rel="stylesheet" href="css/magnific-popup.css" />
+	<link rel="stylesheet" href="css/jquery.raty.css" />
 	<!-- <msdropdown> -->
 	<link rel="stylesheet" type="text/css" href="css/flags/dd.css">
 	<link rel="stylesheet" type="text/css" href="css/flags/flags.css">
@@ -52,53 +51,54 @@
 	<link rel="stylesheet" type="text/css" href="js/alert/sweet-alert.css">
 </head>
 <body>
+	<div id="header">
+		<div id="appLogo"><span>STREAM</span><img src="images/logo.png" style="height:44px;" /><span>STUDIO</span></div>
+        <ul>
+	        <li><a href='#' title='Minimize' id='windowControlMinimize'></a></li>
+	        <li><a href='#' title='Maximize' id='windowControlMaximize'></a></li>
+	        <li><a href='#' title='Close'    id='windowControlClose'></a></li>
+        </ul>
+    </div>
 	<div id='playerTopBar' style="display:none;"><div id="downloadStats"></div><a id="closePlayer" href="#">X</a></div>
 	<div id="playerContainer" style="display:none;">
-		<video class="mejs-ted" id="videoPlayer" width="100%" height="100%" src="t.mp4" preload="auto" controls>
-			
-		</video>
+		<video class="mejs-ted" id="videoPlayer" width="100%" height="100%" src="t.mp4" preload="auto" controls></video>
 	</div>
 	<input style="display:none;" id="fileDialog" type="file" nwdirectory />
 	<div class="container-fluid" id="mainContainer" style="margin-left:10px;padding-left:0;">
-		<h3 class="myBrand" style="display:none;">StreamStudio</h3>
-		<nav class="navbar-fixed-top" id="navBar" style="display:none;">
-			<div class="navbar-header">
-				<div id="tab" class="btn-group" data-toggle="buttons-radio" style="float:left;margin-top:5px;">
-					<a href="#tabpage_1" id="homeToggle" class="btn btn-default active" data-toggle="tab" style="border-radius: 4px 0 0 4px;">Home</a>
-					<a href="#tabpage_2" id="webLibToggle"class="btn btn-default" data-toggle="tab">Bookmarks</a>
-					<a href="#tabpage_3" id="localFilesToggle"class="btn btn-default" data-toggle="tab">Local files</a>
-					<a href="#tabpage_4" id="downloads_tab" class="btn btn-default"  data-toggle="tab">Downloads</a>
-					<a href="#tabpage_5" id="upnpToggle" class="btn btn-default"  data-toggle="tab">Upnp</a>
-					<a id="playerToggle" href="#playerContainer" class="btn btn-default"  data-toggle="tab" style="border-radius: 0 4px 4px 0;">Player</a>
-					<a id="settingsToggle" href="#tabpage_7" class="btn btn-default"  data-toggle="tab" style="display:none;"></a>
+		<div id="main">
+			<div class="row">
+				<div class="col-xs-4 col-md-3 col-lg-2" id="menuContainer" style="height:100%;margin-bottom:5px;">
+					<div id='sectionsContainer'>
+						<a href="#_1" id="homeTopButton" class="btn btn-default active" data-toggle="tab"><img src="images/volet.png" /></a>
+						<a href="#tabpage_6" id="favoritesToggle" class="btn btn-default" data-toggle="tab"><img src="images/Favoris.png" /></a>
+						<a href="#tabpage_7" id="settingsToggle" class="btn btn-default" data-toggle="tab"><img src="images/Reglage.png" /></a>
+					</div>
+				</div>
+				<div id="content" class="col-xs-8 col-md-9 col-lg-10">
+				<div class="navbar-header" style="width:100%;margin-bottom: 10px;">
+					<div id="tab" class="btn-group" data-toggle="buttons-radio" style="width:100%;">
+						<ul class="nav nav-tabs" role="tablist">
+							<li role="presentation" class="active"><a href="#tabpage_1" id="homeToggle" class="tab-pane active" data-toggle="tab">Home</a></li>
+							<li role="presentation"><a href="#tabpage_3" id="localFilesToggle"class="tab-pane" data-toggle="tab">Local files</a></li>
+							<li role="presentation"><a href="#tabpage_4" id="downloads_tab" class="tab-pane"  data-toggle="tab">Downloads</a></li>
+							<li role="presentation"><a href="#tabpage_5" id="upnpToggle" class="tab-pane"  data-toggle="tab">Upnp</a></li>
+							<li role="presentation"><a id="playerToggle" href="#playerContainer" class="tab-pane"  data-toggle="tab">Player</a></li>
+						</ul>
+					</div>
+				</div>
 				</div>
 			</div>
-		</nav>
-		<div id="settingsContainer" style="display:none;">
-			<a id="config_btn" href="#">
-				<img src="images/config.png" height="28" width="28" /> 
-			</a> 
-			<form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-				<input type="hidden" name="cmd" value="_s-xclick">
-				<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7----- ">
-				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-				<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-			</form>
 		</div>
-		<div id="main" >
-		</div>
-		<div id="loadingApp" style="font-weight:bold;display:none;top:48%;position:absolute;left:50%;width:250px;margin-left:-125px;">
-			<div id="spinner" style="float:left;margin-right:10px;">
-			</div><p style="position:relative;top:5px;"></p>
+		<div id="loadingApp" style="font-weight:bold;display:none;top:50%;margin-top:-100px;position:absolute;left:50%;width:250px;margin-left:-125px;">
+			<img src="images/logo.png" style="height:200px;width:250px;"/>
+			<p style="position:relative;top:5px;text-align:center;"></p>
 		</div>
 		<input style="display:none;" id="export_file" type="file" nwsaveas style="display:none" nwworkingdir=""/>
 		<div id="fbxMsg" style="display:none;"></div>
 		<div id="subList" class="container" style="display:none;">
 
 		</div>
-		<script src="js/main.js"></script>
-		<script src="js/youtube-dailym.js"></script>
-		<script src="js/player.js"></script>
+		<script src="js/series.js"></script>
 		<script src="js/mediaelement/build/mediaelement-and-player.js"></script>
 		<script src="js/contextmenu.js"></script>
 		<script src="js/ht5db.js"></script>
@@ -115,8 +115,16 @@
 		<script src="js/megaFunctions.js"></script>
 		<script src="js/ht5pagination.js"></script>
 		<script src="js/upnpclient.js"></script>
+		<script src="js/cpbapi.js"></script>
+		<script src="js/rss.js"></script>
+		<script src="js/tvdb.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/youtube-dailym.js"></script>
+		<script src="js/player.js"></script>
 		<script src="js/magnificpopup.js"></script>
 		<script src="js/alert/sweet-alert.min.js"></script>
+		<script src="js/eztv.js"></script>
+		<script src="js/chromecast.js"></script>
 		<script src="js/airmedia.js"></script>
 	</body>
 </html>

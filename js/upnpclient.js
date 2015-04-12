@@ -1,5 +1,3 @@
-
-
 function getUpnpPosition() {
 	mediaRenderer.getPositionInfo().then(function(response) {      
 		if (response && response.data) {
@@ -7,6 +5,13 @@ function getUpnpPosition() {
 			$('.mejs-time-current').css({width: pct+'%', maxWidth: '100%'})
 			$('span.mejs-currenttime').text(response.data.RelTime);
 			$('span.mejs-duration').text(response.data.TrackDuration);
+			mediaDuration = hmsToSecondsOnly(response.data.TrackDuration);
+			if(upnpToggleOn) {
+				mediaCurrentTime = hmsToSecondsOnly(relTime);
+			} else {
+				player.media.currentTime = hmsToSecondsOnly(relTime);
+			}
+			updateTimer.emit("timeupdate");
 		} else {
 			console.log("Upnp stopping...");
 		}
@@ -15,5 +20,12 @@ function getUpnpPosition() {
 		$('.mejs-time-current').css({width: pct+'%', maxWidth: '100%'})
 		$('span.mejs-currenttime').text(relTime);
 		$('span.mejs-duration').text(trackDuration);
+		mediaDuration = hmsToSecondsOnly(trackDuration);
+		if(upnpToggleOn) {
+			mediaCurrentTime = hmsToSecondsOnly(relTime);
+		} else {
+			player.media.currentTime = hmsToSecondsOnly(relTime);
+		}
+		updateTimer.emit("timeupdate");
 	});
 }

@@ -2300,6 +2300,9 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		hideControls: function(doAnimation) {
+			if(playerBarsLocked) {
+				return;
+			}
 			var t = this;
 			
 			if(t.isFullScreen && $('#playerContainer').is(':visible')) {
@@ -2792,7 +2795,7 @@ if (typeof jQuery != 'undefined') {
 			var 
 			loading = 
 				$('<div class="mejs-overlay mejs-layer">'+
-					'<div class="mejs-overlay-loading"><span></span></div>'+
+					'<div class="mejs-overlay-loading loader"><div class="inner one"></div><div class="inner two"></div><div class="inner three"></div></div>'+
 				'</div>')
 				.hide() // start out hidden
 				.appendTo(layers),
@@ -3145,6 +3148,9 @@ if (typeof jQuery != 'undefined') {
 					'<button aria-controls="transcodeBtn" class="transcoder-disabled" type="button" title="'+_("transcoding disabled")+'"></button>' +
 				'</div>')
 				.appendTo(controls)
+			$('<div class="mejs-button" id="playerBarsLock">' +
+					'<a href="#" aria-controls="playerBarsLockBtn" class="playerBarsLocker playerBarsUnlocked" type="button" title="'+_("Click to pin bars")+'"><i class="glyphicon glyphicon-pushpin"></a>' +
+				'</div>').appendTo(controls)
 			
 			var t = this,
 				stop = 
@@ -3247,7 +3253,7 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
-						if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega) {
+						if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn) {
 							return;
 						}
 						if (x < offset.left) {
@@ -3257,13 +3263,16 @@ if (typeof jQuery != 'undefined') {
 						}
 						pos = x - offset.left;
 						percentage = (pos / width);
-						
 						try {
 							newTime = (percentage <= 0.0001) ? 0 : percentage * mediaDuration;
 						} catch(err) {return;}
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
 							media.setCurrentTime(newTime);
+							mediaCurrentPct = ((pos*100) / width);
+							mediaCurrentTime = newTime;
+							seekAsked = true;
+							mouseIsDown = false;
 							var m = {};
 							var l = currentMedia.link.replace(/&start=(.*)/,'')
 							$('.mejs-overlay,.mejs-overlay-loading').show();
@@ -3279,7 +3288,7 @@ if (typeof jQuery != 'undefined') {
 								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 							}
 							m.title = currentMedia.title;
-							console.log(m)
+							m.cover = currentMedia.cover;
 							startPlay(m);
 						}
 
@@ -3393,7 +3402,7 @@ if (typeof jQuery != 'undefined') {
 						percent = Math.min(1, Math.max(0, percent));
 						// update loaded bar
 						if (t.loaded && t.total && percent !== null) {
-							t.loaded.width(t.total.width() * percent);
+							t.loaded.width(t.total.width() * (percent+mediaCurrentPct));
 						}
 					}
 				} catch(err) {
@@ -3424,7 +3433,7 @@ if (typeof jQuery != 'undefined') {
 					// update bar and handle
 					if (t.total && t.handle) {
 						var 
-							newWidth = Math.round(t.total.width() * t.media.currentTime / mediaDuration),
+							newWidth = Math.round(t.total.width() * (mediaCurrentTime+t.media.currentTime) / mediaDuration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
 						if(t.total.width() < newWidth) {
 							return;
@@ -3435,7 +3444,6 @@ if (typeof jQuery != 'undefined') {
 				}
 			} else {
 				if (t.media.currentTime != undefined && t.media.duration) {
-						
 					// update bar and handle
 					if (t.total && t.handle) {
 						var 
@@ -3521,11 +3529,11 @@ if (typeof jQuery != 'undefined') {
 			if(t.media.duration == Infinity) {
 				t.options.duration = mediaDuration;
 				if (t.currenttime) {
-					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 				}
 			} else {
 				if (t.currenttime) {
-					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 				}
 			}
 		},
@@ -3601,7 +3609,6 @@ if (typeof jQuery != 'undefined') {
 			volumePct = t.container.find('.mejs-volume-pct'),
 
 			positionVolumeHandle = function(volume, secondTry) {
-
 				if (!volumeSlider.is(':visible') && typeof secondTry == 'undefined') {
 					volumeSlider.show();
 					positionVolumeHandle(volume, true);
@@ -3764,7 +3771,7 @@ if (typeof jQuery != 'undefined') {
 
 			if (t.container.is(':visible')) {
 				// set initial volume
-				positionVolumeHandle(player.options.startVolume);
+				positionVolumeHandle(80);
 
 				// mutes the media and sets the volume icon muted if the initial volume is set to 0
         if (player.options.startVolume === 0) {
@@ -3773,7 +3780,7 @@ if (typeof jQuery != 'undefined') {
 
 				// shim gets the startvolume as a parameter, but we have to set it on the native <video> and <audio> elements
 				if (media.pluginType === 'native') {
-					media.setVolume(player.options.startVolume);
+					media.setVolume(80);
 				}
 			}
 		}

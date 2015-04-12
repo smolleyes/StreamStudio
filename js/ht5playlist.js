@@ -31,7 +31,7 @@ function showItems(results) {
 				"icon" : "js/jstree/themes/default/movie_file.png",
 				"data" : {
 					"title" : results[i].title, 
-					"attr" : { "type": "media", "id": results[i]._id, "vid" : results[i].vid, "flink" : results[i].flink, "engine" : results[i].engine, "parent" : parent,"title" : results[i].title } 
+					"attr" : { "type": "media", "id": results[i]._id, "class" : "libraryItem","vid" : results[i].vid, "flink" : results[i].flink, "engine" : results[i].engine, "parent" : parent,"title" : results[i].title } 
 				}
 			}
 			$("#treeview").jstree("create", $("#"+parent+"_rootnode"), "inside",  obj, function() { }, true);
@@ -79,15 +79,6 @@ function onSelectedItem(data) {
 		var id = item.id.value;
 		var title = item.title.value;
 		item.title.value = _('Loading...');
-		var next_vid = '';
-		var next= '';
-		try {
-			next = data.inst._get_next()[0].id;
-			next_vid = $('#'+id+' a')[0].id;
-		} catch(err) {
-			next_vid = '';
-			console.log("no more videos to play in this playlist");
-		}
 		totalResults += 1;
 		itemsCount +=1;
 		var obj = JSON.parse(settings.ht5Player);
@@ -99,12 +90,14 @@ function onSelectedItem(data) {
 			youtube.getVideoInfos('http://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,ext,function(datas) {
 				item.title.value = title;
 				printYtVideoInfos(datas[25], true, false, '', engine);
-				$("#"+vid).click();
+				console.log($("#"+vid))
+				$("#"+vid).find('.start_video').click();
 			});
 		} else if (engine === 'dailymotion'){
 			dailymotion.getVideoInfos(vid,0,1,function(datas) {
 				item.title.value = title;
-				showInfos(datas,next_vid,vid,flink,engine,title)
+				printVideoInfos(datas[0], true, false, '', engine);
+				$("#"+vid).find('.start_video').click();
 			});
 		}
 	} catch(err) {

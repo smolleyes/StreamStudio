@@ -13,15 +13,16 @@ var cSpeed=9;
 	var img = null;
 	
 	function startAnimation(){
-		document.getElementById('spinner').style.backgroundImage='url('+cImageSrc+')';
-		document.getElementById('spinner').style.width=cWidth+'px';
-		document.getElementById('spinner').style.height=cHeight+'px';
-		//FPS = Math.round(100/(maxSpeed+2-speed));
-		FPS = Math.round(100/cSpeed);
-		SECONDS_BETWEEN_FRAMES = 1 / FPS;
-		
-		cPreloaderTimeout=setTimeout('continueAnimation()', SECONDS_BETWEEN_FRAMES/1000);
-		
+		try {
+			document.getElementById('spinner').style.backgroundImage='url('+cImageSrc+')';
+			document.getElementById('spinner').style.width=cWidth+'px';
+			document.getElementById('spinner').style.height=cHeight+'px';
+			//FPS = Math.round(100/(maxSpeed+2-speed));
+			FPS = Math.round(100/cSpeed);
+			SECONDS_BETWEEN_FRAMES = 1 / FPS;
+			
+			cPreloaderTimeout=setTimeout('continueAnimation()', SECONDS_BETWEEN_FRAMES/1000);
+		} catch(err) {}
 	}
 	
 	function continueAnimation(){

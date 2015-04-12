@@ -43,7 +43,6 @@ function insertToDb(type,parent,title,vid,flink,engine) {
 			console.log(title + ' inserted successfully in database');
 			var obj = {
 				"attr" : { "id" : id },
-				"icon" : "js/jstree/themes/default/movie_file.png",
 				"data" : {
 					"title" : title, 
 					"attr" : { "id": id, "vid" : vid, "flink" : flink, "engine" : engine, "parent" : parent  } 
@@ -194,7 +193,7 @@ function loadNodes(results){
 		var type = results[i].type;
 		if (type === 'folder') {
 			var obj = { 
-					"attr" : { id : ''+results[i].title+'_rootnode' },
+					"attr" : { id : ''+results[i].title+'_rootnode',  class : 'firstFolder' },
 					"data" : results[i].title,
 					"children" : []
 			}

@@ -2,6 +2,28 @@ function saveSettings() {
 	localStorage.StdSettings = JSON.stringify(settings);
 }
 
+function showPopup(html,target,cb) {
+	$.magnificPopup.open({
+        items: {
+          src: html+'<div><a href="#" class="mfp-close" style="position:absolute;top:0px;right:20px;font-size:24px;font-weight:bold;">X</a></div>'
+        },
+        type: 'inline',prependTo : $(target),
+        callbacks: {
+        	open: function() {
+        		if(cb) {
+        			return cb();
+        		}
+		    }
+        },
+        closeOnContentClick: false,
+        closeOnBgClick: false,
+        showCloseBtn : false
+        // You may add options here, they're exactly the same as for $.fn.magnificPopup call
+        // Note that some settings that rely on click event (like disableOn or midClick) will not work here
+    }, 0);
+}
+
+
 function getLocalDb(dir,parent) {
 	var fileList = [];
 	fileList.push(dirTree(dir));
@@ -52,7 +74,7 @@ function loadchildrens(childs,parent,close) {
 				if (child.name !== "node_modules") {
 					var nid = Math.floor(Math.random()*1000000);
 					var obj = { 
-						"attr" : { id : ''+nid+'_localSubNode', path : child.path },
+						"attr" : { id : ''+nid+'_localSubNode', path : child.path, class : "firstFolder" },
 						"data" : child.name,
 						"children" : []
 					}
@@ -140,7 +162,7 @@ function downloadFile(link, title, vid, toTorrent) {
 			// Otherwise no redirect; capture the response as normal            
 		} else {
 			pbar.show();
-			$('#progress_' + vid + ' a.cancelD').show();
+			$('#progress_' + vid + ' a.cancel').show();
 			var contentLength = response.headers["content-length"];
 			if (parseInt(contentLength) === 0) {
 				$('#progress_' + vid + ' a.cancelD').hide();
@@ -168,7 +190,7 @@ function downloadFile(link, title, vid, toTorrent) {
 							console.log('successfully deleted ' + target);
 						}
 					});
-					$('#progress_' + vid + ' a.cancelD').hide();
+					$('#progress_' + vid + ' a.cancel').hide();
 					$('#progress_' + vid + ' strong').html(_("Download canceled!"));
 					setTimeout(function() {
 						pbar.hide()
@@ -188,7 +210,7 @@ function downloadFile(link, title, vid, toTorrent) {
 					}
 					$('#progress_' + vid + ' a.open_folder').show();
 					$('#progress_' + vid + ' a.hide_bar').show();
-					$('#progress_' + vid + ' a.cancelD').hide();
+					$('#progress_' + vid + ' a.cancel').hide();
 				}
 			});
 }
@@ -211,7 +233,7 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 	<a href="#" style="display:none;" class="convert" alt="" title="' + _("Convert to mp3") + '"> \
 	<img src="images/video_convert.png"> \
 	</a> \
-	<a href="#" id="cancel_' + vid + '" style="display:none;" class="cancel" alt="" title="' + _("Cancel") + '"> \
+	<a href="#" id="cancel_' + vid + '" style="display:none;" class="cancelD" alt="" title="' + _("Cancel") + '"> \
 	<img src="images/close.png"> \
 	</a> \
 	<a class="open_folder" style="display:none;" title="' + _("Open Download folder") + '" href="#">\
@@ -338,7 +360,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 	<a href="#" style="display:none;" class="convert" alt="" title="' + _("Convert to mp3") + '"> \
 	<img src="images/video_convert.png"> \
 	</a> \
-	<a href="#" id="cancel_' + vid + '" style="display:none;" class="cancel" alt="" title="' + _("Cancel") + '"> \
+	<a href="#" id="cancel_' + vid + '" style="display:none;" class="cancelD" alt="" title="' + _("Cancel") + '"> \
 	<img src="images/close.png"> \
 	</a> \
 	<a class="open_folder" style="display:none;" title="' + _("Open Download folder") + '" href="#">\
@@ -518,10 +540,24 @@ function askSaveTorrent() {
 		});
 }
 
-function stopTorrent(res) {
-	wipeTmpFolder();
+function stopTorrent(restart,data) {
 	torrentPlaying = false;
+	mediaCurrentTime = 0;
+	mediaDuration = 0;
+	mediaCurrentPct = 0;
+	seekAsked = false;
 	$('#downloadStats').empty();
+	try {
+		videoStreamer.deselect()
+		videoStreamer.files.pop()
+		videoStreamer.selection.forEach(function(sel){
+			videoStreamer.selection.pop();
+		})
+		videoStreamer.swarm.destroy()
+		videoStreamer.destroy();
+		videoStreamer = null;
+		wipeTmpFolder();
+	} catch(err) {}
 	if(torrentsArr.length > 0) {
 		$.each(torrentsArr,function(index,torrent) {
 			try {
@@ -539,12 +575,13 @@ function stopTorrent(res) {
 	try {
 		torrentPlaying = false;
 		clearTimeout(statsUpdater);
-		videoStreamer.destroy();
-		videoStreamer = null;
 		streamInfo = {};
 		statsUpdater = null;
 		playStarted = false;
-	} catch(err) { torrentPlaying = false;}
+	} catch(err) { 
+		console.log(err)
+		torrentPlaying = false;
+	}
 
 	player.currentTime = 0;
 	player.current[0].style.width = 0;
@@ -559,6 +596,9 @@ function stopTorrent(res) {
 	$(".mejs-overlay").show();
 	$(".mejs-layer").show();
 	$(".mejs-overlay-loading").hide();
+	if(restart) {
+		getTorrent(data);
+	}
 }
 
 // get user HOMEDIR
@@ -566,7 +606,7 @@ function getUserHome() {
 	return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 }
 
-function getAuthTorrent(url,stream,toFbx) {
+function getAuthTorrent(url,stream,toFbx,cover) {
 	if(url.indexOf('magnet:?xt') !== -1) {
 		if(stream) {
 			getTorrent(url);
@@ -586,9 +626,13 @@ function getAuthTorrent(url,stream,toFbx) {
 				var fileReader = new FileReader();
 				fileReader.onload = function() {
 					arrayBuffer = this.result;
-					var nodeBuffer = new Buffer(arrayBuffer);
+					var nodeBuffer = new Buffer(arrayBuffer,'binary');
 					if(stream) {
-						getTorrent(nodeBuffer);
+						if(cover){
+							getTorrent(nodeBuffer,cover);
+						} else {
+							getTorrent(nodeBuffer);
+						}
 					} else {
 						var id = ((Math.random() * 1e6) | 0);
 						var p = path.join(os.tmpDir(),''+id+'.torrent');
@@ -617,15 +661,15 @@ function getAuthTorrent(url,stream,toFbx) {
 								gui.Shell.openItem(p);
 							}
 						});
-}
-}
-fileReader.readAsBinaryString(blob);
-}
-}
-xhr.open('GET', url);
-xhr.responseType = 'blob';
-xhr.send();
-}	
+					}
+				}
+				fileReader.readAsBinaryString(blob);
+			}
+		}
+		xhr.open('GET', url);
+		xhr.responseType = 'blob';
+		xhr.send();
+	}	
 }
 
 function dirTree(filename) {

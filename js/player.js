@@ -126,6 +126,7 @@ $(document).ready(function() {
     
     // player signals
     player.media.addEventListener('ended', function() {
+    	console.log('media finished')
         updateMiniPlayer();
         on_media_finished();
 		$('.mejs-overlay-play').show();
@@ -178,7 +179,7 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega) {
+		if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn) {
 			return;
 		}
 		var pos = e.offsetX;
@@ -186,6 +187,9 @@ $(document).ready(function() {
 		var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
 		console.log(pct + "%")
 		var newTime = Math.round((duree * pct) / 100);
+		mediaCurrentTime = newTime;
+		mediaCurrentPct = (( pos * 100) / $('#progress-bar').width());
+		seekAsked = true;
 		if(transcoderEnabled || playFromYoutube) {
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
@@ -202,6 +206,7 @@ $(document).ready(function() {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 			}
 			m.title = currentMedia.title;
+			m.cover = currentMedia.cover;
 			startPlay(m);
 		} else {
 			player.setCurrentTime(newTime)
@@ -218,12 +223,32 @@ $(document).ready(function() {
         $('#playerTopBar').hide();
         $('#tab a[href="#tabpage_'+activeTab+'"]').click();
     });
-	
+
+    // pin player bars
+    $(document).on('click', '.playerBarsLocker', function(e) {
+        e.preventDefault();
+        if(playerBarsLocked) {
+        	playerBarsLocked = false;
+        	$(this).removeClass('playerBarsLocked').addClass('playerBarsUnlocked');
+        	$(this).attr('title',_("Click to pin bars"));
+        } else {
+        	playerBarsLocked = true;
+        	$(this).removeClass('playerBarsUnlocked').addClass('playerBarsLocked');
+        	$(this).attr('title',_("Click to unpin bars"));
+        }
+    });
+	$('.mejs-volume-current').css('height','80');
+	$('.mejs-volume-handle').css('top','20')
+    $('.mejs-volume-pct').text('80%')
 });
 
 
 function initPlayer() {
 	// clean subtitles
+	mediaCurrentTime = 0;
+	mediaDuration = 0;
+	mediaCurrentPct = 0;
+	seekAsked = false;
 	try {
 		$('.mejs-captions-button').remove();
 		$('.mejs-captions-layer').remove();
@@ -250,36 +275,26 @@ function initPlayer() {
 		}
 	} catch (err) {}
     // stop external players
-	try {
-		if(extPlayerRunning) {
-			var pid = extPlayerProc.pid+1;
-			psnode.kill(pid, function( err ) {
-				if (err) {
-					psnode.kill(extPlayerProc.pid, function( err ) {
-						if (err) {
-						    psnode.kill(pid+2, function( err ) {
-								if (err) {
-								    throw new Error('');
-								}
-								else {
-								    console.log( 'Process %s has been killed!', pid );
-								    extPlayerRunning = false;
-								}
-							});
-						}
-						else {
-						    console.log( 'Process %s has been killed!', pid );
-						    extPlayerRunning = false;
-						}
-					});
-				}
-				else {
-				    console.log( 'Process %s has been killed!', pid );
-				    extPlayerRunning = false;
-				}
+	if(extPlayerRunning) {
+		try {
+			if(os.platform == "win32") {
+				var playerPath = path.basename(JSON.parse(settings.ht5Player).path);
+			} else {
+				var playerPath = JSON.parse(settings.ht5Player).path;
+			}
+			var pid = 0;
+			psnode.lookup({command:''+playerPath+''},function(err,res){
+				pid = res[0].pid;
+				// kill the process
+				extPlayerProc.kill();
+				psnode.kill(pid, function( err ) {
+					if (err); throw err;
+					console.log( 'Process %s has been killed!', pid );
+					extPlayerRunning = false;
+				});
 			});
-		}
-	} catch(err) {}
+		} catch(err){};
+	}
 	// reinit internal player
     player.pause();
     player.setSrc('');
@@ -308,11 +323,18 @@ function initPlayer() {
 
 function updateMiniPlayer() {
 	var img = null;
+	if($('#subPlayer-title').text() !== currentMedia.title) {
+		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
+	}
 	try {
 		try {
 			img = $('.highlight img')[0].src;
 		}catch(err) {
-			img = $('.list-row.well img')[0].src;
+			try {
+				img = $('.list-row.well img')[0].src;
+			} catch(err) {
+				img = currentMedia.cover;
+			}
 		}
 		if (img && img !== $('#subPlayer-img').attr('src') && activeTab !== 3 && activeTab !== 5) {
 			$('#subPlayer-img').attr('src',img);
@@ -326,6 +348,7 @@ function updateMiniPlayer() {
 
 function startPlay(media) {
 	ffmpegLive = false;
+	transcoderEnabled = false;
 	if(upnpMediaPlaying || playFromUpnp) {
 		play_next = true;
 	}
@@ -349,37 +372,24 @@ function startPlay(media) {
 	}
     if(extPlayerRunning) {
 		try {
-			var pid = extPlayerProc.pid+1;
-			psnode.kill(pid, function( err ) {
-				if (err) {
-					psnode.kill(extPlayerProc.pid, function( err ) {
-						if (err) {
-						    psnode.kill(pid+2, function( err ) {
-								if (err) {
-								    throw new Error('');
-								}
-								else {
-								    console.log( 'Process %s has been killed!', pid );
-								    extPlayerRunning = false;
-								}
-							});
-						}
-						else {
-						    console.log( 'Process %s has been killed!', pid );
-						    extPlayerRunning = false;
-						}
-					});
-				}
-				else {
-				    console.log( 'Process %s has been killed!', pid );
-				    extPlayerRunning = false;
-				}
+			var playerPath = path.basename(JSON.parse(settings.ht5Player).path);
+			var pid = 0;
+			console.log(playerPath)
+			psnode.lookup({command:''+playerPath+''},function(err,res){
+				pid = res[0].pid;
+				// kill the process
+				extPlayerProc.kill();
+				psnode.kill(pid, function( err ) {
+					if (err); throw err;
+					console.log( 'Process %s has been killed!', pid );
+					extPlayerRunning = false;
+					setTimeout(function() {
+						startPlay(media);
+						extPlayerRunning = false;
+					},1000);
+					return;
+				});
 			});
-			setTimeout(function() {
-				startPlay(media);
-				extPlayerRunning = false;
-			},1000);
-			return;
 		} catch(err){};
 	}
     
@@ -404,7 +414,7 @@ function startPlay(media) {
 		console.log(link)
         var title = media.title;
         currentMedia = media;
-        currentMedia.link = link;
+        currentMedia.link = link.trim();
         
         // set title
         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(title));
@@ -508,8 +518,9 @@ function startPlay(media) {
 }
 
 function launchPlay() {
+	seekAsked = false;
+	var obj = JSON.parse(settings.ht5Player);
 	try {
-		var obj = JSON.parse(settings.ht5Player);
 		if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
 			if(doNotSwitch) {
 				doNotSwitch = false;
@@ -526,7 +537,8 @@ function launchPlay() {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	// transcoding by default
-	if(transcoderEnabled && !upnpTranscoding || !upnpToggleOn && os.cpus().length > 2 || upnpToggleOn && upnpTranscoding) {
+	// && currentMedia.title.indexOf('.avi') !== -1
+	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && currentMedia.title.indexOf('.avi') !== -1) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
@@ -551,12 +563,19 @@ function launchPlay() {
 				currentMedia.type = "object.item.videoItem";
 			}
 		}
-		playUpnpRenderer(currentMedia);
+		if(mediaRendererType == 'upnp') {
+			playUpnpRenderer(currentMedia);
+		} else {
+			if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.title.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') !== -1) {
+				var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
+				currentMedia.link = link;
+			}
+			mediaRenderer.play(currentMedia.link);
+		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
 	} else {
-		var obj = JSON.parse(settings.ht5Player);
 		var link = currentMedia.link;
 		if(obj.name === 'StreamStudio') {
 			player.setSrc(currentMedia.link);
@@ -577,11 +596,10 @@ function launchPlay() {
 function startExtPlayer(obj) {
 	var link = decodeURIComponent(currentMedia.link).trim();
 	var cpath = obj.path;
-	if(process.platform === 'win32') {
-		link = link.replace(' ', '\\ ');
-		cpath = obj.path.replace(' ', '\\ ');
+	if(process.platform === 'win32' && playFromFile) {
+		link = link.replace(/\/\//g, '\\\\');
 	}
-	extPlayerProc = cp.exec("'"+cpath+"'"+' '+'"'+link+'"',{maxBuffer: 1024*1024*1024},function (error, stdout, stderr) {
+	extPlayerProc = cp.exec('"'+cpath+'"'+' '+'"'+link+'"',{maxBuffer: 1024*1024*1024},function (error, stdout, stderr) {
 	    console.log('stdout: ' + stdout);
 	    console.log('stderr: ' + stderr);
 	    if (error !== null) {
@@ -653,66 +671,75 @@ function playNextVideo(vid_id) {
 }
 
 function getNext() {
+	initPlayer()
     if (activeTab == 1) {
 		try {
 			engine.play_next();
 		} catch(err) {
-			try {
-				$('.highlight').closest('li').next().find('a')[0].click();
-			} catch (err) {
+			if(search_engine == 'youtube' || search_engine == 'dailymotion') {
 				try {
-					$('.highlight').closest('li').next().find('a.preload')[0].click();
+					$('.highlight').closest('.youtube_item').next().find('.coverPlayImg').click()
 				} catch (err) {
-					try {
-						$('.highlight').closest('div.youtube_item').next().find('a.start_video').click()
-					} catch (err) {
-						playNextVideo(next_vid);
-					}
+					playNextVideo(next_vid);
 				}
+			} else {
+				try {
+					$('.highlight').closest('li').next().find('.coverPlayImg').click()
+				} catch (err) {}
 			}
 		}
 	} else {
-		try {
-			// have next node ? 
-			if($('.jstree-clicked').closest('li').next('li').length > 0) {
-				// we have another node, check if we have a folder or media
-				if($('.jstree-clicked').closest('li').next('li').attr('id').indexOf('SubNode') == -1) {
-					// media file, play it...
-					$('.jstree-clicked').closest('li').next('li').find('a').click();
-				} else {
-					// have a dir, open it
-					$('.jstree-clicked').closest('li').next('li').find('a').click();
-					setTimeout(function(){
-						getNext();
-					},2000);
-				}
-			} else {
-				//check if we are in a sub node
-				while($('.jstree-clicked').closest('ul').parent().attr('id').indexOf('SubNode') !== -1){
-					if($('.jstree-clicked').closest('ul').parent().closest('li').next('li').length > 0) {
-						$('.jstree-clicked').closest('ul').parent().closest('li').next('li').find('a').first().click(); 
-						setTimeout(function(){ 
+		if($('.highlight').is('tr')) {
+			try {
+				$('.highlight').next().find("a").click();
+			} catch(err) {
+				console.log("no more torrents to play...");
+				initPlayer();
+			}
+		} else {
+			try {
+				// have next node ? 
+				if($('.jstree-clicked').closest('li').next('li').length > 0) {
+					// we have another node, check if we have a folder or media
+					if($('.jstree-clicked').closest('li').next('li').attr('id').indexOf('SubNode') == -1) {
+						// media file, play it...
+						$('.jstree-clicked').closest('li').next('li').find('a').click();
+					} else {
+						// have a dir, open it
+						$('.jstree-clicked').closest('li').next('li').find('a').click();
+						setTimeout(function(){
 							getNext();
 						},2000);
-						break;
-					} else {
-						console.log("no more videos to play in the playlists");
-						break;
+					}
+				} else {
+					//check if we are in a sub node
+					while($('.jstree-clicked').closest('ul').parent().attr('id').indexOf('SubNode') !== -1){
+						if($('.jstree-clicked').closest('ul').parent().closest('li').next('li').length > 0) {
+							$('.jstree-clicked').closest('ul').parent().closest('li').next('li').find('a').first().click(); 
+							setTimeout(function(){ 
+								getNext();
+							},2000);
+							break;
+						} else {
+							console.log("no more videos to play in the playlists");
+							break;
+						}
 					}
 				}
-			}
-		} catch(err) {} 
+			} catch(err) {}
+		}
 	}
 }
 
 function getPrev() {
+	initPlayer()
     if (activeTab == 1) {
-		try {
-			$('.highlight').closest('li').prev().find('a')[0].click();
-		} catch (err) {
+		if(search_engine == 'youtube' || search_engine == 'dailymotion') {
+			$('.highlight').closest('.youtube_item').prev().find('.coverPlayImg').click()
+		} else {
 			try {
-				$('.highlight').closest('div.youtube_item').prev().find('a.start_video').click()
-			} catch(err) {}
+				$('.highlight').closest('li').prev().find('.coverPlayImg').click()
+			} catch (err) {}
 		}
 	} else {
 		try {
@@ -750,7 +777,7 @@ function getPrev() {
 
 function on_media_finished(){
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
-	if (playlistMode === 'normal') {
+	if (playlistMode === 'normal' && !seekAsked) {
 		initPlayer();
 	} else if (playlistMode === 'loop') {
 		if(upnpToggleOn) {
@@ -775,10 +802,10 @@ function on_media_finished(){
 
 function updateProgressBar() {
    var progressBar = document.getElementById('progress-bar');
-   var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
+   var duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
    var current = player.media.currentTime;
    try {
-	   var percentage = ((100 / duree) * current);
+   		var percentage = ((100 / duree) * (current+mediaCurrentTime));
 		progressBar.value = percentage;
 	} catch(err) {}
 }

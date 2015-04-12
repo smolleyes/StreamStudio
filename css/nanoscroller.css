@@ -1,9 +1,8 @@
 /** initial setup **/
 .nano {
   position : relative;
-  width    : calc(100% - 5px);
   overflow : hidden;
-  height: calc(100% - 182px);
+  height: calc(100% - 191px);
   overflow: hidden;
 }
 .nano > .nano-content {
@@ -14,6 +13,7 @@
   right         : 0;
   bottom        : 0;
   left          : 0;
+  background-size: 100% !important;
 }
 .nano > .nano-content:focus {
   outline: thin dotted;

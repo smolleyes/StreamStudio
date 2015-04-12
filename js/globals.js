@@ -1,4 +1,4 @@
-var VERSION = "1.29.6";
+var VERSION = "2.0";
 
 var path = require('path');
 var fs = require('fs');
@@ -32,6 +32,13 @@ var rmdir = require('rmdir');
 var psnode = require('ps-node');
 var Iterator = require('iterator').Iterator;
 var sanitize = require("sanitize-filename");
+var events = require("events");
+var EventEmitter = require("events").EventEmitter;
+// set custom events
+var updateTimer = new EventEmitter();
+updateTimer.on("timeupdate", function () {
+    updateProgressBar()
+});
 
 var Jq = $;
 //engines
@@ -94,8 +101,16 @@ var enginesList = [];
 var saveTorrent = false;
 var torrentSaved = false;
 var upnpTranscoding = false;
+var mediaCurrentTime = 0;
+var mediaCurrentPct = 0;
+var seekAsked = false;
+var playerBarsLocked = false;
+var mediaRendererType = 'upnp';
 //storedb
 var sdb = storedb('std');
+var seriesDb = storedb('seriesDb');
+var moviesDb = storedb('moviesDb');
+var seriesUpdated = false;
 
 //checks
 temp.mkdir(function(err,path){
@@ -111,6 +126,7 @@ if (process.platform === 'win32') {
     var cdir = process.env.APPDATA+'/StreamStudio';
     confDir = cdir.replace(/\\/g,'//');
     if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
+    if( ! fs.existsSync(confDir+'//images') ) { mkdirp(confDir+'//images'); }
     livestreamerPath = execDir+'/livestreamer/livestreamer.exe';
     ffmpegPath = execDir + '/ffmpeg.exe';
     
@@ -118,6 +134,7 @@ if (process.platform === 'win32') {
     confDir = getUserHome()+'/.config/StreamStudio';
     ffmpegPath = execDir + '/ffmpeg';
     if( ! fs.existsSync(confDir) ) { mkdirp(confDir); }
+    if( ! fs.existsSync(confDir+'/images') ) { mkdirp(confDir+'/images'); }
     // livestreamer
     fs.exists('/usr/bin/livestreamer',function(res) {
 		if(res) {

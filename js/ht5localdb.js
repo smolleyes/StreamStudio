@@ -148,7 +148,7 @@ function scanForDirs(dir,parent,list) {
 				if (fs.lstatSync(target).isDirectory()) {
 					var id = Math.floor(Math.random()*1000000);
 					var obj = { 
-						"attr" : { id : ''+id+'_rootnode' },
+						"attr" : { id : ''+id+'_rootnode', class : 'firstFolder' },
 						"data" : path.basename(target),
 						"children" : []
 					}
