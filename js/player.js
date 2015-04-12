@@ -28,6 +28,7 @@ var playFromYoutube = false;
 var playFromDailymotionLive = false;
 var doNotSwitch = false;
 var currentMedia = {};
+var ChromecastInterval;
 
 $(document).ready(function() {
 	
@@ -566,11 +567,37 @@ function launchPlay() {
 		if(mediaRendererType == 'upnp') {
 			playUpnpRenderer(currentMedia);
 		} else {
-			if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.title.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') !== -1) {
+			if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.title.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') == -1 || currentMedia.title.toLowerCase().indexOf('ac3') !== -1 || currentMedia.title.toLowerCase().indexOf('dts') !== -1) {
 				var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 				currentMedia.link = link;
 			}
-			mediaRenderer.play(currentMedia.link);
+			mediaRenderer.play(currentMedia.link,null,null,win.window);
+			if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+				mediaRenderer.on('status',function(status) {
+					if(status.playerState == 'IDLE') {
+						//clearInterval(ChromecastInterval);
+						initPlayer();
+					} else if(status.playerState == 'PLAYING') {
+						$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+						if($('#fbxMsg2').length == 0) {
+							//ChromecastInterval = setInterval(getChromeCastPos,1000);
+							if(currentMedia.cover) {
+								$('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
+								$('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your Chromecast device !")+'</p>')
+							} else {
+								$('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;">'+currentMedia.title+' <br/> '+_("Playing on your Chromecast device !")+'</p>')
+							}
+	                    }
+					} else if(status.playerState == 'BUFFERING') {
+						$('#fbxMsg2').remove();
+						$('.mejs-overlay,.mejs-overlay-loading').show()
+						$('.mejs-overlay-play').hide()
+					}
+				});
+			} else {
+				$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+				$('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+currentMedia.title+' <br/> '+_("Playing on your Chromecast device !")+'</p>')
+			}
 		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
@@ -591,6 +618,10 @@ function launchPlay() {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
 	}
+}
+
+function getChromeCastPos() {
+	mediaRenderer.getStatus(function(data){console.log(data)})
 }
 
 function startExtPlayer(obj) {
