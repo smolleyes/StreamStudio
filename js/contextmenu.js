@@ -35,7 +35,7 @@ $(document).ready(function() {
         } else if (text.indexOf('magnet:?xt') !== -1){
             $('#custom-menu ol').empty().append('<li><a id="magnet_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open Magnet")+'</a></li>');
         } else {
-			if(text !== '' && decodeURIComponent(text).match(/^(http|https)/) !== null && decodeURIComponent(text).indexOf('watch?v=') == -1) {
+			if(text !== '' && decodeURIComponent(text).match(/^(http|https)/) !== null && decodeURIComponent(text).indexOf('youtu') == -1) {
 				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
 			}
 		}
@@ -132,19 +132,25 @@ $(document).ready(function() {
 		if(obj.name !== 'StreamStudio'){
 			ext = true;
 		}
-		youtube.getVideoInfos(ytlink,1,1,upnpToggleOn,ext, function(datas){
-			console.log(datas)
-			printYtVideoInfos(datas[25], true, false, '', engine);
+		console.log(ytlink)
+		try {
+			vid = ytlink.match(/.*v=(.*)?&/)[1]
+		} catch(err) {
 			try {
-				vid = ytlink.match('.*v=(.*)?&')[1]
+				vid = ytlink.match(/.*v=(.*)/)[1];
 			} catch(err) {
 				try {
-					vid = ytlink.match('.*v=(.*)')[1];
+					vid = ytlink.match(/.*youtu.be\/(.*)/)[1];
 				} catch(err) {
 					return null;
 				}
 			}
-			$("#"+vid).click();
+		}
+		console.log(vid)
+		youtube.getVideoInfos('https://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,ext,function(datas) {
+			printYtVideoInfos(datas[25], true, false, '', 'youtube');
+			console.log($("#"+vid))
+			$("#"+vid).find('.start_video').click();
 		});
 		$('#custom-menu').slideUp();
 	});
@@ -245,13 +251,18 @@ function getYtlinkFromClipboard() {
 	var text = clipboard.get('text');
 	try {
 		vid = text.match('.*v=(.*)?&')[1]
-		return "www.youtube.com/watch?v="+vid;
+		return "https://www.youtube.com/watch?v="+vid;
 	} catch(err) {
 		try {
 			vid = text.match('.*v=(.*)')[1];
-			return "www.youtube.com/watch?v="+vid;
+			return "https://www.youtube.com/watch?v="+vid;
 		} catch(err) {
-			return null;
+			try {
+				vid = text.match('youtu.be/(.*)')[1];
+				return "https://www.youtube.com/watch?v="+vid;
+			} catch(err) {
+				return null;
+			}
 		}
 	console.log('youtube id: ' + vid);
 	}

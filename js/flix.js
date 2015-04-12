@@ -253,7 +253,7 @@ app.updateStats = function(streamInfo) {
 			  //clearTimeout(statsUpdater);
         try { $('#fbxMsg2').remove(); } catch(err) {}
         $('.mejs-container').append('<div id="fbxMsg2" class="preloadingMsg" style="height:calc(100% - 60px);"><div style="top:62%;position: relative;"><p style="font-weight:bold;text-align: center;">'+_("Please wait while loading your video... (Can take a few seconds)")+'</p></div></div>');
-			  startPlay(stream);
+        startPlay(stream);
         playStarted = true;
      } else {
       torrentSrc = videoStreamer.path;

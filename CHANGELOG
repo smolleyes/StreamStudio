@@ -1,3 +1,7 @@
+V 2.0.3
+  * better chromecast support
+  * fix open youtube link add youtu.be support 
+
 V 2.0.2
   * gui update
   * fix serie update bug

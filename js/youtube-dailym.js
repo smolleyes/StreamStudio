@@ -790,7 +790,12 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
     		} else {
     			author = aut;
     		}
-            var date = infos.uploaded.match(/(.*)?T/)[1];
+            var date = '';
+            try {
+                date = infos.uploaded.match(/(.*)?T/)[1];
+            } catch(err) {
+
+            }
 		} else {
             soloCss = 'none;'; 
         }
