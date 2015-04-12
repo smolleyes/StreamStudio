@@ -2169,7 +2169,7 @@ hr {
 
 #seriesContainer {
 	height: 100%;
-	background-size: 100% calc(100% - 153px) !important;
+	background-size: 100% calc(100% - 120px) !important;
 }
 
 #seriesContainer h3 {

@@ -238,7 +238,7 @@ function loadSerie(id) {
 				}
 				if(num == Object.keys(serie.seasons).length) {
 					$('#seasonsList .btn')[0].click();
-					$('#seriesContainer .row').css('height','calc(100% - '+ parseInt(125 + $("#seasonsList").height())+'px)');
+					$('#seriesContainer .row').css('height','calc(100% - '+ parseInt(65 + $("#seasonsList").height())+'px)');
 					var rating = parseInt(serie.infos.Rating) / 2;
 					$('#raty').raty({ 
 						score:rating,

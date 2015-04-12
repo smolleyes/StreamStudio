@@ -1,7 +1,11 @@
+v 2.0.1
+  * small fix
+ 
 V 2.0
   * New gui design
   * update to nwjs 12 with custom codecs (now support hevc/ac3/dts... natively)
   * new favorites system to add and manage you series automatically
+  * add chromecast support
   * livestreamer updated
   * ffmpeg updated
   * many bug fix and optimisations
