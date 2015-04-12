@@ -1,3 +1,6 @@
+V 2.0.4
+  * fix twitch upnp
+
 V 2.0.3
   * better chromecast support
   * fix open youtube link add youtu.be support 

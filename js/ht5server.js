@@ -4,7 +4,9 @@ var stArr = [];
 function startHt5Server() {
 	ht5Server = http.createServer(function(req, res) {
 		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
-            cleanffar();
+            if(upnpToggleOn && mediaRendererType == "chromecast") {
+                cleanffar();
+            }
 			startStreaming(req, res)
 		}
 	}).listen(8887);
@@ -414,12 +416,12 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if(seekTo !== 0) {
 		start = seekTo;
 	}
-	if(!upnpToggleOn) {
+	if(!upnpToggleOn && search_engine !== 'twitch') {
 		link = decodeURIComponent(link);
         audio = 'copy';
 	} else {
         audio = 'libvorbis';
-    }
+    } 
 	if (host === undefined || link !== '') {
 		//local file...
 		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
