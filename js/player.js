@@ -545,14 +545,14 @@ function launchPlay() {
 	}
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && currentMedia.title.indexOf('.avi') !== -1) {
+	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
 	}
 
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' || currentMedia.link.indexOf('mega.co') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.co') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
