@@ -74,3 +74,17 @@ onload = function() {
 win.on('loaded', function() {
     win.show();
 });
+
+win.on('new-win-policy', newWinPolicyHandler);
+
+function newWinPolicyHandler(frame, url, policy) {
+    policy.setNewWindowManifest({
+        position: 'center',
+        frame: true,
+        focus: true,
+        toolbar:false,
+        title:'StreamStudio',
+        width:800,
+        height:600
+    });
+}

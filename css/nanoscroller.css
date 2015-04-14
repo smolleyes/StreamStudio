@@ -43,7 +43,8 @@
 }
 .nano > .nano-pane > .nano-slider {
   background: #444;
-  background: rgba(0,0,0,.5);
+    background: rgba(135, 135, 136, 1);
+  border: 0.1em solid rgba(0, 0, 0, 0.89) !important;
   position              : relative;
   margin                : 0 1px;
   -moz-border-radius    : 3px;

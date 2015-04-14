@@ -462,6 +462,9 @@ function main() {
     // win headers
     win.isMaximized = false;
     // Min
+    $('#windowControlMinimize').attr('title',_("Minimize"));
+    $('#windowControlMaximize').attr('title',_("Maximize"));
+    $('#windowControlClose').attr('title',_("Close"));
     $(document).on('click','#windowControlMinimize',function(e) {
         e.preventDefault()
         win.minimize();

@@ -12,5 +12,5 @@
     "show": false,
     "frame":false
   },
-  "chromium-args": "--ignore-gpu-blacklist"
+  "chromium-args": "--ignore-gpu-blacklist --disable-gpu-sandbox --blacklist-accelerated-compositing"
 }
