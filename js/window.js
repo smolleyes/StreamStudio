@@ -16,13 +16,7 @@ onload = function() {
                         extPlayerRunning = false;
                     }
                 });
-
             } catch(err) {}
-            
-            if (playAirMedia === true) {
-                login(stop_on_fbx);
-            }
-            // clean torrent dir
             try {
                 fs.unlinkSync(tmpFolder);
             } catch(err) {}
@@ -33,42 +27,40 @@ onload = function() {
             $.each(engines, function(key, value) {
                 var page = value.page;
                 if (page !== undefined) {
-                    try {
-                        page.hide();
-                        page.close(true);
-                    } catch (err) {
-                        console.log(err);
-                        if (playAirMedia === true) {
-                            login(stop_on_fbx);
-                        }
+                    if (upnpMediaPlaying || playFromUpnp) {
                         try {
-                            page.close(true);
-                        } catch (err) {
-                            process.exit();
-                            if (playAirMedia === true) {
-                                login(stop_on_fbx);
-                            }
-                        }
+                            mediaRenderer.stop();
+                        } catch(err) { }
                     }
                 }
             });
-            win.hide();
-            win.close(true);
-            process.exit();
+            try {
+                gui.App.closeAllWindows()
+                process.exit()
+                gui.App.quit();
+            } catch(err) {
+                process.exit()
+                gui.App.quit();
+            }
         });
     } catch (err) {
-        try {
-            if (playAirMedia === true) {
-                login(stop_on_fbx);
-            }
-        } catch (err) {}
+        if (upnpMediaPlaying || playFromUpnp) {
+            try {
+                mediaRenderer.stop();
+            } catch(err) { }
+        }
         try {
             fs.unlinkSync(tmpFolder);
         } catch(err) {}
         // clean torrent dir
-        win.hide();
-        win.close(true);
-        process.exit();
+        try {
+            gui.App.closeAllWindows()
+            process.exit()
+            gui.App.quit();
+        } catch(err) {
+            process.exit()
+            gui.App.quit();
+        }
     }
 }
 

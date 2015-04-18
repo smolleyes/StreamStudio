@@ -2,6 +2,7 @@
   "name": "StreamStudio",
   "main": "index.html",
   "user-agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.157 Safari/537.36",
+  "page-cache" : true,
   "window": {
     "icon": "setup-images/48x48/streamstudio.png",
     "toolbar": false,

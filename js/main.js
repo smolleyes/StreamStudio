@@ -1049,6 +1049,7 @@ function main() {
         $("#dateTypes_select ul").empty();
         $("#dateTypes_select").hide();
         $("#dateTypes_label").hide();
+        $("#duration_select ul").hide();
         $("#duration_select").hide();
         $("#duration_label").hide();
         $("#searchFilters_select ul").empty();
@@ -1301,7 +1302,8 @@ function main() {
             <li><a href="#" data-value="this_week">' + _("This week") + '</a></li> \
             <li><a href="#" data-value="this_month">' + _("This month") + '</a></li> \
             <li><a href="#" data-value="all_time">' + _("All time") + '</a></li>';
-                $('#dateTypes_select ul').empty().append(html).show();
+                $('#dateTypes_select').show();
+                $('#dateTypes_select ul').empty().append(html);
                 $('#dateTypes_select a.active').click();
                 $('#dateTypes_label').show();
                 $('#duration_label').hide();
