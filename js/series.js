@@ -1,5 +1,6 @@
 var Iterator = require('iterator').Iterator;
 var pt = require('parse-torrent');
+var subEngine = require('popcorn-opensubtitles');
 
 $(document).off('mouseenter', '#seriesContainer .serieItem');
 $(document).on('mouseenter', '#seriesContainer .serieItem', function(e) {
@@ -71,7 +72,53 @@ $(document).on('click', '.removeSerie', function(e) {
 $(document).on('click', '.openTorrent', function(e) {
     var obj = JSON.parse(decodeURIComponent($(this).attr('data')));
     if (obj.engine == "eztv") {
-        getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
+        var query = {
+            imdbid: obj.imdbId,
+            season: obj.season,
+            episode: obj.episode,
+            filename: ''
+        };
+        $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+        $('#preloadTorrent').remove();
+        $('.mejs-container').append('<div id="preloadTorrent" \
+          style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
+          <p><b id="preloadProgress">'+_("Loading your torrent, please wait...")+'</b></p> \
+          <div id="torrLoader">  \
+          <div id="lemon"></div>  \
+            <div id="straw"></div>  \
+            <div id="glass">  \
+                <div id="cubes">  \
+                    <div style="display:none;"></div>  \
+                    <div style="display:none;"></div>  \
+                    <div style="display:none;"></div>  \
+                </div>  \
+                <div id="drink"></div>  \
+                <span id="counter"></span>  \
+            </div>  \
+            <div id="coaster"></div>  \
+        </div> \
+        <div id="peerStats"></div></div>');
+        $('#preloadProgress').empty().append(_('Downloading subtitles, please wait...'));
+        cleanSubTitles();
+        subEngine.searchEpisode(query, 'OSTestUserAgent')
+            .then(function(data) {
+                var i = 1;
+                Object.keys(data).forEach(function (prop) {
+                    if(prop == settings.subLanguage)  {
+                        var link = data[settings.subLanguage].url
+                        var target = execDir+'/subtitles/'+settings.subLanguage+'.srt';
+                        download(target,link,function(err,data){
+                            console.log('subtitle for '+settings.subLanguage+' downloaded')
+                        })
+                    }
+                    if(i == Object.keys(data).length) {
+                        getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
+                    }
+                    i++;
+                });
+            }).fail(function(error) {
+                getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
+        });
     } else {
         getAuthTorrent(obj.torrentLink, true, false, obj.cover);
     }
@@ -137,6 +184,23 @@ $(document).on('click', '.newEpisode', function(e) {
         });
     });
 })
+
+function download (localFile, remotePath, callback) {
+    var localStream = fs.createWriteStream(localFile);
+    var out = request({ uri: remotePath });
+    out.on('response', function (resp) {
+        console.log(resp)
+        if (resp.statusCode === 200){
+            out.pipe(localStream);
+            localStream.on('close', function () {
+                callback(null, localFile);
+            });
+        }
+        else {
+            callback(new Error("No file found at given url."),null);
+        }
+    })
+};
 
 function searchSerie() {
     var query = $("#searchSerieByName").val()
@@ -272,6 +336,7 @@ function loadSeasonTable(id, num) {
         var count = 1;
         var infos = list[0];
         $.each(list[0].seasons[num]['episode'], function(i, file) {
+            file.imdbId = infos.eztvId;
             file.cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
             if (list[0].engine == "eztv") {
                 file.engine = 'eztv';

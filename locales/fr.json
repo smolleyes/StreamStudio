@@ -262,5 +262,7 @@
 	"You can find informations on how to use StreamStudio in the <a class=\"open_in_browser\" href=\"http://wiki.streamstudio.me\">wiki</a><br/>         Since we don't have a specific forum yet, please report any bug <a class=\"open_in_browser\" href=\"http://forum.ubuntu-fr.org/viewtopic.php?id=1299461\">here</a> or by mail <a class=\"open_in_browser\" href=\"mailto:staff@streamstudio.me\">here</a><br/>         (use the \"d\" key to open the debug console (informations about this console <a class=\"open_in_browser\" href=\"https://developer.chrome.com/devtools\">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !": "Vous pourrez trouver des informations sur l'utilisation de StreamStudio dans le <a class=\"open_in_browser\" href=\"http://wiki.streamstudio.me\">wiki</a><br/>         N'ayant pas encore de forum spécifique, Merci de reporter tout bug <a class=\"open_in_browser\" href=\"http://forum.ubuntu-fr.org/viewtopic.php?id=1299461\">ici</a> ou par mail <a class=\"open_in_browser\" href=\"mailto:staff@streamstudio.me\">ici</a><br/>         (utilisez la touche \"d\" pour ouvrir la console de debug (informations sur cette console <a class=\"open_in_browser\" href=\"https://translate.google.fr/translate?hl=fr&sl=en&tl=fr&u=https://developer.chrome.com/devtools/docs/console\">ici</a>) et copiez/collez toutes les erreurs que vous pouvez voir !)<br/><br/>Merci pour votre support !",
 	"Playing on your Chromecast device !": "Lecture sur votre périphérique Chromecast !",
 	"Minimize": "Minimiser",
-	"Maximize": "Maximiser"
+	"Maximize": "Maximiser",
+	"Default subtitles language:": "Default subtitles language:",
+	"Downloading subtitles, please wait...": "Downloading subtitles, please wait..."
 }

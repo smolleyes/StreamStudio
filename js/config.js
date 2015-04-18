@@ -103,6 +103,17 @@ function loadConfig() {
         saveSettings();
         saveConf();
     });
+    //sub select
+    $(document).on("click", "#sub_countries li a", function() {
+        $(this).parents('.dropdown').find('.active').removeClass('active');
+        $(this).parent().addClass('active');
+        $(this).addClass('active');
+        $(this).parents('.dropdown').find('.dropdown-toggle').html($(this).text() + ' <span class="caret"></span>');
+        settings.subLanguage = $(this).attr('data-value');
+        saveSettings();
+    });
+    var subLanguage = settings.subLanguage;
+    $("#sub_countries [data-value='" + subLanguage + "']").click();
     //resolutions select
     $(document).on("click", "#resolutions_select li a", function() {
         $(this).parents('.dropdown').find('.active').removeClass('active');
@@ -112,7 +123,7 @@ function loadConfig() {
         settings.resolution = $(this).attr('data-value');
         saveSettings();
     });
-    var selected_resolution = settings.resolution;
+    var selected_resolution = settings.resolution || "en";
     $("#resolutions_select [data-value='" + selected_resolution + "']").click();
     // checkbox changes
     $('.pluginCheckBox:checkbox').change(function() {
@@ -153,7 +164,6 @@ function loadConfig() {
     }
     $('#countries').val(settings.locale);
     $("#countries").msDropdown();
-
     //disclaimer
     $('#disclaimer').click(function() {
         var msg = _("The following are terms and conditions for use of StreamStudio including all \

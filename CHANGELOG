@@ -1,3 +1,7 @@
+V 2.0.7
+  * fix close window process
+  * add opensubtitles support for series
+
 V 2.0.6
   * gui update
   * update translations

@@ -726,7 +726,7 @@
 .mejs-captions-position {
 	position: absolute;
 	width: 100%;
-	bottom: 15px;
+	bottom: 70px !important;
 	left: 0;
 }
 

@@ -446,7 +446,8 @@ function startPlay(media) {
 		} else if (linkType === 'torrent') {
 			torrentPlaying = true;
 			currentMedia.link = link.replace('&torrent','');
-			launchPlay();
+			scanSubTitles(execDir+'/subtitles');
+			//launchPlay();
 		// http(s) links
 		} else if (linkType === 'external') {
 			playFromHttp = true;
@@ -456,38 +457,7 @@ function startPlay(media) {
 		} else if (link.indexOf('file://') !== -1) {
 			playFromFile = true;
 			currentMedia.link = link.replace('file://','');
-			try {
-				var l = decodeURIComponent(link.replace('file://',''));
-				var dir = path.dirname(l);
-				var list = dirTree(dir);
-				var i = 1;
-				$('#videoPlayer').empty();
-				Iterator.iterate(list.children).forEach(function (item,index) {
-					var ext = path.extname(item.path);
-					if(item.type == "file" && ext == ".srt" || ext == ".vtt") {
-						fs.createReadStream(item.path).pipe(fs.createWriteStream(execDir+'/subtitles/'+_("Track")+i+ext));
-						$('#videoPlayer').append('<track kind="subtitles" src="subtitles/'+_("Track")+i+ext+'" srclang="'+_("Track")+i+'" label="'+_("Track")+i+'" />');
-						i+=1;
-					}
-				});
-				player.findTracks();
-				Iterator.iterate(player.tracks).forEach(function (item,index) { 
-					player.loadTrack(index);
-				});
-				if($('.mejs-captions-button').length == 0 ) {
-					setTimeout(function() {
-						player.buildtracks(player,player.controls,player.layers,player.media)
-						launchPlay();
-					},1000);
-				} else {
-					setTimeout(function() {
-						launchPlay();
-					},1000);
-				}
-			} catch(err) {
-				console.log(err)
-				launchPlay();
-			}
+			scanSubTitles(link);
 		// play from upnp server
 		} else if (linkType === 'upnp' || upnpToggleOn) {
 			playFromUpnp = true;

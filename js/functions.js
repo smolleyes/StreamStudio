@@ -23,6 +23,54 @@ function showPopup(html,target,cb) {
     }, 0);
 }
 
+var cleanSubTitles = function() {
+  var dirPath = path.join(execDir, 'subtitles');
+  try { var files = fs.readdirSync(dirPath)}
+  catch(e) { return; }
+  if (files.length > 0)
+    for (var i = 0; i < files.length; i++) {
+      var filePath = path.join(dirPath, files[i]);
+      if (fs.statSync(filePath).isFile())
+        fs.unlinkSync(filePath);
+    }
+};
+
+function scanSubTitles(dir) {
+	try {
+		var l = decodeURIComponent(dir.replace('file://',''));
+		if(l !== execDir+'/subtitles') {
+			dir = path.dirname(l);
+		}
+		var list = dirTree(dir);
+		var i = 1;
+		$('#videoPlayer').empty();
+		Iterator.iterate(list.children).forEach(function (item,index) {
+			var ext = path.extname(item.path);
+			if(item.type == "file" && ext == ".srt" || ext == ".vtt") {
+				fs.createReadStream(item.path).pipe(fs.createWriteStream(execDir+'/subtitles/'+_("Track")+i+ext));
+				$('#videoPlayer').append('<track kind="subtitles" src="subtitles/'+_("Track")+i+ext+'" srclang="'+_("Track")+i+'" label="'+path.basename(item.path)+'" />');
+				i+=1;
+			}
+		});
+		player.findTracks();
+		Iterator.iterate(player.tracks).forEach(function (item,index) { 
+			player.loadTrack(index);
+		});
+		if($('.mejs-captions-button').length == 0 ) {
+			setTimeout(function() {
+				player.buildtracks(player,player.controls,player.layers,player.media)
+				launchPlay();
+			},1000);
+		} else {
+			setTimeout(function() {
+				launchPlay();
+			},1000);
+		}
+	} catch(err) {
+		console.log(err)
+		launchPlay();
+	}
+}
 
 function getLocalDb(dir,parent) {
 	var fileList = [];
@@ -507,17 +555,9 @@ var wipeTmpFolder = function() {
 }
 
 var cleanSubtitles = function() {
-	fs.readdir(exec_path+'/subtitles', function(err, files){
-		$.each(files,function(index,dir) {
-			try {
-				rmdir( tmpFolder+'/'+dir, function ( err, dirs, files ){
-					console.log( 'file '+files+' removed' );
-				});
-			} catch(err) {
-				console.log('can t remove file '+files)
-			}
-		});
-	});
+	fs.readdirSync(execDir+'/subtitles').forEach(function(fileName) {
+        fs.unlinkSync(execDir+'/subtitles/'+fileName);
+    });
 }
 
 function askSaveTorrent() {

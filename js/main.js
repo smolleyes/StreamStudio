@@ -343,6 +343,66 @@ var htmlContent =
                             \
                         </div> \
                         <div class="form-group"> \
+                            <label>' + _("Default subtitles language:") + '</label> \
+                            <li id="sub_countries_cont" class="dropdown btn-default btn-sm"> \
+                                <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
+                                 \
+                                <span class="caret" style="float: right !important;top: 7px;position: relative !important;"></span> \
+                                </a> \
+                                <ul class="dropdown-menu" id="sub_countries" role="menu" style="width:100%;"> \
+                                <li><a href="#" data-value="ar" data-title="(ar) العربية"><img src="" class="flags flags-ar" />لعربية</a></li> \
+                                <li><a href="#" data-value="bg" data-title="(bg) български език"><img src="" class="flags flags-bg" />български език</a></li> \
+                                <li><a href="#" data-value="ca" data-title="(ca) Català"><img src="" class="flags flags-ca" />Català</a></li> \
+                                <li><a href="#" data-value="cs" data-title="(cs) Čeština"><img src="" class="flags flags-cs" />Čeština</a></li> \
+                                <li><a href="#" data-value="da" data-title="(da) Dansk"><img src="" class="flags flags-da" />Dansk</a></li> \
+                                <li><a href="#" data-value="de" data-title="(de) Deutsch"><img src="" class="flags flags-de" />Deutsch</a></li> \
+                                <li><a href="#" data-value="el" data-title="(el) Ελληνικά"><img src="" class="flags flags-el" />Ελληνικά</a></li> \
+                                <li><a class="active" href="#" data-value="en" data-title="(en) English"><img src="" class="flags flags-en" />English</a></li> \
+                                <li><a href="#" data-value="eo" data-title="(eo) Esperanto"><img src="" class="flags flags-eo" />Esperanto</a></li> \
+                                <li><a href="#" data-value="es" data-title="(es) Español"><img src="" class="flags flags-es" />Español</a></li> \
+                                <li><a href="#" data-value="et" data-title="(et) Eesti keel"><img src="" class="flags flags-et" />Eesti keel</a></li> \
+                                <li><a href="#" data-value="eu" data-title="(eu) Basque"><img src="" class="flags flags-eu" />Basque</a></li> \
+                                <li><a href="#" data-value="fa" data-title="(fa) فارسی"><img src="" class="flags flags-fa" />فارسی</a></li> \
+                                <li><a href="#" data-value="fi" data-title="(fi) Suomi"><img src="" class="flags flags-fi" />Suomi</a></li> \
+                                <li><a href="#" data-value="fr" data-title="(fr) Français"><img src="" class="flags flags-fr" />Français</a></li> \
+                                <li><a href="#" data-value="gl" data-title="(gl) Galego"><img src="" class="flags flags-gl" />Galego</a></li> \
+                                <li><a href="#" data-value="he" data-title="(he) עִבְרִית"><img src="" class="flags flags-he" />עִבְרִית</a></li> \
+                                <li><a href="#" data-value="hi" data-title="(hi) हिन्दी"><img src="" class="flags flags-hi" />हिन्दी</a></li> \
+                                <li><a href="#" data-value="hr" data-title="(hr) Hrvatski jezik"><img src="" class="flags flags-hr" />Hrvatski jezik</a></li> \
+                                <li><a href="#" data-value="hu" data-title="(hu) Magyar"><img src="" class="flags flags-hu" />Magyar</a></li> \
+                                <li><a href="#" data-value="id" data-title="(id) Bahasa Indonesia"><img src="" class="flags flags-id" />Bahasa Indonesia</a></li> \
+                                <li><a href="#" data-value="is" data-title="(is) Icelandic"><img src="" class="flags flags-is" />Icelandic</a></li> \
+                                <li><a href="#" data-value="it" data-title="(it) Italiano"><img src="" class="flags flags-it" />Italiano</a></li> \
+                                <li><a href="#" data-value="ja" data-title="(ja) 日本語"><img src="" class="flags flags-ja" />日本語</a></li> \
+                                <li><a href="#" data-value="ka" data-title="(ka) Georgian"><img src="" class="flags flags-ka" />Georgian</a></li> \
+                                <li><a href="#" data-value="km" data-title="(km) ភាសាខ្មែរ"><img src="" class="flags flags-km" />ភាសាខ្មែរ</a></li> \
+                                <li><a href="#" data-value="ko" data-title="(ko) 한국어"><img src="" class="flags flags-ko" />한국어</a></li> \
+                                <li><a href="#" data-value="mk" data-title="(mk) македонски јазик"><img src="" class="flags flags-mk" />македонски јазик</a></li> \
+                                <li><a href="#" data-value="ms" data-title="(ms) Malay"><img src="" class="flags flags-ms" />Malay</a></li> \
+                                <li><a href="#" data-value="nl" data-title="(nl) Nederlands"><img src="" class="flags flags-nl" />Nederlands</a></li> \
+                                <li><a href="#" data-value="no" data-title="(no) Norsk"><img src="" class="flags flags-ano" />Norsk</a></li> \
+                                <li><a href="#" data-value="oc" data-title="(oc) Occitan"><img src="" class="flags flags-oc" />Occitan</a></li> \
+                                <li><a href="#" data-value="pb" data-title="(pb) Português (BR)"><img src="" class="flags flags-pb" />Português (BR)</a></li> \
+                                <li><a href="#" data-value="pl" data-title="(pl) Polski"><img src="" class="flags flags-pl" />Polski</a></li> \
+                                <li><a href="#" data-value="pt" data-title="(pt) Português"><img src="" class="flags flags-pt" />Português</a></li> \
+                                <li><a href="#" data-value="ro" data-title="(ro) Română"><img src="" class="flags flags-ro" />Română</a></li> \
+                                <li><a href="#" data-value="ru" data-title="(ru) русский язык"><img src="" class="flags flags-ru" />русский язык</a></li> \
+                                <li><a href="#" data-value="si" data-title="(si) සිංහල"><img src="" class="flags flags-si" />සිංහල</a></li> \
+                                <li><a href="#" data-value="sk" data-title="(sk) Slovenčina"><img src="" class="flags flags-sk" />Slovenčina</a></li> \
+                                <li><a href="#" data-value="sl" data-title="(sl) Slovenščina"><img src="" class="flags flags-sl" />Slovenščina</a></li> \
+                                <li><a href="#" data-value="sq" data-title="(sq) Shqip"><img src="" class="flags flags-sq" />Shqip</a></li> \
+                                <li><a href="#" data-value="sr" data-title="(sr) Cрпски"><img src="" class="flags flags-sr" />Cрпски</a></li> \
+                                <li><a href="#" data-value="sv" data-title="(sv) Svenska"><img src="" class="flags flags-sv" />Svenska</a></li> \
+                                <li><a href="#" data-value="th" data-title="(th) ภาษาไทย"><img src="" class="flags flags-th" />ภาษาไทย</a></li> \
+                                <li><a href="#" data-value="tl" data-title="(tl) Tagalog"><img src="" class="flags flags-tl" />Tagalog</a></li> \
+                                <li><a href="#" data-value="tr" data-title="(tr) Türkçe"><img src="" class="flags flags-tr" />Türkçe</a></li> \
+                                <li><a href="#" data-value="uk" data-title="(uk) українська мова"><img src="" class="flags flags-uk" />українська мова</a></li> \
+                                <li><a href="#" data-value="vi" data-title="(vi) Tiếng Việt"><img src="" class="flags flags-vi" />Tiếng Việt</a></li> \
+                                <li><a href="#" data-value="zh" data-title="(zh) 汉语"><img src="" class="flags flags-zh" />汉语</a></li> \
+                                <li><a href="#" data-value="zt" data-title="(zt) 漢語"><img src="" class="flags flags-zt" />漢語</a></li> \
+                            </ul> \
+                        </li> \
+                        <div class="form-group"> \
                             <p><u><b>' + _("Default player:") + '</b></u></p> \
                             <li id="externalPlayers" class="dropdown btn-default btn-sm"> \
                                 <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
@@ -1460,7 +1520,8 @@ function main() {
     $('.tab-content').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
         updateScroller();
     });
-
+    
+    cli.searchDevices();
     setTimeout(function(){
         cli.searchDevices();
     },2000)

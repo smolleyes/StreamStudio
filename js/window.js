@@ -3,6 +3,7 @@ onload = function() {
         cleanffar();
     } catch(err) {}
     try {
+        initPlayer();
         win.on('close', function() {
             try {
                 var pid = extPlayerProc.pid+1;
@@ -53,6 +54,7 @@ onload = function() {
             });
             win.hide();
             win.close(true);
+            process.exit();
         });
     } catch (err) {
         try {
