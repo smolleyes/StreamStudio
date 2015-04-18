@@ -508,6 +508,7 @@ video{
 	width: calc(100% - 8px);
 	opacity: 0.9;
 	z-index: 1006;
+	left: 0;
 	border: 0;
 	-webkit-box-shadow: 0px 0px 2px black;
 	background-color: #17181b;

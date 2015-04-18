@@ -25,6 +25,7 @@ if (localStorage.StdSettings === undefined) {
 	settings.download_dir = "";
 	settings.shared_dirs = [];
 	settings.locale = "en";
+	settings.subLanguage = "en";
 	settings.resolution = "720p";
 	settings.os = getOsType();
 	settings.collections=[{"name":"Library","parent":""}];
