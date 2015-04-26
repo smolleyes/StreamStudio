@@ -95,7 +95,7 @@ function loadConfig() {
     $(document).on('click', '#valid_config', function(e) {
         e.preventDefault();
         settings.init = true;
-        if(settings.plugins.indexOf('t411') !== -1 && !settings.t411Username || !settings.t411Password || settings.t411Username == "" || settings.t411Password == "") {
+        if(settings.plugins.indexOf('t411') !== -1 && (!settings.t411Username || !settings.t411Password)) {
             $('#t411LoginUsername').attr('placeholder', '').focus();
             swal(_("Error!"), _("Please enter your login/password for t411 engine !"), "error")
             return;

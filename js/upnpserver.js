@@ -358,6 +358,9 @@ var upnpDeviceState = '';
 function playUpnpRenderer(obj) {
     stopUpnp();
     cleanffar();
+    if(mediaRendererType == "chromecast") {
+        return playOnChromecast(obj);
+    }
     mediaRenderer.stop().then(function(response) {
         setTimeout(function() {
             // stop upnp file loading if needed
@@ -503,6 +506,7 @@ function getRendererState(state) {
 }
 
 function checkStopped() {
+    stopUpnp();
     mediaRenderer.getTransportInfo().then(function(response) {
         if (response && response.data) {
             //console.log(response.data.CurrentTransportState, state, continueTransition , transitionCount)
@@ -559,6 +563,38 @@ function startUPNPserver() {
 } catch(err) {
     console.log(err)
 }
+}
+
+function playOnChromecast(currentMedia) {
+    if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.link.indexOf('stream.php?streamKey') == -1 && currentMedia.link.indexOf('vp8') == -1 && currentMedia.link.indexOf('mp4') == -1 && currentMedia.link.indexOf('.ogg') == -1 && currentMedia.link.indexOf('.wav') == -1 && currentMedia.link.indexOf('.mp3') == -1 && currentMedia.link.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') == -1 || currentMedia.title.toLowerCase().indexOf('ac3') !== -1 || currentMedia.title.toLowerCase().indexOf('dts') !== -1) {
+        var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.replace('&upnp','');
+        currentMedia.link = link;
+    }
+    mediaRenderer.play(currentMedia.link,null,null,win.window);
+    ChromecastInterval = setInterval(getChromeCastPos,1000);
+    mediaRenderer.on('status',function(status) {
+        if(status.playerState == 'IDLE') {
+            if(chromeCastplaying) {
+                clearInterval(ChromecastInterval);
+                chromeCastplaying = false;
+            }
+            initPlayer();
+        } else if(status.playerState == 'PLAYING' || status.playerState == 'BUFFERING') {
+            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+            $('#fbxMsg2,#fbxMsg').remove();
+            chromeCastplaying = true;
+            if(currentMedia.cover) {
+                $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -200px;position: relative;top: 50%;margin-top: -200px;width:400px;max-height:400px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
+                $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;top: calc(50% - 350px);">'+_("Playing on your Chromecast device !")+'</p>')
+            } else {
+                $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;">'+currentMedia.title+' <br/> '+_("Playing on your Chromecast device !")+'</p>')
+            }
+        } else if(status.playerState == 'BUFFERING') {
+            $('#fbxMsg2').remove();
+            $('.mejs-overlay,.mejs-overlay-loading').show()
+            $('.mejs-overlay-play').hide()
+        }
+    });
 }
 
 // start 
