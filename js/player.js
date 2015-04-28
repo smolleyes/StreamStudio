@@ -799,7 +799,7 @@ function updateProgressBar() {
 	} else {
 		duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
 	    try {
-	   		var percentage = ((100 / duree) * (current+mediaCurrentTime));
+	   		var percentage = ((100 / duree) * (player.media.currentTime+mediaCurrentTime));
 			progressBar.value = percentage;
 		} catch(err) {}
 	}
