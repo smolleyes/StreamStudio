@@ -1,3 +1,8 @@
+V 2.2
+  * add seeking from player functions for chromecast
+  * fix sudo bug for updates on linux
+  * fix youtube bug for videos with age confirmation needed
+
 V 2.1
   * fix t411 login
   * fix play upnp files thru chromecast

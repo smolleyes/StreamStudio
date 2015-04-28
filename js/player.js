@@ -181,12 +181,17 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn) {
+		if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
 			return;
 		}
 		var pos = e.offsetX;
 		var pct = (( pos * 100) / $('#progress-bar').width()).toFixed(2);
-		var duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
+		var duree;
+		if(chromeCastplaying){
+			duree = mediaDuration;
+		} else {
+			duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
+		}
 		console.log(pct + "%")
 		var newTime = Math.round((duree * pct) / 100);
 		mediaCurrentTime = newTime;
@@ -211,7 +216,13 @@ $(document).ready(function() {
 			m.cover = currentMedia.cover;
 			startPlay(m);
 		} else {
-			player.setCurrentTime(newTime)
+			if(chromeCastplaying){
+				mediaRenderer.player.seek(newTime,function(){
+					console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
+				})
+			} else {
+				player.setCurrentTime(newTime)
+			}
 		}
 	})
 	
@@ -566,10 +577,6 @@ function launchPlay() {
 	}
 }
 
-function getChromeCastPos() {
-	mediaRenderer.getStatus(function(data){})
-}
-
 function startExtPlayer(obj) {
 	var link = decodeURIComponent(currentMedia.link).trim();
 	var cpath = obj.path;
@@ -778,11 +785,22 @@ function on_media_finished(){
 }
 
 function updateProgressBar() {
-   var progressBar = document.getElementById('progress-bar');
-   var duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
-   var current = player.media.currentTime;
-   try {
-   		var percentage = ((100 / duree) * (current+mediaCurrentTime));
-		progressBar.value = percentage;
-	} catch(err) {}
+    var progressBar = document.getElementById('progress-bar');
+    if(chromeCastplaying){
+		duree = mediaDuration;
+		try {
+			var percentage = ((100 / duree) * (player.media.currentTime));
+			progressBar.value = percentage;
+			$('.mejs-duration').text(mejs.Utility.secondsToTimeCode(duree))
+			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (player.media.currentTime) / mediaDuration)+'px');
+			$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(player.media.currentTime))
+			$('#subPlayer-img').attr('src',currentMedia.cover);
+		} catch(err) {}
+	} else {
+		duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
+	    try {
+	   		var percentage = ((100 / duree) * (current+mediaCurrentTime));
+			progressBar.value = percentage;
+		} catch(err) {}
+	}
 }

@@ -1,4 +1,4 @@
-var VERSION = "2.1";
+var VERSION = "2.2";
 
 var path = require('path');
 var fs = require('fs');
@@ -111,6 +111,7 @@ var sdb = storedb('std');
 var seriesDb = storedb('seriesDb');
 var moviesDb = storedb('moviesDb');
 var seriesUpdated = false;
+var chromecastPlaying = false;
 
 //checks
 temp.mkdir(function(err,path){

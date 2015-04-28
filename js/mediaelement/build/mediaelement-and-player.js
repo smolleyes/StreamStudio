@@ -2573,7 +2573,7 @@ if (typeof jQuery != 'undefined') {
 				
 				// resize on the first play
 				t.media.addEventListener('loadedmetadata', function(e) {
-					if(t.media.duration == Infinity) {
+					if(t.media.duration == Infinity || chromecastPlaying) {
 						t.options.duration = mediaDuration;
 					}
 					if (t.updateDuration) {
@@ -3253,7 +3253,7 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
-						if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn) {
+						if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
 							return;
 						}
 						if (x < offset.left) {
@@ -3270,26 +3270,32 @@ if (typeof jQuery != 'undefined') {
 						if (mouseIsDown && newTime !== media.currentTime) {
 							media.setCurrentTime(newTime);
 							mediaCurrentPct = ((pos*100) / width);
-							mediaCurrentTime = newTime;
-							seekAsked = true;
-							mouseIsDown = false;
-							var m = {};
-							var l = currentMedia.link.replace(/&start=(.*)/,'')
-							$('.mejs-overlay,.mejs-overlay-loading').show();
-							if(playFromFile) {
-								m.link = l.replace('?file=','?file=file://')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
-							} else if(playFromHttp) {
-								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
-							} else if (torrentPlaying) {
-								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
-							} else if (playFromUpnp) {
-								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
-							} else if (playFromYoutube) {
-								m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+							if(chromeCastplaying){
+								mediaRenderer.player.seek(newTime,function(){
+									console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
+								})
+							} else {
+								player.setCurrentTime(newTime)
+								seekAsked = true;
+								mouseIsDown = false;
+								var m = {};
+								var l = currentMedia.link.replace(/&start=(.*)/,'')
+								$('.mejs-overlay,.mejs-overlay-loading').show();
+								if(playFromFile) {
+									m.link = l.replace('?file=','?file=file://')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								} else if(playFromHttp) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
+								} else if (torrentPlaying) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
+								} else if (playFromUpnp) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+								} else if (playFromYoutube) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								}
+								m.title = currentMedia.title;
+								m.cover = currentMedia.cover;
+								startPlay(m);
 							}
-							m.title = currentMedia.title;
-							m.cover = currentMedia.cover;
-							startPlay(m);
 						}
 
 						// position floating time box
@@ -3429,7 +3435,7 @@ if (typeof jQuery != 'undefined') {
 
 			var t = this;
 		    if(t.media.duration == Infinity) {
-				if (t.media.currentTime != undefined && mediaDuration) {
+				if (t.media.currentTime != undefined && mediaDuration || chromecastPlaying) {
 					// update bar and handle
 					if (t.total && t.handle) {
 						var 
@@ -3488,7 +3494,7 @@ if (typeof jQuery != 'undefined') {
 
 		buildduration: function(player, controls, layers, media) {
 			var t = this;
-			if(t.media.duration == Infinity) {
+			if(t.media.duration == Infinity || chromecastPlaying) {
 				t.options.duration = mediaDuration;
 			} else {
 				t.options.duration = media.duration;
@@ -3526,7 +3532,7 @@ if (typeof jQuery != 'undefined') {
 		
 		updateCurrent:  function() {
 			var t = this;
-			if(t.media.duration == Infinity) {
+			if(t.media.duration == Infinity || chromecastPlaying) {
 				t.options.duration = mediaDuration;
 				if (t.currenttime) {
 					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
@@ -3540,7 +3546,7 @@ if (typeof jQuery != 'undefined') {
 		
 		updateDuration: function() {
 			var t = this;
-			if(t.media.duration == Infinity) {
+			if(t.media.duration == Infinity || chromecastPlaying) {
 				t.options.duration = mediaDuration;
 				//Toggle the long video class if the video is longer than an hour.
 				t.container.toggleClass("mejs-long-video", mediaDuration > 3600);
