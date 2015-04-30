@@ -262,5 +262,7 @@
 	"Maximize": "Maximize",
 	"Loading subtitles, please wait...": "Loading subtitles, please wait...",
 	"Downloading subtitles, please wait...": "Downloading subtitles, please wait...",
-	"Default subtitles language:": "Default subtitles language:"
+	"Default subtitles language:": "Default subtitles language:",
+	"Download best Audio track only": "Download best Audio track only",
+	"Audio only": "Audio only"
 }

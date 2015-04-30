@@ -266,12 +266,15 @@ function downloadFile(link, title, vid, toTorrent) {
 current_download[vid].end();
 }
 
-function downloadFileHttps(link, title, vid, toTorrent) {
+function downloadFileHttps(link, target, vid, toTorrent,fromYoutubeTrack) {
 	if (activeTab !== 4 && toTorrent === undefined || toTorrent === false) {
 		$("#downloads_tab").click();
 	}
 	var vid = ((Math.random() * 1e6) | 0);
-	var title = sanitize(title.split('::')[0]);
+	var title = target;
+	try{
+		title = sanitize(title.split('::')[0]);
+	} catch(err) {}
 	var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
 	<p><b>' + title + '</b></p> \
 	<p> \
@@ -364,7 +367,7 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 				$('#progress_' + vid + ' strong').html(txt);
 				if(pct == 100) {
 					$('#progress_' + vid + ' strong').html(_('Download ended !'));
-					if (title.match('.mp3') === null) {
+					if (title.match('.mp3') === null && !fromYoutubeTrack) {
 						$('#progress_' + vid + ' a.convert').attr('alt', download_dir + '/' + title + '::' + vid).show();
 					}
 					$('#progress_' + vid + ' a.open_folder').show();
@@ -382,23 +385,27 @@ function downloadFileHttps(link, title, vid, toTorrent) {
 	}
 }
 
-function downloadFFMpeg(link,title,vid,toTorrent) {
+function downloadFFMpeg(link,title,vid,toTorrent,audio) {
 	var child_process = require('child_process');
 	var sys = require('sys');
 	
 	if (activeTab !== 4) {
 		$("#downloads_tab").click();
 	}
+	var vid = ((Math.random() * 1e6) | 0);
 
-	var vlink = link.split('::')[0];
-	try {
-		var alink = link.split('::')[1].replace('%20','');
-	} catch(err) {
-		return downloadFileHttps(link,title,vid,toTorrent);
+	if(!audio) {
+		var vlink = link.split('::')[0];
+		try {
+			var alink = link.split('::')[1].replace('%20','');
+		} catch(err) {
+			return downloadFileHttps(link,title,vid,toTorrent);
+		}
+		var title = sanitize(title.split('::')[0].trim().replace(/\\|\//g,'_').replace('.webm','.mkv'));
+	} else {
+		title = sanitize(title.replace('.mp4','.aac'));
 	}
 
-	var vid = ((Math.random() * 1e6) | 0);
-	var title = sanitize(title.split('::')[0].trim().replace(/\\|\//g,'_').replace('.webm','.mkv'));
 	var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
 	<p><b>' + title + '</b></p> \
 	<p> \
@@ -441,7 +448,12 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 	var target = download_dir + '/' + title.replace(/  /g, ' ').trim();
 	pbar.show();
 
-	var encoder = child_process.spawn(ffmpegPath,['-y','-i', vlink,'-i',alink, '-c:v', 'libx264', '-c:a', 'copy', '-f','matroska',target]);
+	var encoder;
+	if(!audio){
+		encoder = child_process.spawn(ffmpegPath,['-y','-i', vlink,'-i',alink, '-c:v', 'libx264', '-c:a', 'copy', '-f','matroska',target]);
+	} else {
+		encoder = child_process.spawn(ffmpegPath,['-y','-i', link,'-c:a', 'aac', '-b:a', '240k', '-strict', '-2',target]);
+	}
 	opt.process = encoder;
 	current_download[vid] = opt;
 	var total_time = 0,
@@ -453,14 +465,14 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 			if (total_data.toString().match(/Duration:\s\d\d:\d\d:\d\d\.\d\d/)) {
 				$('#progress_' + vid + ' a.cancelD').show();
 				var time = total_data.toString().match(/Duration:\s(\d\d:\d\d:\d\d\.\d\d)/).toString().substring(10,21);
-				console.log('DATA:' + total_data.toString());
-				console.log('Time:' + time);
+				console.log('DATA: ' + total_data.toString());
+				console.log('Time: ' + time);
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 				total_data = '';
 				total_time = seconds;
 			}
 
-			if (data.toString().substr(0,5) == 'frame') {
+			if (data.toString().substr(0,5) == 'frame' || data.toString().substr(0,4) == 'size') {
 				var time = data.toString().match(/time=(\d\d:\d\d:\d\d\.\d\d)/)[1];
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 				if (canceled === true) {
@@ -484,7 +496,7 @@ function downloadFFMpeg(link,title,vid,toTorrent) {
 				$('#progress_' + vid + ' strong').html(txt);
 				if(pct == 100) {
 					$('#progress_' + vid + ' strong').html(_('Download ended !'));
-					if (title.match('.mp3') === null) {
+					if (title.match('.mp3') === null && !audio) {
 						$('#progress_' + vid + ' a.convert').attr('alt', download_dir + '/' + title + '::' + vid).show();
 					}
 					$('#progress_' + vid + ' a.open_folder').show();

@@ -797,9 +797,10 @@ function updateProgressBar() {
 			$('#subPlayer-img').attr('src',currentMedia.cover);
 		} catch(err) {}
 	} else {
-		duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
+		var duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
+	    var current = player.media.currentTime;
 	    try {
-	   		var percentage = ((100 / duree) * (player.media.currentTime+mediaCurrentTime));
+	   		var percentage = ((100 / duree) * (current+mediaCurrentTime));
 			progressBar.value = percentage;
 		} catch(err) {}
 	}

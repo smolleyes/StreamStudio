@@ -3270,14 +3270,15 @@ if (typeof jQuery != 'undefined') {
 						if (mouseIsDown && newTime !== media.currentTime) {
 							media.setCurrentTime(newTime);
 							mediaCurrentPct = ((pos*100) / width);
+							mediaCurrentTime = newTime;
+							seekAsked = true;
+							mouseIsDown = false;
 							if(chromeCastplaying){
 								mediaRenderer.player.seek(newTime,function(){
 									console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
 								})
 							} else {
-								player.setCurrentTime(newTime)
-								seekAsked = true;
-								mouseIsDown = false;
+								//player.setCurrentTime(newTime)
 								var m = {};
 								var l = currentMedia.link.replace(/&start=(.*)/,'')
 								$('.mejs-overlay,.mejs-overlay-loading').show();
