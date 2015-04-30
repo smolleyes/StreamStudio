@@ -820,7 +820,7 @@ function main() {
                     if (obj.name !== 'StreamStudio') {
                         ext = true;
                     }
-                    youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 1, 1, upnpToggleOn, ext, function(datas) {
+                    youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 1, 1, upnpToggleOn, ext, settings,function(datas) {
                         $('.spiffy').hide();
                         $('#youtube_entry_res_' + vid).empty()
                         var infos = datas[25];
@@ -839,7 +839,7 @@ function main() {
                                 if (upnpToggleOn) {
                                     vlink += '&upnp';
                                 } else {
-                                    if (infos.upnp === false && !ext) {
+                                    if (!infos.upnp && !ext) {
                                         vlink = resolutions[resolution]['link'];
                                         vlinka = resolutions[resolution]['linka'];
                                     }
@@ -852,7 +852,7 @@ function main() {
                                 continue;
                             }
                             // append links
-                            if (infos.upnp === false && !ext) {
+                            if (!infos.upnp && !ext && resolution !== '720p' && resolution !== "360p") {
                                 $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + '::' + vlinka + ' " alt="' + resolution + '"><span class="twitchQualityLink">' + resolution + '</span></a><a href="' + vlink + '::' + vlinka + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
                             } else {
                                 $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + ' " alt="' + resolution + '"><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
@@ -1035,7 +1035,7 @@ function main() {
         $(this).parent().addClass('active');
         $(this).addClass('active');
         $(this).parents('.dropdown').find('.dropdown-toggle').html($(this).text() + ' <span class="caret"></span>');
-        searchTypes_select = 'videos';
+        searchTypes_select
         getCategories();
         pagination_init = false;
         current_page = 1;
@@ -1308,6 +1308,7 @@ function main() {
                 $('#dateTypes_label').show();
                 $('#duration_label').hide();
                 $('#duration_select').hide();
+                $('#video_search_btn').click();
             } else {
                 $('#video_search_query').prop('disabled', false);
                 $('#searchTypes_label').show();

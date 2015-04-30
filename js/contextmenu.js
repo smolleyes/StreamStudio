@@ -147,7 +147,7 @@ $(document).ready(function() {
 			}
 		}
 		console.log(vid)
-		youtube.getVideoInfos('https://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,ext,function(datas) {
+		youtube.getVideoInfos('https://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,ext,settings,function(datas) {
 			printYtVideoInfos(datas[25], true, false, '', 'youtube');
 			console.log($("#"+vid))
 			$("#"+vid).find('.start_video').click();

@@ -751,6 +751,7 @@ function getPrev() {
 						break;
 					} else {
 						console.log("no more videos to play in the playlists");
+						$('#homeToggle').click();
 						break;
 					}
 				}
@@ -763,6 +764,7 @@ function on_media_finished(){
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	if (playlistMode === 'normal' && !seekAsked) {
 		initPlayer();
+		$('#homeToggle').click();
 	} else if (playlistMode === 'loop') {
 		if(upnpToggleOn) {
 			if(upnpContinuePlay){

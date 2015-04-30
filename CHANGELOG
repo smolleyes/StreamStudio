@@ -1,3 +1,7 @@
+V 2.2.4
+  * final youtube update after many changes in youtube_dl
+  * small gui fix
+
 V 2.2.3
   * add download audio only for youtube
   * youtube fix
