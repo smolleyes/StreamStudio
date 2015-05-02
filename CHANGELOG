@@ -1,3 +1,6 @@
+v 2.2.5
+  * remove grooveshark, add piratebay
+
 V 2.2.4
   * final youtube update after many changes in youtube_dl
   * small gui fix

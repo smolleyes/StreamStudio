@@ -9,6 +9,8 @@ var mime = require('mime');
 var path = require('path');
 var mime = require('mime');
 var ___ = require('underscore');
+var pt = require('parse-torrent');
+
 var totalBuffered = 0;
 
 var statsUpdater = null;
@@ -123,7 +125,6 @@ function getTorrent(link,cover) {
           if(torrent.files.length > 1) {
             analyseTorrent(torrent.files);
           } else {
-            var pt = require('parse-torrent');
             handleTorrent(torrentInfo, stateModel);
           }
         } catch(err) {
@@ -136,18 +137,19 @@ function getTorrent(link,cover) {
 
 function analyseTorrent(list) {
   var files = [];
-  var arr = ['nfo','txt','jpg','jpeg','png','pdf','html','.torrent'];
+  var arr = ['nfo','txt','jpg','jpeg','png','pdf','html','torrent'];
   $.each(list,function(i,file){
+    console.log(file.name.split('.').pop())
     if(arr.indexOf(file.name.split('.').pop()) !== -1){
-      if(i+1 == list.length){
-          loadTable(files)
+      if(i+1 == list.length){     
+            loadTable(files)
       } 
       return true;
     } else {
       file.index = i;
       files.push(file);
       if(i+1 == list.length){ 
-        loadTable(files)
+          loadTable(files)
       }
     }
   });
@@ -321,7 +323,6 @@ function saveToDisk(src,name) {
 }
 
 function handleTorrent(torrent, stateModel,id) {
-  
   $('#preloadTorrent').remove();
   $('.mejs-container').append('<div id="preloadTorrent" \
           style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 400px;right: 50%;left: -200px;"> \
@@ -348,7 +349,7 @@ function handleTorrent(torrent, stateModel,id) {
     } else {
       tmpFolder = path;
     }
-    if(id) {
+    if(typeof id !== "undefined") {
       videoStreamer = peerflix(torrent.info, {
         connections: 150,
         path : tmpFolder,
@@ -388,7 +389,9 @@ function handleTorrent(torrent, stateModel,id) {
        streamInfo.src = 'http://'+ipaddress+':' + videoStreamer.server.address().port + '/';
        streamInfo.type = 'video/mp4';
        var item = {};
-       item.name = videoStreamer.server.index.name;
+       try{
+        item.name = videoStreamer.server.index.name;
+      } catch(err) {}
        item.obj = videoStreamer;
        torrentsArr.push(item);
        console.log('peerrlifx listening on http://'+ipaddress+':' + videoStreamer.server.address().port + '/')

@@ -192,7 +192,6 @@ $(document).ready(function() {
 		} else {
 			duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
 		}
-		console.log(pct + "%")
 		var newTime = Math.round((duree * pct) / 100);
 		mediaCurrentTime = newTime;
 		mediaCurrentPct = (( pos * 100) / $('#progress-bar').width());

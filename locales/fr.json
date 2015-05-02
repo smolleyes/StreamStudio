@@ -266,5 +266,6 @@
 	"Default subtitles language:": "Default subtitles language:",
 	"Downloading subtitles, please wait...": "Downloading subtitles, please wait...",
 	"Download best Audio track only": "Télécharger la meilleure piste audio",
-	"Audio only": "Piste Audio"
+	"Audio only": "Piste Audio",
+	"Can't parse your torrent file, please retry!": "Can't parse your torrent file, please retry!"
 }

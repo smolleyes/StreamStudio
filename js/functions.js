@@ -661,7 +661,11 @@ function getUserHome() {
 function getAuthTorrent(url,stream,toFbx,cover) {
 	if(url.indexOf('magnet:?xt') !== -1) {
 		if(stream) {
-			getTorrent(url);
+			if(cover){
+				getTorrent(url,cover);
+			} else {
+				getTorrent(url);
+			}
 		} else {
 			if(toFbx) {
 				addFreeboxDownload(url);

@@ -311,8 +311,8 @@ var htmlContent =
                                     <input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
-                                    <label for="grooveshark">Grooveshark</label> \
-                                    <input class="pluginCheckBox" type="checkbox" id="grooveshark" name="grooveshark"> \
+                                    <label for="thepiratebay">Piratebay</label> \
+                                    <input class="pluginCheckBox" type="checkbox" id="thepiratebay" name="thepiratebay"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
                                     <label for="omgtorrent">Cpasbien</label> \
