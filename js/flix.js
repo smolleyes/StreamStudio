@@ -68,15 +68,15 @@ $(document).on('click', '#closeMfp', function(evt) {
 });
 
 function getTorrent(link, cover) {
-    if (link.indexOf('magnet:?') !== -1) {
+    if (link.toString().indexOf('magnet:?') !== -1) {
         var id = link.match('btih:(.*?)&')[1];
         $.get('https://getstrike.net/api/v2/torrents/download/?hash=' + id).done(function(res) {
-            getTorrent(res.message, cover)
+            getTorrent(res.message, cover || '')
         }).fail(function() {
-            loadTorrent(link,cover)
+            loadTorrent(link,cover || '')
         });
     } else {
-        loadTorrent(link,cover)
+        loadTorrent(link,cover || '')
     }
 }
 
