@@ -1,3 +1,8 @@
+V 2.3
+  * fix download audio only on youtube
+  * fix piratebay engine
+  * fix torrent streaming from magnet
+ 
 v 2.2.5
   * remove grooveshark, add piratebay
 

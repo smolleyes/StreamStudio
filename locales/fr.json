@@ -6,7 +6,7 @@
 	"Engine:": "Moteur:",
 	"Views:": "Vues:",
 	"Posted by:": "Posté par:",
-	"Maximum resolution:": "Résolution maximum:",
+	"Maximum resolution (youtube/dailymotion):": "Résolution maximum  (youtube/dailymotion):",
 	" Loading videos...": " Chargement des vidéos...",
 	"<p><strong>No videos</strong> found...</p>": "<p><strong>Aucune vidéo</strong> trouvée...</p>",
 	"<p><strong>No playlist</strong> found...</p>": "<p><strong>Aucune playlist</strong> trouvée...</p>",
@@ -267,5 +267,8 @@
 	"Downloading subtitles, please wait...": "Downloading subtitles, please wait...",
 	"Download best Audio track only": "Télécharger la meilleure piste audio",
 	"Audio only": "Piste Audio",
-	"Can't parse your torrent file, please retry!": "Can't parse your torrent file, please retry!"
+	"Can't parse your torrent file, please retry!": "Can't parse your torrent file, please retry!",
+	"Note:": "Note:",
+	"Subtitles are only working from the favorites or local files sections": "Subtitles are only working from the favorites or local files sections",
+	"Note: Subtitles are only working from the favorites or local files sections": "Note: Subtitles are only working from the favorites or local files sections"
 }

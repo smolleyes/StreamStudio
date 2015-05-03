@@ -272,7 +272,7 @@ var htmlContent =
                             </select> \
                         </div> \
                         <div class="form-group"> \
-                            <label>' + _("Maximum resolution:") + '</label> \
+                            <label>' + _("Maximum resolution (youtube/dailymotion):") + '</label> \
                             <li id="resolutions_select_cont" class="dropdown btn-default btn-sm"> \
                                 <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
                                 1080p \
@@ -311,7 +311,7 @@ var htmlContent =
                                     <input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
-                                    <label for="thepiratebay">Piratebay</label> \
+                                    <label for="thepiratebay">ThePiratebay</label> \
                                     <input class="pluginCheckBox" type="checkbox" id="thepiratebay" name="thepiratebay"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
@@ -342,8 +342,9 @@ var htmlContent =
                             <div style="clear:both;"></div> \
                             \
                         </div> \
-                        <div class="form-group"> \
+                        <div class="form-group" id="subtitles_form"> \
                             <label>' + _("Default subtitles language:") + '</label> \
+                            <p style="font-size:12px;">'+_("Note: Subtitles are only working from the favorites or local files sections")+'</p> \
                             <li id="sub_countries_cont" class="dropdown btn-default btn-sm"> \
                                 <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
                                  \
@@ -402,6 +403,7 @@ var htmlContent =
                                 <li><a href="#" data-value="zt" data-title="(zt) 漢語"><img src="" class="flags flags-zt" />漢語</a></li> \
                             </ul> \
                         </li> \
+                        </div> \
                         <div class="form-group"> \
                             <p><u><b>' + _("Default player:") + '</b></u></p> \
                             <li id="externalPlayers" class="dropdown btn-default btn-sm"> \
@@ -820,7 +822,7 @@ function main() {
                     if (obj.name !== 'StreamStudio') {
                         ext = true;
                     }
-                    youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 1, 1, upnpToggleOn, ext, settings,function(datas) {
+                    youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 0, 1, upnpToggleOn, ext, settings,function(datas) {
                         $('.spiffy').hide();
                         $('#youtube_entry_res_' + vid).empty()
                         var infos = datas[25];
@@ -856,6 +858,10 @@ function main() {
                                 $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + '::' + vlinka + ' " alt="' + resolution + '"><span class="twitchQualityLink">' + resolution + '</span></a><a href="' + vlink + '::' + vlinka + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
                             } else {
                                 $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + ' " alt="' + resolution + '"><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
+                            }
+                            if(i+1 == resolutions_string.length) {
+                                $('#youtube_entry_res_' + vid).append('<li role="presentation" class="divider" style="clear: both;margin-bottom: 2px;"></li>');
+                                $('#youtube_entry_res_' + vid).append('<li class="youtubeAudioTrackContainer resolutions_container"><a href="#" alt="' + title + '.mp4::' + vid + '" title="' + _("Download best Audio track only") + '" class="youtubeAudioTrack twitchQualityLink">' + _("Audio only")  + '</a></li>');
                             }
                         }
                         startVideo(vid);

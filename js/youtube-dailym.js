@@ -74,7 +74,7 @@ $(document).on('click', '.youtube_downloads', function(e) {
     var title = $(this).closest('.youtube_item').find('.itemTitle').attr('title');
     if ($('#youtube_entry_res_' + vid + ' a.download_file_https').length === 0 && $('#youtube_entry_res_' + vid + ' p').length === 0) {
         $('#youtube_entry_res_' + vid).append('<p style="font-size:12px;text-align:center;position:relative;top:3px;">'+_("Loading...")+'</p>')
-        youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 1, 1, false, false, function(datas) {
+        youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 0, 1, false,false, settings, function(datas) {
             var infos = datas[25];
             var resolutions_string = ['1080p', '720p', '480p', '360p', '240p'];
             var resolutions = infos.resolutions;
@@ -87,6 +87,7 @@ $(document).on('click', '.youtube_downloads', function(e) {
                     $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a href="' + vlink + '::' + vlinka + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
                 } catch(err) {}
                 if(i+1 == resolutions_string.length) {
+                    $('#youtube_entry_res_' + vid).append('<li role="presentation" class="divider" style="clear: both;margin-bottom: 2px;"></li>');
                     $('#youtube_entry_res_' + vid).append('<li class="youtubeAudioTrackContainer resolutions_container"><a href="#" alt="' + title + '.mp4::' + vid + '" title="' + _("Download best Audio track only") + '" class="youtubeAudioTrack twitchQualityLink">' + _("Audio only")  + '</a></li>');
                     $('#youtube_entry_res_' + vid).find('p').remove();
                     $('#youtube_entry_res_' + vid + ' a.dropdown-toggle');
@@ -732,7 +733,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
                     ' + _("Download") + ' \
                     <span class="caret"></span> \
                     </a> \
-                    <ul class="dropdown-menu" role="menu" style="width:100%;max-height:60px;" id="youtube_entry_res_' + vid + '"> \
+                    <ul class="dropdown-menu" role="menu" style="width:100%;max-height:80px;" id="youtube_entry_res_' + vid + '"> \
                     </ul> \
                 </div> \
             </div> \
@@ -838,7 +839,7 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine) {
                     ' + _("Download") + ' \
                     <span class="caret"></span> \
                     </a> \
-                    <ul class="dropdown-menu" role="menu" style="width:100%;max-height:60px;" id="youtube_entry_res_' + vid + '"></ul> \
+                    <ul class="dropdown-menu" role="menu" style="width:100%;max-height:80px;" id="youtube_entry_res_' + vid + '"></ul> \
                 </div> \
             </div> \
             <div><p style="margin-top:15px;"><a class="itemTitle" title="'+title+'"><b>' + text + '</b></a></p></div> \

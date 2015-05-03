@@ -8,7 +8,7 @@
     "toolbar": false,
     "position": "center",
     "title": "StreamStudio",
-    "min_width": 960,
+    "min_width": 995,
     "min_height": 550,
     "show": false,
     "frame":false

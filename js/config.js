@@ -41,6 +41,10 @@ $(document).on('ready', function() {
         }
     });
 
+    if(settings.locale == "fr") {
+        $('#subtitles_form').hide();
+    }
+
     $(document).on('change', '#defaultTranscoding', function(e) {
         if (this.checked) {
             settings.transcoding = true;
