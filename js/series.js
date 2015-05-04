@@ -303,7 +303,7 @@ function loadSerie(id) {
             var num = 1;
             $.each(serie.seasons, function(key, val) {
                 if (Object.keys(val.episode).length > 0) {
-                    $('#seasonsList').append('<button href="#" class="seasonItem btn btn-infos" data-id="' + serie.id + '" data-num="' + num + '"><span>' + _("Season") + ' ' + num + '</span></button>');
+                    $('#seasonsList').append('<button href="#" class="seasonItem btn btn-infos" data-id="' + serie.id + '" data-num="' + key + '"><span>' + _("Season") + ' ' + key + '</span></button>');
                 }
                 if (num == Object.keys(serie.seasons).length) {
                     $('#seasonsList .btn')[0].click();
@@ -335,111 +335,117 @@ function loadSeasonTable(id, num) {
         var html = '<div class="bigTable"><div class="panel panel-default"><div class="panel-heading"><h3 style="margin: -6px 0 0 0 !important;color:white;">' + _("Episodes list:") + '</h3></div><div class="nano"><div class="panel-body nano-content"><table class="table table-stripped table-hover table-bordered table-responsive serieTable"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th><th data-field="size">' + _("Seeders") + '</th><th data-field="size">' + _("Leechers") + '</th></tr></thead><tbody>';
         var count = 1;
         var infos = list[0];
-        $.each(list[0].seasons[num]['episode'], function(i, file) {
-            file.imdbId = infos.eztvId;
-            file.cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
-            if (list[0].engine == "eztv") {
-                file.engine = 'eztv';
-                var hash = pt(file.torrents['480p'].url.match(/btih:(.*?)&/)[1]).infoHash;
-                $.get('http://torrentproject.se/?s=' + hash + '&out=json&orderby=latest')
-                    .done(function(data) {
-                        if (parseInt(data.total_found) > 0) {
-                            file.torrentTitle = data[1].title;
-                            file.seeders = data[1].seeds;
-                            file.leechers = data[1].leechs;
-                            file.size = bytesToSize(parseInt(data[1].torrent_size), 2);
-                        } else {
+        num = parseInt(num);
+        console.log(id)
+        try {
+            $.each(list[0].seasons[num]['episode'], function(i, file) {
+                file.imdbId = infos.eztvId;
+                file.cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
+                if (list[0].engine == "eztv") {
+                    file.engine = 'eztv';
+                    var hash = pt(file.torrents['480p'].url.match(/btih:(.*?)&/)[1]).infoHash;
+                    $.get('http://torrentproject.se/?s=' + hash + '&out=json&orderby=latest')
+                        .done(function(data) {
+                            if (parseInt(data.total_found) > 0) {
+                                file.torrentTitle = data[1].title;
+                                file.seeders = data[1].seeds;
+                                file.leechers = data[1].leechs;
+                                file.size = bytesToSize(parseInt(data[1].torrent_size), 2);
+                            } else {
+                                file.torrentTitle = file.title;
+                                file.seeders = _('');
+                                file.leechers = _('');
+                                file.size = _('');
+                            }
+                            var c = sdb.find({
+                                "title": file.torrentTitle
+                            });
+                            var viewed = c.length > 0 ? 'block' : 'none';
+                            var watched = c.length > 0 ? _("already watched") : _("Not seen");
+                            var newItem = file.newItem ? 'newEpisode' : '';
+                            infos.season = parseInt(num);
+                            if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
+                                file.title += ' (VOSTFR)';
+                            }
+                            if (newItem) {
+                                file.title += _(" (NEW)");
+                            }
+                            if (file.type == "complete") {
+                                infos.ep = 'complete';
+                                html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                            } else {
+                                infos.ep = count;
+                                html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                            }
+                            if (count == Object.keys(list[0].seasons[num]['episode']).length) {
+                                html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
+                                $('#epContainer').empty().append(html)
+                            }
+                            count += 1;
+                        })
+                        .fail(function(error) {
                             file.torrentTitle = file.title;
                             file.seeders = _('');
                             file.leechers = _('');
                             file.size = _('');
-                        }
-                        var c = sdb.find({
-                            "title": file.torrentTitle
+                            var c = sdb.find({
+                                "title": file.torrentTitle
+                            });
+                            var viewed = c.length > 0 ? 'block' : 'none';
+                            var watched = c.length > 0 ? _("already watched") : _("Not seen");
+                            var newItem = file.newItem ? 'newEpisode' : '';
+                            infos.season = parseInt(num);
+                            if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
+                                file.title += ' (VOSTFR)';
+                            }
+                            if (newItem) {
+                                file.title += _(" (NEW)");
+                            }
+                            if (file.type == "complete") {
+                                infos.ep = 'complete';
+                                html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                            } else {
+                                infos.ep = count;
+                                html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                            }
+                            if (count == Object.keys(list[0].seasons[num]['episode']).length) {
+                                html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
+                                $('#epContainer').empty().append(html)
+                            }
+                            count += 1;
                         });
-                        var viewed = c.length > 0 ? 'block' : 'none';
-                        var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                        var newItem = file.newItem ? 'newEpisode' : '';
-                        infos.season = parseInt(num);
-                        if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
-                            file.title += ' (VOSTFR)';
-                        }
-                        if (newItem) {
-                            file.title += _(" (NEW)");
-                        }
-                        if (file.type == "complete") {
-                            infos.ep = 'complete';
-                            html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
-                        } else {
-                            infos.ep = count;
-                            html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
-                        }
-                        if (count == Object.keys(list[0].seasons[num]['episode']).length) {
-                            html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
-                            $('#epContainer').empty().append(html)
-                        }
-                        count += 1;
-                    })
-                    .fail(function(error) {
-                        file.torrentTitle = file.title;
-                        file.seeders = _('');
-                        file.leechers = _('');
-                        file.size = _('');
-                        var c = sdb.find({
-                            "title": file.torrentTitle
-                        });
-                        var viewed = c.length > 0 ? 'block' : 'none';
-                        var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                        var newItem = file.newItem ? 'newEpisode' : '';
-                        infos.season = parseInt(num);
-                        if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
-                            file.title += ' (VOSTFR)';
-                        }
-                        if (newItem) {
-                            file.title += _(" (NEW)");
-                        }
-                        if (file.type == "complete") {
-                            infos.ep = 'complete';
-                            html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
-                        } else {
-                            infos.ep = count;
-                            html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
-                        }
-                        if (count == Object.keys(list[0].seasons[num]['episode']).length) {
-                            html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
-                            $('#epContainer').empty().append(html)
-                        }
-                        count += 1;
-                    });
-            } else {
-                file.engine = 'tvdb'
-                var c = sdb.find({
-                    "title": file.torrentTitle
-                });
-                var viewed = c.length > 0 ? 'block' : 'none';
-                var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                var newItem = file.newItem ? 'newEpisode' : '';
-                infos.season = parseInt(num);
-                if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
-                    file.title += ' (VOSTFR)';
-                }
-                if (newItem) {
-                    file.title += _(" (NEW)");
-                }
-                if (file.type == "complete") {
-                    infos.ep = 'complete';
-                    html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
                 } else {
-                    infos.ep = count;
-                    html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                    file.engine = 'tvdb'
+                    var c = sdb.find({
+                        "title": file.torrentTitle
+                    });
+                    var viewed = c.length > 0 ? 'block' : 'none';
+                    var watched = c.length > 0 ? _("already watched") : _("Not seen");
+                    var newItem = file.newItem ? 'newEpisode' : '';
+                    infos.season = parseInt(num);
+                    if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
+                        file.title += ' (VOSTFR)';
+                    }
+                    if (newItem) {
+                        file.title += _(" (NEW)");
+                    }
+                    if (file.type == "complete") {
+                        infos.ep = 'complete';
+                        html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                    } else {
+                        infos.ep = count;
+                        html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                    }
+                    if (count == Object.keys(list[0].seasons[num]['episode']).length) {
+                        html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
+                        $('#epContainer').empty().append(html)
+                    }
+                    count += 1;
                 }
-                if (count == Object.keys(list[0].seasons[num]['episode']).length) {
-                    html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
-                    $('#epContainer').empty().append(html)
-                }
-                count += 1;
-            }
-        })
+            })
+        } catch(err) {
+            console.log(err)
+        }
     });
 }
 

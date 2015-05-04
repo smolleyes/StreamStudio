@@ -58,9 +58,11 @@ function storeCpbDatas(list,results,cb) {
 			//detect season
 			try {
 				item.season = parseInt(item.title.toUpperCase().match(/S(\d{1,3})/)[1])
+				item.type = 'episode'
 			} catch(err) {
 				try {
 					item.season = parseInt(item.title.toUpperCase().match(/SAISON (\d{1,3})/)[1])
+					item.type = 'complete'
 				} catch(err) {
 					return true;
 				}
@@ -71,7 +73,6 @@ function storeCpbDatas(list,results,cb) {
 				results.seasons[item.season]['episode'] = {}
 			}
 			// check if we have an episode number, set is a episode type first
-			item.type = 'episode'
 			try {
 				item.ep = parseInt(item.title.toUpperCase().match(/S(\d{1,3})E(\d{1,3})/)[2]);
 				Iterator.iterate(results.infos['Episodes']).forEach(function(e) {
@@ -90,7 +91,13 @@ function storeCpbDatas(list,results,cb) {
 						}
 					}
 				});
-			} catch(err) {}
+			} catch(err) {
+				// if not if we have a season number, add it as complete season torrent...
+				if(!results.seasons[item.season]['episode'].hasOwnProperty('complete')) {
+					item.type = 'complete';
+					results.seasons[item.season]['episode']['complete'] = item;
+				}
+			}
 		} catch(err) {}
 	});
 	cb(results);
@@ -133,9 +140,11 @@ function getOmgDatas(results,cb,page) {
 						item.torrentTitle = src.rls;
 						try {
 							item.season = parseInt(item.title.toUpperCase().match(/S(\d{1,3})/)[1])
+							item.type = 'episode'
 						} catch(err) {
 							try {
 								item.season = parseInt(item.title.toUpperCase().match(/SAISON (\d{1,3})/)[1])
+								item.type = 'complete'
 							} catch(err) {
 								return true;
 							}
