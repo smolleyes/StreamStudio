@@ -264,5 +264,12 @@
 	"Downloading subtitles, please wait...": "Downloading subtitles, please wait...",
 	"Default subtitles language:": "Default subtitles language:",
 	"Download best Audio track only": "Download best Audio track only",
-	"Audio only": "Audio only"
+	"Audio only": "Audio only",
+	"Can't parse your torrent file, please retry!": "Can't parse your torrent file, please retry!",
+	"Note:": "Note:",
+	"Subtitles are only working from the favorites or local files sections": "Subtitles are only working from the favorites or local files sections",
+	"Note: Subtitles are only working from the favorites or local files sections": "Note: Subtitles are only working from the favorites or local files sections",
+	"Date": "Date",
+	"Title": "Titre",
+	"Most populars": "Most populars"
 }

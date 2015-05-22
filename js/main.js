@@ -87,8 +87,7 @@ var htmlStr ='<div id="menu"> \
                 <li><a href="#" data-value="playlists">' + _("Playlists") + '</option> \
                 <li><a href="#" data-value="category">' + _("Categories") + '</option> \
                 <li><a href="#" data-value="channels" id="channelsOpt">' + _("Channels") + '</a></li> \
-                <li><a href="#" data-value="topRated" id="topRatedOpt">' + _("Top rated") + '</a></li> \
-                <li><a href="#" data-value="mostViewed" id="mostViewed">' + _("Most viewed") + '</a></li> \
+                <li><a href="#" data-value="topRated" id="topRatedOpt">' + _("Most populars") + '</a></li> \
             </ul> \
         </li> \
         <label id="dateTypes_label" style="margin-top: 5px;">' + _("Date:") + '</label> \
@@ -122,9 +121,10 @@ var htmlStr ='<div id="menu"> \
             </a> \
             <ul class="dropdown-menu" role="menu" style="width:100%;"> \
                 <li class="active"><a href="#" data-value="relevance">' + _("Relevance") + '</a></li> \
-                <li><a href="#" data-value="published">' + _("Published") + '</a></li> \
+                <li><a href="#" data-value="date">' + _("Date") + '</a></li> \
                 <li><a href="#" data-value="viewCount">' + _("Views") + '</a></li> \
                 <li><a href="#" data-value="rating">' + _("Rating") + '</a></li> \
+                <li><a href="#" data-value="title">' + _("Title") + '</a></li> \
             </ul> \
         </li> \
         <label id="duration_label" style="margin-top: 5px;">' + _("Duration:") + '</label> \
@@ -1169,8 +1169,7 @@ function main() {
         <li><a href="#" data-value="playlists">' + _("Playlists") + '</a></li> \
         <li><a href="#" data-value="category">' + _("Categories") + '</a></li> \
         <li><a href="#" data-value="channels" id="channelsOpt">' + _("Channels") + '</a></li> \
-        <li><a href="#" data-value="topRated" id="topRated">' + _("Top rated") + '</a></li> \
-        <li><a href="#" data-value="mostViewed" id="mostViewed">' + _("Most viewed") + '</a></li>';
+        <li><a href="#" data-value="topRated" id="topRatedOpt">' + _("Most populars") + '</a></li>';
                 $('#searchTypes_select ul').empty().append(html);
                 $('#searchTypes_select a.active').click();
                 var html = '<li class="active"><a href="#" data-value="" class="active">' + _("No filters") + '</a></li> \
@@ -1557,19 +1556,15 @@ function updateScroller() {
                 } else {
                     if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading) ||  $("#items_container .youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
                         if (search_engine === "youtube" && searchTypes_select === "playlists" && $("#items_container .youtube_item_playlist").length !== 0 && $("#items_container .youtube_item_playlist").length < totalResults) {
-                            current_page += 1;
                             pageLoading = true;
                             changePage();
                         } else if (activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container .youtube_item_channel").length !== 0 && $("#items_container .youtube_item_channel").length < totalResults) {
-                            current_page += 1;
                             pageLoading = true;
                             changePage();
                         } else if (activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container .youtube_item_channel").length == 0 && $("#items_container .youtube_item").length < totalResults) {
-                            current_page += 1;
                             pageLoading = true;
                             changeChannelPage();
                         } else if (activeTab == 1 && $("#items_container .youtube_item").length < totalResults) {
-                            current_page += 1;
                             pageLoading = true;
                             changePage();
                         }
@@ -1695,26 +1690,32 @@ function startSearch(query) {
         } else if (search_engine === 'youtube') {
             if (searchTypes_select === 'videos') {
                 youtube.searchVideos(query, current_page, searchFilters, search_order, searchDuration, function(datas) {
+                    current_page = datas.nextPageToken;
+                    ytSearchType = 'videos';
                     getVideosDetails(datas, 'youtube', false);
                 });
             } else if (searchTypes_select === 'playlists') {
-                youtube.searchPlaylists(query, current_page, function(datas) {
+                youtube.searchPlaylists(query, current_page, search_order, function(datas) {
+                    current_page = datas.nextPageToken;
+                    ytSearchType = 'playlist';
                     getPlaylistInfos(datas, 'youtube');
                 });
             } else if (searchTypes_select === 'category') {
                 youtube.categories(query, current_page, searchFilters, selected_category, searchDuration, function(datas) {
+                    current_page = datas.nextPageToken;
+                    ytSearchType = 'videos'
                     getVideosDetails(datas, 'youtube', false);
                 });
             } else if (searchTypes_select === 'channels') {
-                youtube.searchChannels(query, current_page, function(datas) {
+                youtube.searchChannels(query, current_page,search_order, function(datas) {
+                    current_page = datas.nextPageToken;
+                    ytSearchType = 'playlist';
                     getChannelsInfos(datas, 'youtube');
                 });
             } else if (searchTypes_select === 'topRated') {
-                youtube.standard(current_page, localeCode, 'top_rated', searchDate, function(datas) {
-                    getVideosDetails(datas, 'youtube', false);
-                });
-            } else if (searchTypes_select === 'mostViewed') {
-                youtube.standard(current_page, localeCode, 'most_popular', searchDate, function(datas) {
+                youtube.standard(current_page, localeCode, function(datas) {
+                    current_page = datas.nextPageToken;
+                    ytSearchType = 'toprated'
                     getVideosDetails(datas, 'youtube', false);
                 });
             }

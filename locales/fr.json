@@ -263,12 +263,15 @@
 	"Playing on your Chromecast device !": "Lecture sur votre périphérique Chromecast !",
 	"Minimize": "Minimiser",
 	"Maximize": "Maximiser",
-	"Default subtitles language:": "Default subtitles language:",
+	"Default subtitles language:": "Langue par défaut des sous-titres:",
 	"Downloading subtitles, please wait...": "Downloading subtitles, please wait...",
 	"Download best Audio track only": "Télécharger la meilleure piste audio",
 	"Audio only": "Piste Audio",
-	"Can't parse your torrent file, please retry!": "Can't parse your torrent file, please retry!",
+	"Can't parse your torrent file, please retry!": "Impossible d'analyser votre torrent, merci de réessayer!",
 	"Note:": "Note:",
-	"Subtitles are only working from the favorites or local files sections": "Subtitles are only working from the favorites or local files sections",
-	"Note: Subtitles are only working from the favorites or local files sections": "Note: Subtitles are only working from the favorites or local files sections"
+	"Subtitles are only working from the favorites or local files sections": "Les sous-titres fonctionnent uniquement depuis la section fichiers locaux",
+	"Note: Subtitles are only working from the favorites or local files sections": "Note: les sous-titres fonctionnent uniquement depuis la section fichiers locaux",
+	"Date": "Date",
+	"Title": "Titre",
+	"Most populars": "Plus populaires"
 }

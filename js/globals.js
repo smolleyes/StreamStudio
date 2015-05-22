@@ -106,6 +106,7 @@ var mediaCurrentPct = 0;
 var seekAsked = false;
 var playerBarsLocked = false;
 var mediaRendererType = 'upnp';
+var ytSearchType = 'search';
 //storedb
 var sdb = storedb('std');
 var seriesDb = storedb('seriesDb');
