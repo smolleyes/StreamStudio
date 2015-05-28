@@ -476,6 +476,7 @@ function getRendererState(state) {
                             $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
                             $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
                         } else {
+                            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
                             $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
                         }
                         $('.mejs-controls').width('100%');
