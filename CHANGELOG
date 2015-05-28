@@ -1,3 +1,7 @@
+V 2.4
+  * update youtube to api V3
+  * fix upnp server
+
 V 2.3.1
   * add cpasbien support for complete season in the favorites
   * fix season numbers in the favorites
