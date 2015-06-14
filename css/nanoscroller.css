@@ -2,7 +2,7 @@
 .nano {
   position : relative;
   overflow : hidden;
-  height: calc(100% - 191px);
+  height: calc(100% - 192px);
   overflow: hidden;
 }
 .nano > .nano-content {
@@ -29,8 +29,8 @@
   position   : absolute;
   width      : 10px;
   right      : 0;
-  top        : 0;
-  bottom     : 0;
+  top        : 0px;
+  bottom     : 2px;
   visibility : hidden\9; /* Target only IE7 and IE8 with this hack */
   opacity    : .01;
   -webkit-transition    : .2s;

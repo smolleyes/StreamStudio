@@ -18,22 +18,33 @@ $(document).on('click', '.seriePopupSelect', function() {
     $.magnificPopup.close();
     $("#mySeries").empty();
     $($("#seriesContainer p")[0]).empty().append('<p>'+_("Loading your serie, please wait...")+'</p>');
+    console.log(id, searchCb, searchQuery,true,engine,etzvId)
     return searchTVdbAllById(id, searchCb, searchQuery,true,engine,etzvId);
 })
 
 function checkSeriesUpdates(cb) {
 	var results = {};
 	results.success=true;
+	seriesToUpdate = 0;
+	seriesUpdated = 0;
 	bongo.db('seriesDb').collection('series').find({}).toArray(function(error,list) {
 		Iterator.iterate(list).forEach(function(item, i) {
+			seriesToUpdate +=1;
 			console.log('searching updates for '+ item.query);
 			var eztvId = null;
 		    if(item.engine == "eztv") {
 		    	etzvId = item.eztvId;
 		    }
 			searchTVdbAllById(item.id, function(data){
+				console.log(data)
 				if (!data.success) {
 					results.success = false;
+				}
+				seriesUpdated+=1;
+				if (seriesUpdated == seriesToUpdate) {
+					reloadSeries();
+				} else {
+					$("#mySeries").hide();
 				}
 			}, item.query,false,item.engine,eztvId);
 		});
@@ -136,12 +147,11 @@ function printSearchResults(items,cb,query,engine) {
 	searchCb = cb;
     searchQuery = query;
     $($("#seriesContainer p")[0]).empty().append('<p>'+_("%s results found, click the image to add the serie to your favorites", items.length)+'</p>');
-    $("#mySeries").prepend('<div class="nano"><div class="nano-content"></div></div>');
     Iterator.iterate(items).forEach(function(item, i) {
     	if(engine == 'eztv') {
-        	$("#mySeries .nano-content").append('<li class="list-row" style="float:left;border-bottom:0 !important;"><a href="#" class="seriePopupSelect" data-id="'+engine+'::'+item._id+'" id="' + item.tvdb_id + '"><img style="width:150px;height:185px;cursor:pointer;" src="' + item.images.poster + '" /></a><p class="coverInfosTitle" title="' + item.title + '">' + item.title + '</p></li>');
+        	$("#mySeries").append('<li class="list-row" style="float:left;border-bottom:0 !important;"><a href="#" class="seriePopupSelect" data-id="'+engine+'::'+item._id+'" id="' + item.tvdb_id + '"><img style="width:150px;height:185px;cursor:pointer;" src="' + item.images.poster + '" /></a><p class="coverInfosTitle" title="' + item.title + '">' + item.title + '</p></li>');
     	} else {
-    		$("#mySeries .nano-content").append('<li class="list-row" style="float:left;border-bottom:0 !important;"><a href="#" class="seriePopupSelect" data-id="'+engine+'::" id="' + item.id + '"><img style="width:150px;height:185px;cursor:pointer;" src="' + item.poster + '" /></a><p class="coverInfosTitle" title="' + item.SeriesName + ' (' + item.language + ')">' + item.SeriesName + ' (' + item.language + ')</p></li>');
+    		$("#mySeries").append('<li class="list-row" style="float:left;border-bottom:0 !important;"><a href="#" class="seriePopupSelect" data-id="'+engine+'::" id="' + item.id + '"><img style="width:150px;height:185px;cursor:pointer;" src="' + item.poster + '" /></a><p class="coverInfosTitle" title="' + item.SeriesName + ' (' + item.language + ')">' + item.SeriesName + ' (' + item.language + ')</p></li>');
     	}
     });
 }

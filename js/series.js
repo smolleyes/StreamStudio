@@ -145,9 +145,9 @@ $(document).on('click', '#refreshSeries', function(e) {
     $("#seriesContainer p").empty().append('<p>' + _("Searching updates for your series, please wait ... !") + '</p>');
     checkSeriesUpdates(function(data) {
         if (data.success) {
-            setTimeout(function() {
-                reloadSeries()
-            }, 2000)
+            // setTimeout(function() {
+            //     reloadSeries()
+            // }, 2000)
         } else {
             swal(_("Error!"), _("Series update error, please try again later !"), "error")
             printSeriesList(list)
@@ -158,12 +158,13 @@ $(document).on('click', '#refreshSeries', function(e) {
 $(document).on('click', '.newEpisode', function(e) {
     e.preventDefault();
     var infos = JSON.parse(decodeURIComponent($(this).attr('data-infos')));
+    var ep = JSON.parse(decodeURIComponent($(this).attr('data')));
     bongo.db('seriesDb').collection('series').find({
         'id': infos.id
     }).toArray(function(error, list) {
         var serie = list[0];
         var count = parseInt(serie.newItems) - 1;
-        serie.seasons[infos.season]['episode'][infos.ep].newItem = false;
+        serie.seasons[infos.season]['episode'][ep.ep].newItem = false;
         bongo.db('seriesDb').collection('series').save({
             _id: serie._id,
             id: serie.id,
@@ -189,7 +190,6 @@ function download (localFile, remotePath, callback) {
     var localStream = fs.createWriteStream(localFile);
     var out = request({ uri: remotePath });
     out.on('response', function (resp) {
-        console.log(resp)
         if (resp.statusCode === 200){
             out.pipe(localStream);
             localStream.on('close', function () {
@@ -210,7 +210,7 @@ function searchSerie() {
         $("#mySeries").empty();
         searchTVdb(query, function(data) {
             if (!data.success) {
-                swal(_("Error!"), _("Can't find results for %s !", data.infos.SeriesName), "error");
+                swal(_("Error!"), _("Can't find results for %s !", query), "error");
                 reloadSeries();
             }
         }, true)
@@ -336,12 +336,11 @@ function loadSeasonTable(id, num) {
         var count = 1;
         var infos = list[0];
         num = parseInt(num);
-        console.log(id)
         try {
             $.each(list[0].seasons[num]['episode'], function(i, file) {
-                file.imdbId = infos.eztvId;
                 file.cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
                 if (list[0].engine == "eztv") {
+                    file.imdbId = infos.eztvId;
                     file.engine = 'eztv';
                     var hash = pt(file.torrents['480p'].url.match(/btih:(.*?)&/)[1]).infoHash;
                     $.get('http://torrentproject.se/?s=' + hash + '&out=json&orderby=latest')
@@ -450,7 +449,7 @@ function loadSeasonTable(id, num) {
 }
 
 function reloadSeries() {
-    $("#seriesContainer").empty().append('<p></p><ul id="mySeries"></ul>');
+    $("#seriesContainer").empty().append('<p></p><div class="nano" style="height: calc(100% - 243px);"><div class="nano-content"><ul id="mySeries"></ul></div></div>');
     $('#seriesContainer').css('background', '');
     loadMySeries();
 }

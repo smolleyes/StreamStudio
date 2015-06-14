@@ -11,6 +11,7 @@ function analyseCpbDatas(results,cb) {
 	var seasons = {};
 	var fr = [];
 	var vost = [];
+	results.sucess = true;
 	Iterator.iterate(results.list).forEach(function (src,index) {
 		try {
 			var item = {};
@@ -34,18 +35,18 @@ function analyseCpbDatas(results,cb) {
 	// if french list is 0 parse vostfr
 	if(fr.length == 0) {
 		storeCpbDatas(vost,results,function(datas){
-			return getOmgDatas(datas,cb,1);
+			verifySerie(datas,cb)
 		});
 	} else {
 		// else parse it then try vost after callback
 		storeCpbDatas(fr,results,function(datas){
 			// if vost list is 0 call omgtorrent
 			if(vost.length == 0) {
-				return getOmgDatas(datas,cb,1);
+				verifySerie(datas,cb)
 			} else {
 				// else parse vost then call omgtorrent in callback 
 				storeCpbDatas(vost,datas,function(datas){
-					return getOmgDatas(datas,cb,1);
+					verifySerie(datas,cb)
 				});
 			}
 		})
@@ -101,6 +102,27 @@ function storeCpbDatas(list,results,cb) {
 		} catch(err) {}
 	});
 	cb(results);
+}
+
+function verifySerie(results,cb) {
+	// count valid seasons
+	results.seasonsCount = 0;
+	//console.log(results)
+	if(Object.keys(results.seasons).length == 0) {
+		swal(_("Error!"), _("No torrents found for %s, sorry !",results.name), "error");
+		return loadMySeries();
+	}
+	var num = 1;
+	$.each(results.seasons,function(key,val) {
+		if(Object.keys(val.episode).length > 0) {
+			results.seasonsCount+=1;
+		}
+		if(num == Object.keys(results.seasons).length) {
+			storeSerieToDb(results,cb)
+			//return cb(results);
+		}
+		num += 1;
+	});
 }
 
 function getOmgDatas(results,cb,page) {

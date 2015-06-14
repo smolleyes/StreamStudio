@@ -2146,11 +2146,10 @@ hr {
 #mySeries, #myMovies {
 	position: absolute;
 	left: 10;
-	top: 140px;
+	top: 6px;
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	height: calc(100% - 170px);
 }
 
 #reloadSeries {
@@ -2175,6 +2174,7 @@ hr {
 #seriesContainer {
 	height: 100%;
 	background-size: 100% calc(100% - 120px) !important;
+	width: calc(100% - 5px);
 }
 
 #seriesContainer h3 {

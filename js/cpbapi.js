@@ -30,17 +30,19 @@ function parseDatas(data, results,cb) {
 			results.seasons = {};
 			return getOmgDatas(results,cb,1);
 		}
-		var mlist=$('#centre div',data).get();
+		var mlist=$('.ligne0,.ligne1',data).get();
 		Iterator.iterate(mlist).forEach(function (item,i) {
-			if($(item).hasClass('ligne0') || $(item).hasClass('ligne1')){
+			try {
 				var video = {};
-				video.torrentLink = 'http://www.cpasbien.pw/telechargement/'+path.basename($(item).find('a')[0].href).replace('.html','.torrent');
+				video.torrentLink = 'http://www.cpasbien.pw/telechargement/'+path.basename($(item).find('.titre').attr('href').replace('.html','.torrent'));
 				video.seeders = $(item).find('.up').text();
 				video.leechers = $(item).find('.down').text();
-				video.title = $(item).find('a')[0].innerHTML;
-				video.torrentTitle = $(item).find('a')[0].innerHTML;
+				video.title = $(item).find('.titre').text();
+				video.torrentTitle = video.title;
 				video.size = $(item).find('.poid').text().trim();
 				results.list.push(video)
+			} catch(err) {
+				console.log(err)
 			}
 		});
 		if(results.list.length !== results.totalResults) {

@@ -1,3 +1,9 @@
+V 2.4.1
+  * remove OmgTorrent
+  * fix favorites to add a serie
+  * fix scrolling in favorites
+  * others small fix
+ 
 V 2.4
   * update youtube to api V3
   * fix upnp server

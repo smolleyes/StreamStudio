@@ -229,7 +229,11 @@ var htmlContent =
                                 </div> \
                                 <div id="seriesContainer"> \
                                     <p></p> \
-                                    <ul id="mySeries"></ul> \
+                                    <div class="nano" style="height: calc(100% - 243px);"> \
+                                        <div class="nano-content"> \
+                                            <ul id="mySeries"></ul> \
+                                        </div> \
+                                    </div> \
                                 </div> \
                             </div> \
                         </div> \
@@ -317,10 +321,6 @@ var htmlContent =
                                 <div class="ItemCheckbox left"> \
                                     <label for="omgtorrent">Cpasbien</label> \
                                     <input class="pluginCheckBox" type="checkbox" id="cpasbien" name="cpasbien"> \
-                                </div> \
-                                <div class="ItemCheckbox left"> \
-                                    <label for="omgtorrent">Omgtorrent</label> \
-                                    <input class="pluginCheckBox" type="checkbox" id="omgtorrent" name="omgtorrent"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
                                     <label for="t411">T411</label> \
