@@ -15,12 +15,12 @@ MysqlRegistry.prototype.initialize = function(service, callback) {
 
 };
 
-MysqlRegistry.prototype.registerItem = function(item, callback) {
+MysqlRegistry.prototype.registerNode = function(item, callback) {
 
   return callback(null, item);
 };
 
-MysqlRegistry.prototype.getItemById = function(id, callback) {
+MysqlRegistry.prototype.getNodeById = function(id, callback) {
 
   return callback(null, item);
 

@@ -192,7 +192,7 @@ function *getTVdbBanners(item, query) {
     		item.poster = 'images/tvdb.png';
     		return item;
     	}
-        Iterator.iterate(res).forEach(function(banner, i) {
+        Iterator.iterate(res.reverse()).forEach(function(banner, i) {
             if (banner.BannerType == "poster") {
                 item.poster = 'http://thetvdb.com/banners/' + banner.BannerPath;
                 if (!found) {

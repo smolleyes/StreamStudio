@@ -29,6 +29,7 @@ function downloadNW()
 	cd node_modules
 	echo -e "\nEdit some files... \n"
 	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" chromecast-js/node_modules/node-ssdp/lib/index.js
+	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" upnp.js
 	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" chromecast-js/node_modules/mdns-js/lib/networking.js
 	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" peerflix/node_modules/torrent-stream/node_modules/bittorrent-tracker/server.js
 	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" peerflix/node_modules/torrent-stream/node_modules/bittorrent-tracker/client.js
@@ -36,8 +37,9 @@ function downloadNW()
 	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" upnp-client/node_modules/node-ssdp/index.js
 	sed -i "s%{ type: 'udp4', reuseAddr: true }%'udp4'%" upnpserver/node_modules/node-ssdp/lib/index.js
 	cd ..
-	sed -i 's%"chromium-args.*$%"chromium-args":"--ignore-gpu-blacklist",\n  "js-flags": "--harmony --harmony-generators"%' package.json
-
+	if [[ ! `egrep "js-flags" package.json` ]]; then
+    	sed -i 's%"chromium-args.*$%"chromium-args":"--ignore-gpu-blacklist",\n  "js-flags": "--harmony --harmony-generators"%' package.json
+	fi
 	echo -e "Done !!!"
 	nohup ./streamstudio
 

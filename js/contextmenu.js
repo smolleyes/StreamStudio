@@ -148,9 +148,12 @@ $(document).ready(function() {
 		}
 		console.log(vid)
 		youtube.getVideoInfos('https://www.youtube.com/watch?v='+vid,0,1,upnpToggleOn,ext,settings,function(datas) {
-			printYtVideoInfos(datas[25], true, false, '', 'youtube');
-			console.log($("#"+vid))
-			$("#"+vid).find('.start_video').click();
+			var data = datas[25];
+			data.idList = [vid];
+			ytSearchType="playlist";
+			printYtVideoInfos(data, true, false, '', 'youtube',false,function(vid){
+				$("#"+vid).find('.start_video').click();
+			});
 		});
 		$('#custom-menu').slideUp();
 	});

@@ -59,7 +59,7 @@ $(document).ready(function() {
         }
         $('#playerContainer').hide();
         $('#playerTopBar').hide();
-        $('#tab a[href="#tabpage_'+activeTab+'"]').click();
+        $('#closePlayer').click();
         stopTorrent();
     });
     // pause/stop button
@@ -750,7 +750,7 @@ function getPrev() {
 						break;
 					} else {
 						console.log("no more videos to play in the playlists");
-						$('#homeToggle').click();
+						$('#closePlayer').click();
 						break;
 					}
 				}
@@ -763,7 +763,7 @@ function on_media_finished(){
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	if (playlistMode === 'normal' && !seekAsked) {
 		initPlayer();
-		$('#homeToggle').click();
+		$('#closePlayer').click();
 	} else if (playlistMode === 'loop') {
 		if(upnpToggleOn) {
 			if(upnpContinuePlay){

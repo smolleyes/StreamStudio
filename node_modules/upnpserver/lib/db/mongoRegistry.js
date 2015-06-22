@@ -18,12 +18,12 @@ MongooseRegistry.prototype.initialize = function(service, callback) {
 	});
 };
 
-MongooseRegistry.prototype.registerItem = function(item, callback) {
+MongooseRegistry.prototype.registerNode = function(item, callback) {
 
 	return callback(null, item);
 };
 
-MongooseRegistry.prototype.getItemById = function(id, callback) {
+MongooseRegistry.prototype.getNodeById = function(id, callback) {
 
 	return callback(null, item);
 

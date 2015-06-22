@@ -20,7 +20,7 @@ function searchGateway(timeout, callback) {
   
   var self    = this;
   var reqbuf  = new Buffer(req, "ascii");
-  var socket  = new dgram.Socket('udp4');
+  var socket  = new dgram.createSocket({ type: 'udp4', reuseAddr: true })
   var clients = {};
   var t;
   

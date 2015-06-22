@@ -849,7 +849,7 @@ function parseDuration(duration) {
     return seconds;
 }
 
-function printYtVideoInfos(infos, solo, sublist, sublist_id, engine,fromPlaylist) {
+function printYtVideoInfos(infos, solo, sublist, sublist_id, engine,fromPlaylist,cb) {
     youtube.getVideoStats(infos.idList,function(datas){
         $.each(datas.items,function(i,infos) {
             try {
@@ -946,6 +946,9 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine,fromPlaylist
             }
             if($('#items_container .youtube_item').length === itemsCount) {
                 pageLoading = false;
+            }
+            if(cb){
+                cb(vid);
             }
         });
     });

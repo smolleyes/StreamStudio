@@ -1,3 +1,9 @@
+V 2.4.2
+  * fix open youtube link
+  * fix covers on series search
+  * update ssdp node modules
+  * others small fix
+
 V 2.4.1
   * remove OmgTorrent
   * fix favorites to add a serie
