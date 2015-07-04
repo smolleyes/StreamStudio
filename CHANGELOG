@@ -3,6 +3,7 @@ V 2.5
   * fix lazyloading for cpasbien and t411 engine
   * gui update (new font)
   * fix kickass engine
+  * fix upnpserver (mkv not listed)
 
 V 2.4.2
   * fix open youtube link
