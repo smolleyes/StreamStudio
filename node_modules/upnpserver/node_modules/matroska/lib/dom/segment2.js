@@ -187,15 +187,7 @@ Segment2.prototype._addAttachment = function(desc) {
 		info = "*function*";
 
 	} else if (desc.path) {
-		getStream = function(start, end, callback) {
-			var options = {};
-			if (start !== undefined && start >= 0) {
-				options.start = start;
-			}
-			if (end !== undefined && end >= 0) {
-				options.end = end;
-			}
-
+		getStream = function(options, callback) {
 			var stream = fs.createReadStream(desc.path, options);
 			// console.log("Get stream (3) of ", desc.path, stream);
 			callback(null, stream);

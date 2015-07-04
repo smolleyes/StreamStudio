@@ -1,3 +1,9 @@
+V 2.5
+  * fix chromecast
+  * fix lazyloading for cpasbien and t411 engine
+  * gui update (new font)
+  * fix kickass engine
+
 V 2.4.2
   * fix open youtube link
   * fix covers on series search

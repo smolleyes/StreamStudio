@@ -592,9 +592,10 @@ function playOnChromecast(currentMedia) {
             } else {
                 $('.mejs-container').append('<p id="fbxMsg" style="height:45px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;">'+currentMedia.title+' <br/> '+_("Playing on your Chromecast device !")+'</p>')
             }
+            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
         } else if(status.playerState == 'BUFFERING') {
             $('#fbxMsg2').remove();
-            $('.mejs-overlay,.mejs-overlay-loading').show()
+            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').show()
             $('.mejs-overlay-play').hide()
         }
     });

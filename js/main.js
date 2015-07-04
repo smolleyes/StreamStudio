@@ -182,7 +182,7 @@ var htmlContent =
                 <p>' + _("Welcome to StreamStudio !<br><br>Make a new search or select a category to start...") + '</p> \
             </div> \
         </div> \
-        <div id="nanoContent1" class="nano" style="height:calc(100% - 201px);"> \
+        <div id="nanoContent1" class="nano" style="height:calc(100% - 216px);"> \
             <div id="items_container" class="nano-content"></div> \
         </div> \
     </div> \
@@ -300,7 +300,7 @@ var htmlContent =
                             </div> \
                         </div> \
                         <div class="form-group"> \
-                            <p><b><u>'+ _("Plugins choice:")+'</u></b><br>'+_("Please read the disclaimer here : <u><a id='disclaimer' style='color:red;' href='#'>disclaimer</a></u>")+'</p> \
+                            <div><p><b><u>'+ _("Plugins choice:")+'</u></b></p><p>'+_("Please read the disclaimer here : <u><a id='disclaimer' style='color:red;' href='#'>disclaimer</a></u>")+'</p></div> \
                             <div class="input-group well" style="display: table !important;"> \
                                 <!--<div class="ItemCheckbox left"> \
                                     <label for="vimeo">Vimeo</label> \
@@ -851,20 +851,24 @@ function main() {
                                 }
                                 var container = resolutions[resolution]['container'];
                             } catch (err) {
-                                continue;
+                                if(i+1 == resolutions_string.length) {
+
+                                } else {
+                                    continue;
+                                }
                             }
                             // append links
                             if (!infos.upnp && !ext && resolution !== '720p' && resolution !== "360p") {
                                 $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + '::' + vlinka + ' " alt="' + resolution + '"><span class="twitchQualityLink">' + resolution + '</span></a><a href="' + vlink + '::' + vlinka + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
                             } else {
-                                $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + ' " alt="' + resolution + '"><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
+                                $('#youtube_entry_res_' + vid).append('<li class="resolutions_container"><a class="video_link twitchQualityLink" style="display:none;" href="' + vlink + ' " alt="' + resolution + '"><span class="twitchQualityLink">' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + vid + '" title="' + _("Download") + '" class="download_file_https twitchQualityLink">' + resolution + '</a></li>');
                             }
                             if(i+1 == resolutions_string.length) {
                                 $('#youtube_entry_res_' + vid).append('<li role="presentation" class="divider" style="clear: both;margin-bottom: 2px;"></li>');
                                 $('#youtube_entry_res_' + vid).append('<li class="youtubeAudioTrackContainer resolutions_container"><a href="#" alt="' + title + '.mp4::' + vid + '" title="' + _("Download best Audio track only") + '" class="youtubeAudioTrack twitchQualityLink">' + _("Audio only")  + '</a></li>');
+                                startVideo(vid);
                             }
                         }
-                        startVideo(vid);
                     })
                 } else {
                     startVideo(vid);
@@ -1494,9 +1498,9 @@ function main() {
     cli.on('updateUpnpDevice', function() {
         updateUpnpList()
     });
-    try {
-        UPNPserver.stop()
-    } catch(err) {}
+    // try {
+    //     UPNPserver.stop()
+    // } catch(err) {}
 
     var observer = new MutationObserver(function(mutations) {
         if (spinnerPlay === false) {
@@ -1538,7 +1542,7 @@ function main() {
 $(document).bind("scrollend", ".nano",function(e){
     setTimeout(function() {
         updateScroller();
-    },200)
+    },300)
 });
 
 function updateScroller() {
@@ -1550,6 +1554,7 @@ function updateScroller() {
                 if (engine) {
                     if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height()) && pos == 0 && !engine.pageLoading ||  $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
                         if ($("#items_container ul li").length < engine.totalItems) {
+                            console.log("load more")
                             engine.loadMore();
                         }
                     }

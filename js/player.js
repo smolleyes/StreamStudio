@@ -448,7 +448,7 @@ function startPlay(media) {
 			playFromDailymotionLive = true;
 			currentMedia.link = link;
 			launchPlay();
-		} else if (link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
+		} else if (link.indexOf('videoplayback?') !== -1 && !upnpToggleOn) {
 			playFromYoutube = true;
 			currentMedia.link = link;
 			currentMedia.ytId = ytId;
@@ -525,7 +525,7 @@ function launchPlay() {
 	}
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1) {
+	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1 || playFromYoutube && obj.resolution !== '720p' && obj.resolution !== '360p' ) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;

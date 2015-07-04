@@ -1,9 +1,8 @@
 /** initial setup **/
 .nano {
   position : relative;
-  overflow : hidden;
-  height: calc(100% - 192px);
-  overflow: hidden;
+  height: calc(100% - 191px);
+  outline:none;
 }
 .nano > .nano-content {
   position      : absolute;
@@ -14,6 +13,7 @@
   bottom        : 0;
   left          : 0;
   background-size: 100% !important;
+  outline:none;
 }
 .nano > .nano-content:focus {
   outline: thin dotted;
@@ -30,7 +30,7 @@
   width      : 10px;
   right      : 0;
   top        : 0px;
-  bottom     : 2px;
+  bottom     : 0px;
   visibility : hidden\9; /* Target only IE7 and IE8 with this hack */
   opacity    : .01;
   -webkit-transition    : .2s;
@@ -40,6 +40,8 @@
   -moz-border-radius    : 5px;
   -webkit-border-radius : 5px;
   border-radius         : 5px;
+  overflow: hidden;
+  outline:none;
 }
 .nano > .nano-pane > .nano-slider {
   background: #444;

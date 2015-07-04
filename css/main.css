@@ -23,6 +23,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	src: url('../fonts/Ripper.ttf');
 }
 
+@font-face {
+	font-family: OpenSansSemibold; 
+	src: url('../fonts/OpenSans-Semibold.ttf');
+}
+
 .preload_dailymotion_live {
 	top: -8px;
 	position: relative;
@@ -394,11 +399,10 @@ html{
 }
 
 body {
-    font:12px/1.5 Tahoma, Arial, sans-serif;
+    font:14px OpenSansSemibold, Arial, sans-serif !important;
     background-color : #17181b !important;
+    line-height: 1 !important;
     color:white !important;
-    -webkit-font-smoothing: subpixel-antialiased;
-    -webkit-font-smoothing: antialiased !important;
     min-height: 100%;
 }
 
@@ -460,8 +464,9 @@ video{
     top: 0px;
     position: relative ;
     z-index:100001;
-    height:80px;
+    height:95px;
 }
+
 
 #loading p {
 	width:450px;
@@ -471,12 +476,11 @@ video{
 #search {
     z-index: 500;
     overflow:auto;
-    height:40px;
+    height:55px;
 }
 
-#search p {
-   	margin: 5px 0 10px 8px;
-    height: 32px ;
+#search_results {
+	  padding-top: 10px;
 }
 
 #search a {
@@ -499,6 +503,10 @@ video{
 .start_video {
     position: relative;
 	top: -5px;
+}
+
+div,form,a,select {
+	outline:none !important;
 }
 
 #subPlayer {
@@ -2156,8 +2164,8 @@ hr {
     font-size: 24px;
 	font-weight: bold;
 	position: absolute;
-	right: 35px;
-  	top: 50px;
+	right: 25px;
+  	top: 20px;
 	z-index: 10000;
 }
 

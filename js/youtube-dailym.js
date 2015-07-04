@@ -287,7 +287,7 @@ function getVideosDetails(datas, engine, sublist, vid) {
                         <span class="optionsBottom" style="display:none;bottom:90px;"></span> \
                         <div id="optionsBottomInfos" style="display:none;bottom:90px;"> \
                                 <div class="dropdown"> \
-                                    <a style="margin-top:-17px;" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
+                                    <a style="margin-top:-12px;" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
                                     ' + _("Available streams:") + ' \
                                     <span class="caret"></span> \
                                     </a> \
@@ -775,7 +775,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
             <div id="optionsBottomInfos" style="display:none;bottom:80px;"> \
                 <span><i class="glyphicon glyphicon-time"></i>'+seconds+'</span> \
                 <div class="dropdown"> \
-                    <a style="float:right;margin-top:-17px;" class="dropdown-toggle youtube_downloads" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
+                    <a style="float:right;margin-top:-12px;" class="dropdown-toggle youtube_downloads" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
                     ' + _("Download") + ' \
                     <span class="caret"></span> \
                     </a> \
@@ -909,7 +909,7 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine,fromPlaylist
                     <div id="optionsBottomInfos" style="display:none;bottom:80px;"> \
                         <span><i class="glyphicon glyphicon-time"></i>'+seconds+'</span> \
                         <div class="dropdown"> \
-                            <a style="float:right;margin-top:-17px;" class="dropdown-toggle youtube_downloads" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
+                            <a style="float:right;margin-top:-12px;" class="dropdown-toggle youtube_downloads" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
                             ' + _("Download") + ' \
                             <span class="caret"></span> \
                             </a> \
