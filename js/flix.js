@@ -131,8 +131,6 @@ function loadTorrent(link,cover) {
                 swal(_("Error!"), _("Can't get your torrent file, please retry!"), "error")
                 $('#preloadTorrent').empty();
             } else {
-                saveTorrent = false;
-                torrentSaved = false;
                 title = torrent.name;
                 torrentInfo = {
                     info: raw,

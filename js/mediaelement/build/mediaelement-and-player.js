@@ -3253,7 +3253,7 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
-						if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
+						if(playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
 							return;
 						}
 						if (x < offset.left) {
@@ -3277,6 +3277,8 @@ if (typeof jQuery != 'undefined') {
 								mediaRenderer.player.seek(newTime,function(){
 									console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
 								})
+							} else if (playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+								media.setCurrentTime(newTime);
 							} else {
 								//player.setCurrentTime(newTime)
 								var m = {};

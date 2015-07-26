@@ -1,3 +1,7 @@
+V 2.5.1
+  * fix seeking in the mini-player...
+  * fix youtube
+
 V 2.5
   * fix chromecast
   * fix lazyloading for cpasbien and t411 engine

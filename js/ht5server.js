@@ -424,7 +424,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     } 
 	if (host === undefined || link !== '') {
 		//local file...
-		if(!playFromYoutube && link.indexOf('videoplayback?id') == -1) {
+		if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
 			if(link.indexOf('.mp3') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.mp4?e=') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1) {
 				args = ['-ss' , start,'-re','-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
 			} else {
@@ -439,8 +439,8 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 			try {
 				var vlink = link.split('::')[0];
 				var alink = link.split('::')[1].trim().replace('%20','');
-				args = ['-ss' , start,'-i', vlink, '-ss', start,'-i', alink,'-preset', 'ultrafast', '-deinterlace','-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
-			} catch(err) {
+				args = ['-ss' , start,'-i', vlink, '-ss', start,'-i', alink,'-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+            } catch(err) {
 				currentMedia.link = link;
 				player.setSrc(currentMedia.link);
 				player.play();
@@ -472,10 +472,12 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 				var time = data.toString().match(/time=(\d\d:\d\d:\d\d\.\d\d)/)[1];
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 			    var pct = (seconds / total_time) * 100;
-				$('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
-				if(pct == 100) {
+                var total = pct+mediaCurrentPct;
+				if (pct >= 100) {
 					return;
-				}
+				} else {
+                   $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show(); 
+                }
 			}
 			
 		}

@@ -432,6 +432,9 @@ video{
 	font-weight: bold;
 }
 
+.form-control {
+	  padding: 8px 5px !important;
+}
 /*
 #menu {
     position: fixed;
@@ -545,7 +548,7 @@ div,form,a,select {
 
 #subPlayer-title-container {
 	margin-left: 250px;
-	margin-top: 26px;
+	margin-top: 28px;
 	float:left;
 }
 

@@ -1,4 +1,4 @@
-var VERSION = "2.5";
+var VERSION = "2.5.1";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -113,6 +113,7 @@ var seriesDb = storedb('seriesDb');
 var moviesDb = storedb('moviesDb');
 var seriesUpdated = false;
 var chromecastPlaying = false;
+var videoResolution = false;
 
 //checks
 temp.mkdir(function(err,path){

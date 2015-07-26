@@ -166,7 +166,11 @@ $(document).ready(function() {
 	
 	$('#subPlayer-play, #subPlayer-pause').click(function() {
 		if(player.media.paused) {
-			player.play();
+			if(player.media.src.indexOf('index.html') !== -1) {
+				startPlay(currentMedia);
+			} else {
+				player.play();
+			}
 		} else {
 			player.pause();
 		}
@@ -181,11 +185,11 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(engine && engine.engine_name === 'Grooveshark' || playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
+		if(playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
 			return;
 		}
 		var pos = e.offsetX;
-		var pct = (( pos * 100) / $('#progress-bar').width()).toFixed(2);
+		var pct = (( pos * 100) / $('#progress-bar').outerWidth(true)).toFixed(2);
 		var duree;
 		if(chromeCastplaying){
 			duree = mediaDuration;
@@ -193,10 +197,10 @@ $(document).ready(function() {
 			duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
 		}
 		var newTime = Math.round((duree * pct) / 100);
-		mediaCurrentTime = newTime;
-		mediaCurrentPct = (( pos * 100) / $('#progress-bar').width());
+		mediaCurrentPct = pct;
 		seekAsked = true;
-		if(transcoderEnabled || playFromYoutube) {
+		console.log(transcoderEnabled, playYoutubeDash)
+		if(transcoderEnabled || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
 			if(playFromFile) {
@@ -220,7 +224,7 @@ $(document).ready(function() {
 					console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
 				})
 			} else {
-				player.setCurrentTime(newTime)
+				player.media.setCurrentTime(newTime);
 			}
 		}
 	})
@@ -337,7 +341,7 @@ function initPlayer() {
 
 function updateMiniPlayer() {
 	var img = null;
-	if($('#subPlayer-title').text() !== currentMedia.title) {
+	if(currentMedia.title && $('#subPlayer-title').text() !== currentMedia.title) {
 		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 	}
 	try {
@@ -420,6 +424,7 @@ function startPlay(media) {
     playFromDailymotionLive = false;
     playFromYoutube = false;
     var localLink = null;
+    playYoutubeDash = false;
     try {
         next_vid = media.next;
         var link = media.link;
@@ -520,12 +525,11 @@ function launchPlay() {
 	} catch(err) {}
 	$('#subPlayer-play').hide();
 	$('#subPlayer-pause').show();
-	if($('#subPlayer-title').text() !== currentMedia.title) {
-		$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
-	}
+	
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1 || playFromYoutube && obj.resolution !== '720p' && obj.resolution !== '360p' ) {
+	console.log("VIDEORESOLUTION " + videoResolution)
+	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1 || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p' ) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
@@ -614,11 +618,13 @@ function startVideo(vid_id, title) {
             var res = $(childs[i], this).attr('alt');
             if (res == settings.resolution) {
                 childs[i].click();
+                videoResolution = res;
                 break;
             } else {
                 // if not found  select the highest resolution available...
                 if (i + 1 == elength) {
                     if (found === false) {
+                    	videoResolution = $(childs[0]).attr('alt');
                         childs[0].click();
                     } else {
                         continue;

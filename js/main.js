@@ -828,7 +828,7 @@ function main() {
                         var infos = datas[25];
                         mediaDuration = 0;
                         if (infos.upnp === false && !ext) {
-                            var resolutions_string = ['1080p', '720p', '480p', '360p', '240p'];
+                            var resolutions_string = ['1080p', '720p', '360p', '240p'];
                         } else {
                             var resolutions_string = ['720p', '360p'];
                         }
@@ -852,7 +852,9 @@ function main() {
                                 var container = resolutions[resolution]['container'];
                             } catch (err) {
                                 if(i+1 == resolutions_string.length) {
-
+                                    $('#youtube_entry_res_' + vid).append('<li role="presentation" class="divider" style="clear: both;margin-bottom: 2px;"></li>');
+                                    $('#youtube_entry_res_' + vid).append('<li class="youtubeAudioTrackContainer resolutions_container"><a href="#" alt="' + title + '.mp4::' + vid + '" title="' + _("Download best Audio track only") + '" class="youtubeAudioTrack twitchQualityLink">' + _("Audio only")  + '</a></li>');
+                                    startVideo(vid);
                                 } else {
                                     continue;
                                 }
