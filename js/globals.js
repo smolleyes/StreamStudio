@@ -1,4 +1,4 @@
-var VERSION = "2.5.1";
+var VERSION = "2.5.2";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
