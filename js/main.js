@@ -1160,7 +1160,7 @@ function main() {
                 $('#searchTypes_select a.active').click();
                 var html = '<li class="active"><a href="#" data-value="" class="active">' + _("No filters") + '</a></li> \
         <li><a href="#" data-value="hd">HD</a></li> \
-        <li><a href="#" data-value="3dopt" value = "3d">3D</a></li>';
+        <li><a href="#" data-value="3dopt" value="3d">3D</a></li>';
                 $('#searchFilters_select ul').empty().append(html);
                 $('#searchFilters_select a.active').click();
             } else {
@@ -1542,9 +1542,10 @@ function main() {
 }
 
 $(document).bind("scrollend", ".nano",function(e){
+    console.log("scroll end")
     setTimeout(function() {
         updateScroller();
-    },300)
+    },500)
 });
 
 function updateScroller() {
@@ -1554,14 +1555,14 @@ function updateScroller() {
             try {
                 var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
                 if (engine) {
-                    if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height()) && pos == 0 && !engine.pageLoading ||  $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
+                    if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height()) && pos == 0 && !engine.pageLoading || $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
                         if ($("#items_container ul li").length < engine.totalItems) {
                             console.log("load more")
                             engine.loadMore();
                         }
                     }
                 } else {
-                    if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading) ||  $("#items_container .youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
+                    if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading) ||  $("#items_container .youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
                         if (search_engine === "youtube" && searchTypes_select === "playlists" && $("#items_container .youtube_item_playlist").length !== 0 && $("#items_container .youtube_item_playlist").length < totalResults) {
                             pageLoading = true;
                             changePage();

@@ -60,87 +60,64 @@ function searchTVdb(query, cb, fromSearch) {
     results.fromSearch = true;
     searchCb = cb;
     searchQuery = query;
-    $.get("http://eztvapi.re/shows/1?keywords=" + query).done(function(items) {
-        if (items.length > 0 && settings.locale !== 'fr') {
-        	if(fromSearch) {
-            	return printSearchResults(items,cb,query,'eztv');
-        	}
-            if (items.length == 1) {
-                var id = items[0].tvdb_id;
-                return searchTVdbAllById(id, cb,query,'eztv',items[0]._id);
-            } else {
-                var html = '<h3>Select your serie!</h3><ul style="  width: 600px;position: relative;top: 50%;left: 50%;margin-left: -300px;">'
-                Iterator.iterate(items).forEach(function(item, i) {
-                    html += '<li class="list-row" style="float:left;"><a href="#" class="seriePopupSelect" data-id="eztv::'+item._id+'" id="' + item.tvdb_id + '"><img style="width:150px;height:200px;" src="' + item.images.poster + '" /></a><p class="coverInfosTitle">' + item.title + '</p></li>';
-                });
-                html += '</ul>';
-                showPopup(html, 'body');
-            }
-        } else {
-            tvdb.getSeries(query).then(function(items) {
-                if (items.length > 0) {
-                    if (items.length == 1) {
-                    	if(fromSearch) {
-                    		var list = [];
-                    		var gen = getTVdbBanners(items[0],query);
-                            var res = gen.next().value.then(
-                                function(val) {
-                                    list.push(val);
-							        return printSearchResults(list,cb,query,'tvdb',null);
-                                }
-                            );
-			        	} else {
-			        		var id = items[0].id;
-                        	return searchTVdbAllById(id, cb, query,false,'tvdb',null);
-			        	}
-                    } else {
-                        var list = [];
-                        Iterator.iterate(items).forEach(function(item, i) {
-                            var gen = getTVdbBanners(item);
-                            var res = gen.next().value
-                            .then(
-                                function(val) {
-                                    list.push(val);
-                                    if (list.length == items.length) {
-                                    	if(fromSearch) {
-                                    		return printSearchResults(list,cb,query,'tvdb');
-                                    	}
-                                        var html = '<h3>Select your serie!</h3><ul style="margin-top:10px;position: relative;top: 50%;display:inline-block;">'
-                                        Iterator.iterate(list).forEach(function(item, i) {
-                                            html += '<li class="list-row" style="float:left;"><a href="#" class="seriePopupSelect" data-id="tvdb::" id="' + item.id + '"><img style="width:150px;height:200px;" src="' + item.poster + '" /></a><p class="coverInfosTitle">' + item.SeriesName + ' (' + item.language + ')</p></li>';
-                                        });
-                                        html += '</ul>';
-                                        showPopup(html, 'body');
-                                    }
-                               }
-                            );
-                        });
-                    }
+        tvdb.getSeries(query).then(function(items) {
+            if (items.length > 0) {
+                if (items.length == 1) {
+                	if(fromSearch) {
+                		var list = [];
+                		var gen = getTVdbBanners(items[0],query);
+                        var res = gen.next().value.then(
+                            function(val) {
+                                list.push(val);
+					        return printSearchResults(list,cb,query,'tvdb',null);
+                            }
+                        );
+	        	} else {
+	        		var id = items[0].id;
+                    	return searchTVdbAllById(id, cb, query,false,'tvdb',null);
+	        	}
                 } else {
-                    results.success = false;
-                    results.error = "Can't find results for " + query;
-                    swal(_("Error!"), _("Can't find results for %s !",query), "error")
-                    if(fromSearch) {
-                    	$($("#seriesContainer p")[0]).empty().append('<p>'+_("No results found...")+'</p>');
-                	}
-                    cb(results);
+                    var list = [];
+                    Iterator.iterate(items).forEach(function(item, i) {
+                        var gen = getTVdbBanners(item);
+                        var res = gen.next().value
+                        .then(
+                            function(val) {
+                                list.push(val);
+                                if (list.length == items.length) {
+                                	if(fromSearch) {
+                                		return printSearchResults(list,cb,query,'tvdb');
+                                	}
+                                    var html = '<h3>Select your serie!</h3><ul style="margin-top:10px;position: relative;top: 50%;display:inline-block;">'
+                                    Iterator.iterate(list).forEach(function(item, i) {
+                                        html += '<li class="list-row" style="float:left;"><a href="#" class="seriePopupSelect" data-id="tvdb::" id="' + item.id + '"><img style="width:150px;height:200px;" src="' + item.poster + '" /></a><p class="coverInfosTitle">' + item.SeriesName + ' (' + item.language + ')</p></li>';
+                                    });
+                                    html += '</ul>';
+                                    showPopup(html, 'body');
+                                }
+                           }
+                        );
+                    });
                 }
-            })
-            .catch(function(error) {
+            } else {
                 results.success = false;
                 results.error = "Can't find results for " + query;
                 swal(_("Error!"), _("Can't find results for %s !",query), "error")
                 if(fromSearch) {
-                    $($("#seriesContainer p")[0]).empty().append('<p>'+_("No results found...")+'</p>');
-                }
+                	$($("#seriesContainer p")[0]).empty().append('<p>'+_("No results found...")+'</p>');
+            	}
                 cb(results);
-            });
-        }
-    }).fail(function(error) {
-        results.success = false;
-        results.error = error;
-        cb(results);
-    });
+            }
+        })
+        .catch(function(error) {
+            results.success = false;
+            results.error = "Can't find results for " + query;
+            swal(_("Error!"), _("Can't find results for %s !",query), "error")
+            if(fromSearch) {
+                $($("#seriesContainer p")[0]).empty().append('<p>'+_("No results found...")+'</p>');
+            }
+            cb(results);
+        });
 }
 
 function printSearchResults(items,cb,query,engine) {
