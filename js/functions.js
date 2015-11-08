@@ -99,7 +99,7 @@ function loadPcFiles(list,mainParent) {
 function loadchildrens(childs,parent,close) {
 	var html;
 	if ((childs !== undefined) && (childs !== null) && (childs.length !== 0)) {
-		$.each(childs,function(index,child) {
+		$.each(childs.reverse(),function(index,child) {
 			if(child.type==="file") {
 				var id = Math.floor(Math.random()*1000000);
 				var ext = child.name.split('.').pop().toLowerCase();

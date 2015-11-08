@@ -119,7 +119,7 @@ function browseUpnpDir(serverId, indexId, parentId) {
 }
 
 function loadUpnpItems(items) {
-    $.each(items, function(index, file) {
+    $.each(items.reverse(), function(index, file) {
         if (file.type === "folder") {
             var id = Math.floor(Math.random() * 1000000);
             var obj = {
