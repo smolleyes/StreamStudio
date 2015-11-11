@@ -439,7 +439,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 			try {
 				var vlink = decodeURIComponent(link).split('::')[0];
 				var alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
-				args = ['-ss' , start,'-i', vlink, '-ss', start,'-i', alink,'-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+				args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
             } catch(err) {
 				currentMedia.link = link;
 				player.setSrc(currentMedia.link);
@@ -473,7 +473,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 			    var pct = (seconds / total_time) * 100;
                 var total = pct+mediaCurrentPct;
-				if (pct >= 100) {
+				if (parseInt(total) >= 100) {
 					return;
 				} else {
                    $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show(); 

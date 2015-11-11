@@ -610,12 +610,13 @@ function startVideo(vid_id, title) {
         return;
     }
     
-    var childs = $('#' + vid_id + ' a.video_link');
+    var childs = $('#' + vid_id + ' a.video_link').get().reverse();
     var elength = parseInt(childs.length);
     if (elength > 1) {
         for (var i = 0; i < elength; i++) {
             var found = false;
             var res = $(childs[i], this).attr('alt');
+            console.log(res,settings.resolution)
             if (res == settings.resolution) {
                 childs[i].click();
                 videoResolution = res;
@@ -624,8 +625,8 @@ function startVideo(vid_id, title) {
                 // if not found  select the highest resolution available...
                 if (i + 1 == elength) {
                     if (found === false) {
-                    	videoResolution = $(childs[0]).attr('alt');
-                        childs[0].click();
+                    	videoResolution = $(childs[1]).attr('alt');
+                        childs[1].click();
                     } else {
                         continue;
                     }
@@ -805,10 +806,10 @@ function updateProgressBar() {
 		} catch(err) {}
 	} else {
 		var duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
-	    var current = player.media.currentTime;
-	    try {
-	   		var percentage = ((100 / duree) * (current+mediaCurrentTime));
-			progressBar.value = percentage;
-		} catch(err) {}
+      var current = player.media.currentTime;
+      try {
+        var percentage = ((100 / duree) * (current+mediaCurrentTime));
+      progressBar.value = percentage;
+    } catch(err) {}
 	}
 }

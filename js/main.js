@@ -285,7 +285,7 @@ var htmlContent =
                                 <ul class="dropdown-menu" id="resolutions_select" role="menu" style="width:100%;"> \
                                     <li class="active"><a href="#" data-value="1080p">1080p</a></li> \
                                     <li><a href="#" data-value="720p">720p</a></li> \
-                                    <li><a href="#" data-value="480pp">480p</a></li> \
+                                    <li><a href="#" data-value="480p">480p</a></li> \
                                     <li><a href="#" data-value="360p">360p</a></li> \
                                     <li><a href="#" data-value="240p">240p</a></li> \
                                 </ul> \

@@ -3265,7 +3265,7 @@ if (typeof jQuery != 'undefined') {
 						percentage = (pos / width);
 						try {
 							newTime = (percentage <= 0.0001) ? 0 : percentage * mediaDuration;
-						} catch(err) {return;}
+						} catch(err) {}
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
 							media.setCurrentTime(newTime);
@@ -3277,8 +3277,6 @@ if (typeof jQuery != 'undefined') {
 								mediaRenderer.player.seek(newTime,function(){
 									console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
 								})
-							} else if (playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
-								media.setCurrentTime(newTime);
 							} else {
 								//player.setCurrentTime(newTime)
 								var m = {};
@@ -3293,6 +3291,7 @@ if (typeof jQuery != 'undefined') {
 								} else if (playFromUpnp) {
 									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
 								} else if (playFromYoutube) {
+									console.log("SEEK IN YOUTUBE")
 									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 								}
 								m.title = currentMedia.title;
@@ -3396,7 +3395,11 @@ if (typeof jQuery != 'undefined') {
 					percent = Math.min(1, Math.max(0, percent));
 					// update loaded bar
 					if (t.loaded && t.total) {
-						t.loaded.width(t.total.width() * percent);
+						if((t.total.width() * percent) >= 100) {
+							return;
+						} else {
+							t.loaded.width(t.total.width() * percent);
+						}
 					}
 				}
 			} else {
