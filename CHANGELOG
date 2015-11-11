@@ -1,5 +1,12 @@
+V 2.6.3
+ * switch youtube codecs from mp4 to vp9 by default
+ * fix video seeking with ffmpeg
+
 V 2.6.2
   * fix playlists order
+
+V 2.6.1
+ * small fix...
   
 V 2.6
   * add m4a support
