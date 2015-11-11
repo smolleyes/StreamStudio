@@ -437,8 +437,8 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 		} else {
 			var vlink = link.split('::')[0];
 			try {
-				var vlink = link.split('::')[0];
-				var alink = link.split('::')[1].trim().replace('%20','');
+				var vlink = decodeURIComponent(link).split('::')[0];
+				var alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
 				args = ['-ss' , start,'-i', vlink, '-ss', start,'-i', alink,'-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
             } catch(err) {
 				currentMedia.link = link;

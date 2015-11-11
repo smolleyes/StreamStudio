@@ -145,7 +145,6 @@ function loadUpnpItems(items) {
 					return true;
 				}
 			} catch(err) {}
-			
 			if(ext)
             var id = Math.floor(Math.random() * 1000000);
                 var obj = {
