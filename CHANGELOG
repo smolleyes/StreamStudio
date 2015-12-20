@@ -1,3 +1,12 @@
+V 2.6.4
+ * fix youtube downloads
+ * update disclaimer
+ * fix piratebay engine
+
+V 2.6.4
+ * fix youtube on windows
+ * better peering system on torrents
+
 V 2.6.3
  * switch youtube codecs from mp4 to vp9 by default
  * fix video seeking with ffmpeg

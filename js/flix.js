@@ -5,6 +5,7 @@ var proc = require('child_process');
 var rTorrent = require('read-torrent');
 var peerflix = require('peerflix');
 var mime = require('mime');
+var magnetToTorrent = require('magnet-to-torrent');
 
 var path = require('path');
 var mime = require('mime');
@@ -69,18 +70,48 @@ $(document).on('click', '#closeMfp', function(evt) {
 
 function getTorrent(link, cover) {
     if (link.toString().indexOf('magnet:?') !== -1) {
-        var id = link.match('btih:(.*?)&')[1];
-        $.get('https://getstrike.net/api/v2/torrents/download/?hash=' + id).done(function(res) {
-            getTorrent(res.message, cover || '')
-        }).fail(function() {
-            loadTorrent(link,cover || '')
-        });
+        if (cover) {
+            mediaCover = cover;
+        } else {
+            mediaCover = '';
+        }
+        $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+        var obj = JSON.parse(settings.ht5Player);
+        if ((activeTab == 1 || activeTab == 2) && (search_engine === 'dailymotion' || search_engine === 'youtube' ||  engine.type == "video") && obj.name === "StreamStudio") {
+            $('#playerToggle').click();
+        }
+        $('#preloadTorrent').remove();
+        $('.mejs-container').append('<div id="preloadTorrent" \
+	      style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
+	      <p><b id="preloadProgress">' + _("Loading your torrent, please wait...") + '</b></p> \
+	      <div id="torrLoader">  \
+	      <div id="lemon"></div>  \
+		<div id="straw"></div>  \
+		<div id="glass">  \
+		    <div id="cubes">  \
+		        <div style="display:none;"></div>  \
+		        <div style="display:none;"></div>  \
+		        <div style="display:none;"></div>  \
+		    </div>  \
+		    <div id="drink"></div>  \
+		    <span id="counter"></span>  \
+		</div>  \
+		<div id="coaster"></div>  \
+	    </div> \
+	      <div id="peerStats"></div></div>');
+        magnetToTorrent.getLink(link)
+            .then(function(torrentLink) {
+                getTorrent(torrentLink, cover || '')
+            })
+            .fail(function(error) {
+                loadTorrent(link, cover || '') // couldn't get a valid link
+            });
     } else {
-        loadTorrent(link,cover || '')
+        loadTorrent(link, cover || '')
     }
 }
 
-function loadTorrent(link,cover) {
+function loadTorrent(link, cover) {
     initPlayer();
     stopTorrent();
     torrentInfo = {};
@@ -258,8 +289,8 @@ app.updateStats = function(streamInfo) {
                 stream.cover = mediaCover;
             }
             if (sdb.find({
-                "title": itemTitle
-            }).length == 0) {
+                    "title": itemTitle
+                }).length == 0) {
                 sdb.insert({
                     "title": itemTitle
                 }, function(err, result) {
@@ -270,8 +301,8 @@ app.updateStats = function(streamInfo) {
                     }
                 })
             } else if (sdb.find({
-                "title": stream.title
-            }).length == 0) {
+                    "title": stream.title
+                }).length == 0) {
                 sdb.insert({
                     "title": stream.title
                 }, function(err, result) {
@@ -529,8 +560,8 @@ function loadTable(files) {
                 type: 'inline',
                 prependTo: $('.mejs-container'),
                 closeOnContentClick: false
-                // You may add options here, they're exactly the same as for $.fn.magnificPopup call
-                // Note that some settings that rely on click event (like disableOn or midClick) will not work here
+                    // You may add options here, they're exactly the same as for $.fn.magnificPopup call
+                    // Note that some settings that rely on click event (like disableOn or midClick) will not work here
             }, 0);
             if ($('.loadStreaming').length == 1) {
                 $('.loadStreaming').click();
