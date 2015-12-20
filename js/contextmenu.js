@@ -27,6 +27,7 @@ $(document).ready(function() {
   			activElement = document.activeElement.id;
   		} catch(err) {}
         var text = clipboard.get('text');
+        console.log(text)
         $('#custom-menu ol').empty();
         if (text.indexOf('mega.co.nz') !== -1) {
             $('#custom-menu ol').empty().append('<li><a id="mega_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open mega link")+'</a></li>');
@@ -38,6 +39,7 @@ $(document).ready(function() {
 			if(text !== '' && decodeURIComponent(text).match(/^(http|https)/) !== null && decodeURIComponent(text).indexOf('youtu') == -1) {
 				$('#custom-menu ol').empty().append('<li><a id="external_link" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Open external link")+'</a></li>');
 			}
+			$('#custom-menu ol').append('<li><a id="youtube_dl" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Open with youtube-dl")+'</a></li>');
 		}
 		if(clipboard.get('text').trim() !== "" && $('#'+activElement).is("input[type=text]")) {
 			$('#custom-menu ol').empty().append('<li><a id="paste_link" href="#" alt="'+decodeURIComponent(text)+'" class="btn btn-default ">'+_("Paste")+'</a></li>');
@@ -194,6 +196,15 @@ $(document).ready(function() {
 		media.link = 'http://'+ipaddress+':8887/?file='+vlink+'&external';
 		media.title = vlink.split('/').pop();
 		startPlay(media);
+		$('#custom-menu').slideUp();
+	});
+
+	// open ytdl
+	$(document).on('click','#youtube_dl',function(e) {
+		e.preventDefault();
+		clipboard.clear();
+		var text = $(this).attr('alt');
+		openYtdlLink(text);
 		$('#custom-menu').slideUp();
 	});
 

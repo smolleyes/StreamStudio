@@ -1,6 +1,148 @@
+var ytl = require('youtube-dl');
+var __ = require('underscore');
+
 function saveSettings() {
     localStorage.StdSettings = JSON.stringify(settings);
 }
+
+function openYtdlLink(link) {
+    console.log(link)
+    var options = ["-j"];
+    $('#search').hide()
+    $('#loading').show();
+    ytl.getInfo(link,options,function(err, item){
+        console.log(item)
+        if(err || !item) {
+            $('#items_container').empty()
+            $('#search').show();
+            $('#search_results').empty().html('<p>' + _("No results found") + '</p>').show();
+            $('#loading').hide();
+            return;
+        }
+        $('#items_container').empty()
+        var count = 1;
+        if($.isArray(item)) {
+            __.each(item,function(data) {
+                console.log(data)
+                loadItem(data,count)
+                count+=1;
+            })
+        } else {
+            loadItem(item,count)
+        }
+    });
+}
+
+function loadItem(item, count) {
+    console.log(item)
+        var title = item.title;
+        if(item.thumbnail) {
+            var thumb = item.thumbnail.replace('/320','');
+        } else {
+            var thumb = execDir+'/images/movie.png';
+        }
+        var pid = generateUUID();
+        var length = item.duration == 'NaN' ? _('Unknown') : item.duration;
+        var filename = item._filename;
+        var ext = item.ext || 'mp4';
+        var views = item.view_count || ''
+        if(item.formats) {
+           var formats = item.formats; 
+        }
+
+        $('#items_container').append('<div class="youtube_item" style="height:180px;" id="'+pid+'"> \
+            <span class="optionsTop" style="display:none;"></span> \
+            <div id="optionsTopInfos" style="display:none;"> \
+               <span><i class="glyphicon glyphicon-eye-open"></i>'+_("Views:")+views+'</span> \
+            </div> \
+            <img src="' + thumb + '" class="video_thumbnail" /> \
+            <div> \
+                <img id="' + pid + '::ytdl" class="coverPlayImg start_video" style="display:none;margin: -75px 0 0 -100px;" /> \
+            </div> \
+            <span class="optionsBottom" style="display:none;bottom:50px;"></span> \
+            <div id="optionsBottomInfos" style="display:none;bottom:50px;"> \
+                <span><i class="glyphicon glyphicon-time"></i>'+length+'</span> \
+                <div class="dropdown"> \
+                    <a style="float:right;margin-top:-12px;" class="dropdown-toggle youtube_downloads" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
+                    ' + _("Download") + ' \
+                    <span class="caret"></span> \
+                    </a> \
+                    <ul class="dropdown-menu" role="menu" style="width:100%;max-height:80px;" id="youtube_entry_res_' + pid + '"> \
+                    </ul> \
+                </div> \
+            </div> \
+            <div><p style="margin-top:15px;"><a class="itemTitle" title="'+title+'"><b>' + title + '</b></a></p><div> \
+        </div>').show();
+
+        if(formats && formats.length > 0 ) {
+            for (var i = 0; i < formats.length; i++) {
+                try {
+                    var resolution = formats[i].format_id.toLowerCase().match(/\d{3,4}p/) !== null ? formats[i].format_id.toLowerCase().match(/\d{3,4}p/) !== null: formats[i].format_id.toLowerCase() ;
+                    
+                    if (resolution.toLowerCase().indexOf('hd') !== -1) {
+                        resolution = '1080p';
+                    } else if (formats[i].format.indexOf('1280x720') !== -1 || resolution.toLowerCase().indexOf('mp4_sq') !== -1) {
+                        resolution = '720p';
+                    } else if (resolution.toLowerCase().indexOf('sd') !== -1 || resolution.toLowerCase().indexOf('mp4_eq') !== -1) {
+                        resolution = '480p';
+                    } else if (resolution.toLowerCase().indexOf('hls_sq') !== -1 || resolution.toLowerCase().indexOf('mp4_mq') !== -1) {
+                        resolution = '360p';
+                    } else if (resolution.toLowerCase().indexOf('mobile') !== -1 || resolution.toLowerCase().indexOf('hls_lq') !== -1 || resolution.toLowerCase().indexOf('mp4_lq') !== -1) {
+                        resolution = '240p';
+                    }   
+                    var vlink = formats[i].url;
+                    if (vlink === 'null' || vlink.toLowerCase().indexOf('rtmp') !== -1 || formats[i].ext !== 'mp4' && formats[i].ext !== 'hls' && formats[i].ext !== 'webm' && formats[i].ext !== 'm3u8' && formats[i].ext !== 'mp3' && formats[i].ext !== 'aac') {
+                        continue;
+                    }
+                    var container = formats[i].ext;
+                } catch (err) {
+                    continue;
+                }
+                $('#youtube_entry_res_' + pid).append('<li class="resolutions_container" style="width:auto;"><a class="video_link ytdlQualityLink" style="display:none;margin-left:10px;" href="' + vlink + ' " alt="' + resolution + '"><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + pid + '" title="' + _("Download") + '" class="download_file_https ytdlQualityLink">' + resolution + '</a></li>');
+            }
+        } else {
+            try {
+                    var resolution = item.format_id.toLowerCase().match(/\d{3,4}p/) !== null ? item.format_id.toLowerCase().match(/\d{3,4}p/) !== null: item.format_id.toLowerCase() ;
+                    if (resolution.toLowerCase().indexOf('hd') !== -1) {
+                        resolution = '1080p';
+                    } else if (item.format.indexOf('1280x720') !== -1 || resolution.toLowerCase().indexOf('mp4_sq') !== -1) {
+                        resolution = '720p';
+                    } else if (resolution.toLowerCase().indexOf('sd') !== -1 || resolution.toLowerCase().indexOf('mp4_eq') !== -1) {
+                        resolution = '480p';
+                    } else if (resolution.toLowerCase().indexOf('hls_sq') !== -1 || resolution.toLowerCase().indexOf('mp4_mq') !== -1) {
+                        resolution = '360p';
+                    } else if (resolution.toLowerCase().indexOf('mobile') !== -1 || resolution.toLowerCase().indexOf('hls_lq') !== -1 || resolution.toLowerCase().indexOf('mp4_lq') !== -1) {
+                        resolution = '240p';
+                    }   
+                    var vlink = item.url;
+                    if (vlink === 'null' || vlink.toLowerCase().indexOf('rtmp') !== -1 || item.ext !== 'mp4' && item.ext !== 'hls' && item.ext !== 'webm' && item.ext !== 'm3u8' && item.ext !== 'mp3' && item.ext !== 'aac') {
+                        return;
+                    }
+                    var container = item.ext;
+                } catch (err) {
+                    console.log(err)
+                }
+                $('#youtube_entry_res_' + pid).append('<li class="resolutions_container" style="width:auto;"><a class="video_link ytdlQualityLink" style="display:none;margin-left:10px;" href="' + vlink + ' " alt="' + resolution + '"><span>' + resolution + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + pid + '" title="' + _("Download") + '" class="download_file_https ytdlQualityLink">' + resolution + '</a></li>');
+        }
+        if ($('#youtube_entry_res_' + pid + ' a.video_link').length === 0) {
+            $('#youtube_entry_res_' + pid).parent().parent().remove();
+        }
+
+        $('#search').show();
+        $('#search_results').empty().html('<p><strong>'+count+'</strong> ' + _("videos found") + '</p>').show();
+        $('#items_container').show();
+        $('#loading').hide();
+}
+
+function generateUUID() {
+  var d = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = (d + Math.random()*16)%16 | 0;
+      d = Math.floor(d/16);
+      return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+  });
+  return uuid;
+};
 
 function showPopup(html, target, cb) {
     $.magnificPopup.open({
@@ -412,23 +554,29 @@ function downloadFFMpeg(link, title, vid, toTorrent, audio) {
     if (activeTab !== 4) {
         $("#downloads_tab").click();
     }
+    var vlink = null;
+    var alink = null;
     var vid = ((Math.random() * 1e6) | 0);
     console.log("download link :" + link)
-    if (!audio) {
-        var vlink = link.split('::')[0];
-        try {
-            var alink = link.split('::')[1].replace('%20', '');
-            if (alink.indexOf('videoplayback?') == -1) {
+    if(link.indexOf('m3u8') == -1) {
+        if (!audio) {
+            vlink = link.split('::')[0];
+            try {
+                alink = link.split('::')[1].replace('%20', '');
+                if (alink.indexOf('videoplayback?') == -1) {
+                    return downloadFileHttps(vlink, title, vid, toTorrent);
+                }
+            } catch (err) {
                 return downloadFileHttps(vlink, title, vid, toTorrent);
             }
-        } catch (err) {
-            return downloadFileHttps(vlink, title, vid, toTorrent);
+            var title = sanitize(title.split('::')[0].trim().replace(/\\|\//g, '_').replace('.webm', '.mkv'));
+        } else {
+            title = sanitize(title.replace('.mp4', '.aac'));
         }
-        var title = sanitize(title.split('::')[0].trim().replace(/\\|\//g, '_').replace('.webm', '.mkv'));
     } else {
-        title = sanitize(title.replace('.mp4', '.aac'));
+        vlink = link;
     }
-
+    title = sanitize(title);
     var html = '<div id="progress_' + vid + '" class="progress" style="display:none;"> \
 	<p><b>' + title + '</b></p> \
 	<p> \
@@ -472,8 +620,10 @@ function downloadFFMpeg(link, title, vid, toTorrent, audio) {
     pbar.show();
 
     var encoder;
-    if (!audio) {
+    if (!audio && vlink && alink) {
         encoder = child_process.spawn(ffmpegPath, ['-y', '-i', vlink, '-i', alink, '-c:v', 'libx264', '-c:a', 'copy', '-f', 'matroska', target]);
+    } else if (!audio && vlink && !alink) {
+        encoder = child_process.spawn(ffmpegPath, ['-y', '-i', link, '-c:a', 'aac', '-c:v', 'libx264', '-preset', 'ultrafast','-strict', '-2', target]);
     } else {
         encoder = child_process.spawn(ffmpegPath, ['-y', '-i', link, '-c:a', 'aac', '-b:a', '240k', '-strict', '-2', target]);
     }

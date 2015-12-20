@@ -273,5 +273,9 @@
 	"Note: Subtitles are only working from the favorites or local files sections": "Note: les sous-titres fonctionnent uniquement depuis la section fichiers locaux",
 	"Date": "Date",
 	"Title": "Titre",
-	"Most populars": "Plus populaires"
+	"Most populars": "Plus populaires",
+	"Open with youtube-dl": "Open with youtube-dl",
+	"Unknown duration": "Unknown duration",
+	"Unknown": "Unknown",
+	"No results found": "No results found"
 }
