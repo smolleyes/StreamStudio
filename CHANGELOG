@@ -1,3 +1,8 @@
+V 2.6.5
+ * fix youtube downloads
+ * fix thepiratebay engine
+ * update disclaimer
+
 V 2.6.4
  * fix youtube on windows
  * better peering system on torrents
