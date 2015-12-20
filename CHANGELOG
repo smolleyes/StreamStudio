@@ -1,3 +1,7 @@
+V 2.6.6
+ * fix windows setup
+ * add function to open youtube-dl supported website's links by right click
+
 V 2.6.5
  * fix youtube downloads
  * fix thepiratebay engine
