@@ -1,0 +1,348 @@
+V 2.6.4
+ * fix youtube on windows
+ * better peering system on torrents
+
+V 2.6.3
+ * switch youtube codecs from mp4 to vp9 by default
+ * fix video seeking with ffmpeg
+
+V 2.6.2
+  * fix playlists order
+
+V 2.6.1
+ * small fix...
+  
+V 2.6
+  * add m4a support
+  * fix cpasbien engine
+  * fix kickass engine
+  * fix dailymotion engine
+  * fix lazyloading on engines
+  * css/gui update
+
+V 2.5.2
+  * fix save torrent after download
+
+V 2.5.1
+  * fix seeking in the mini-player...
+  * fix youtube
+
+V 2.5
+  * fix chromecast
+  * fix lazyloading for cpasbien and t411 engine
+  * gui update (new font)
+  * fix kickass engine
+  * fix upnpserver (mkv not listed)
+
+V 2.4.2
+  * fix open youtube link
+  * fix covers on series search
+  * update ssdp node modules
+  * others small fix
+
+V 2.4.1
+  * remove OmgTorrent
+  * fix favorites to add a serie
+  * fix scrolling in favorites
+  * others small fix
+ 
+V 2.4
+  * update youtube to api V3
+  * fix upnp server
+
+V 2.3.1
+  * add cpasbien support for complete season in the favorites
+  * fix season numbers in the favorites
+V 2.3
+  * fix download audio only on youtube
+  * fix piratebay engine
+  * fix torrent streaming from magnet
+ 
+v 2.2.5
+  * remove grooveshark, add piratebay
+
+V 2.2.4
+  * final youtube update after many changes in youtube_dl
+  * small gui fix
+
+V 2.2.3
+  * add download audio only for youtube
+  * youtube fix
+
+V 2.2.2
+  * youtube update 
+
+V 2.2.1
+ * fix progressbar
+
+V 2.2
+  * add seeking from player functions for chromecast
+  * fix sudo bug for updates on linux
+  * fix youtube bug for videos with age confirmation needed
+
+V 2.1
+  * fix t411 login
+  * fix play upnp files thru chromecast
+  * small youtube fix
+
+V 2.0.9 
+  * bug fix
+
+V 2.0.8
+  * fix youtube bugs
+
+V 2.0.7
+  * fix close window process
+  * add opensubtitles support for series
+
+V 2.0.6
+  * gui update
+  * update translations
+  * fix t411 engine login
+
+V 2.0.5
+  * fix external player
+
+V 2.0.4
+  * fix twitch upnp
+
+V 2.0.3
+  * better chromecast support
+  * fix open youtube link add youtu.be support 
+
+V 2.0.2
+  * gui update
+  * fix serie update bug
+
+v 2.0.1
+  * small fix
+ 
+V 2.0
+  * New gui design
+  * update to nwjs 12 with custom codecs (now support hevc/ac3/dts... natively)
+  * new favorites system to add and manage you series automatically
+  * add chromecast support
+  * livestreamer updated
+  * ffmpeg updated
+  * many bug fix and optimisations
+
+V 1.29.5 - 6 -7
+  * fix...
+
+V 1.29.4
+  * fix torrent thru upnp
+  * fix plugins update
+
+V 1.29.3
+  * fix
+
+V 1.29.2
+  * fix
+
+V 1.29.1
+  * fix
+
+V 1.29
+  * add multi files torrent support
+  * fix plugins config
+  * fix torrents peers connexion
+
+V 1.28.1
+  * fix start update on windows
+  * fix bug on plugins update
+
+v 1.28
+  * add informatiosn strings
+  * fix torrent starting
+
+v 1.27.5
+  * fix 
+
+V 1.27.4
+  * add transcoding thru ffmpeg by default
+  * fix subtitles
+
+v 1.27.3
+  * add yes/no popup to save torrents
+  * fix torrents stats
+  * update translations
+
+V 1.27.2
+  * add torrent stats
+  * add volume percentage
+
+v 1.27.1
+  * add progress bar for plugins updates
+  * add deutsch translation
+  * update italian translation
+
+V 1.27
+  * fix live streaming
+
+V 1.26.5
+  * add srt and vtt subtitles support for local files in local player
+ 
+V 1.26.4
+  * add upnp functions
+  * fix mega.co streaming
+
+V 1.26.3
+  * rewrite upnp 
+
+V 1.26.2
+  * fix youtube audio
+  * fix upnp
+
+V 1.26.1
+  * update ffmpeg windows
+  * fix local files playing thru upnp on windows
+
+v 1.26
+  * add dailymotion live streaming 
+
+V 1.25.4
+  * fix updater
+
+V 1.25.3
+  * all plugins can be used thru transcoder
+  * bug fixes
+
+V 1.25.2
+  * rewrite upnp functions
+
+V 1.25.1
+  * fix external players not playing youtube videos
+  * fix cursor restore when media finished and play is fullscreen
+  * fix get next media in upnp/local files playlist's when next media is a folder (was stopping before)
+  * exit fullscreen when stop button clicked
+  * better external players system
+  * change temp dir system for torrents
+
+V 1.25
+  * fix torrent temp dir 
+  * fix player duration not reinitialized
+
+V 1.24
+  * fix songza bugs
+  * add audio visualisations when transcoder enabled for audio files
+
+V 1.23
+  * add duration filter for youtube search
+  * update ffmpeg linux
+  * fix youtube download cancel
+
+V 1.22
+  * fix!
+
+V 1.21
+  * small fix
+  * clean files
+
+V 1.20
+  * fix osX ffmpeg
+  * fix youtube videos not playing
+
+V 1.19
+  * fix videos not completely readed
+  * small gui changes
+
+V 1.18
+  * fix osX update
+  * use compiled ffmpeg for osX
+  * bug fix 
+
+V 1.17
+  * add preload progress bar in the player when using transcoder
+  * many bug fixes
+
+V 1.16
+  * rewrite youtube code, get 1080p/240p and all formats thru direct ffmpeg transcoding and vp9/vorbis links
+
+V 1.15
+  * fix youtube 
+
+V 1.14
+  * add twitch plugin
+  * gui changes
+
+V 1.13
+  * bug fix
+
+V 1.12
+  * bug fix
+
+V 1.11
+  * remove pagination system, replaced by lazyloading
+
+V 1.10
+  * bug fixes
+
+V 1.9.9
+  * fix release
+
+v 1.9.8
+  * add transcoding functions to seek in the files!!!
+  * try es6 generators
+
+V 1.9.7
+  * add already watched database on torrent files
+  * fix youtube channels browsing
+ 
+V 1.9.6
+  * fix cpasbien/kickass/omgtorrent
+  * fix torrent stop function
+
+V 1.9.5
+  * fix youtube-dl
+  * fix osX update
+
+v 1.9.4
+  * fix download piratebay / kickass
+
+V 1.9.3
+  * fix restart
+
+V 1.9.2
+  * css fix
+  * torrents engine fix
+  * add play mode selector to subplayer
+
+V 1.9.1
+  * fix 
+
+V 1.9
+  * change youtube video loading 
+  * fix auto resoluton select
+
+V 1.8
+  * disable recursive scan for local db
+  * fix songza engine
+
+V 1.7
+  * fix peerflix with upnp on samsung tv
+  * fix fullscreen exit
+  * filter some local dirs in the scan
+
+V 1.6
+  * fix pagination
+  * fix local files scan
+
+V 1.5
+  * fix cpu usage at 20-25%
+
+V 1.4
+  * fix web library playlists
+  * fix right click contextmenu
+
+V 1.3
+  * fix some upnp bugs
+
+V 1.2
+  * fix external players
+  * small gui update
+
+V 1.1
+  * design fix 
+
+V 1.0
+  * first release!
