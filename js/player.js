@@ -536,7 +536,7 @@ function launchPlay() {
 	}
 
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.co') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.co') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
@@ -557,7 +557,11 @@ function launchPlay() {
 		if(mediaRendererType == 'upnp') {
 			playUpnpRenderer(currentMedia);
 		} else {
-			playOnChromecast(currentMedia);
+			if(currentMedia.link.indexOf('videoplayback?') !== -1) {
+				playOnChromecast(currentMedia, true);
+			} else {
+				playOnChromecast(currentMedia, false);
+			}
 		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
@@ -609,7 +613,7 @@ function startVideo(vid_id, title) {
     if ($('#' + vid_id + ' a.video_link').length === 0) {
         return;
     }
-    
+    videoResolution = '';
     var childs = $('#' + vid_id + ' a.video_link').get().reverse();
     var elength = parseInt(childs.length);
     if (elength > 1) {
@@ -618,8 +622,8 @@ function startVideo(vid_id, title) {
             var res = $(childs[i], this).attr('alt');
             console.log(res,settings.resolution)
             if (res == settings.resolution) {
-                childs[i].click();
                 videoResolution = res;
+                childs[i].click();
                 break;
             } else {
                 // if not found  select the highest resolution available...

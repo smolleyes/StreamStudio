@@ -565,8 +565,8 @@ function startUPNPserver() {
 }
 }
 
-function playOnChromecast(currentMedia) {
-    if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.link.indexOf('stream.php?streamKey') == -1 && currentMedia.link.indexOf('vp8') == -1 && currentMedia.link.indexOf('mp4') == -1 && currentMedia.link.indexOf('.ogg') == -1 && currentMedia.link.indexOf('.wav') == -1 && currentMedia.link.indexOf('.mp3') == -1 && currentMedia.link.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') == -1 || currentMedia.title.toLowerCase().indexOf('ac3') !== -1 || currentMedia.title.toLowerCase().indexOf('dts') !== -1 || currentMedia.title.toLowerCase().indexOf('hevc') !== -1 || currentMedia.title.toLowerCase().indexOf('x265') !== -1) {
+function playOnChromecast(currentMedia,yt) {
+    if(!yt && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.link.indexOf('stream.php?streamKey') == -1 && currentMedia.link.indexOf('vp8') == -1 && currentMedia.link.indexOf('mp4') == -1 && currentMedia.link.indexOf('.ogg') == -1 && currentMedia.link.indexOf('.wav') == -1 && currentMedia.link.indexOf('.mp3') == -1 && currentMedia.link.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') == -1 || currentMedia.title.toLowerCase().indexOf('ac3') !== -1 || currentMedia.title.toLowerCase().indexOf('dts') !== -1 || currentMedia.title.toLowerCase().indexOf('hevc') !== -1 || currentMedia.title.toLowerCase().indexOf('x265') !== -1 && currentMedia.link.indexOf('videoplayback?') == -1) {
         var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.replace('&upnp','');
         currentMedia.link = link;
     }

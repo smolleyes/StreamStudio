@@ -29,7 +29,7 @@ function checkUpdates() {
 				} else {
 					$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("ubukey is unreachable !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
 				}
-				$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:7000,content:_("Please DONATE if you like this software !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+				//$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:7000,content:_("Please DONATE if you like this software !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
 			});
 		});
 	} catch (err) {
