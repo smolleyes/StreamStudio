@@ -1,3 +1,6 @@
+V 2.6.7
+ * fix youtube-dl module (updated)
+
 V 2.6.6
  * fix windows setup
  * add function to open youtube-dl supported website's links by right click
