@@ -1,3 +1,7 @@
+V 2.6.8.1
+ * fix youtube 240p
+ * fix invalid time on dailymotion videos
+
 V 2.6.8
  * fix dailymotion engine
  * add wat.tv support to "open with youtube-dl" function
