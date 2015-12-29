@@ -224,7 +224,7 @@ function getVideosDetails(datas, engine, sublist, vid) {
             pageLoading = false;
             return;
         }
-        var page = parseInt(p) + 1;
+        var page = current_page + 1;
         if (search_engine === 'dailymotion') {
             if (has_more === true) {
                 $('#loadmore_' + vid).attr('alt', '' + totalResults + '::' + page + '::' + vid + '::' + engine + '').show();
@@ -304,6 +304,7 @@ function getVideosDetails(datas, engine, sublist, vid) {
                     }
                 } else {
                     dailymotion.getVideoInfos(items[i].id, i, items.length, function(datas) {
+                        console.log(datas)
                         fillPlaylist(datas, sublist, vid, 'dailymotion')
                     });
                 }
@@ -809,6 +810,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
             $('#search_results').empty().html('<p><strong>' + totalResults + '</strong> ' + _("videos found") + '</p>');
             $('#items_container').show();
 			pageLoading = false;
+            current_page+=1
 		}
 		
     } catch (err) {
@@ -818,6 +820,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
             $('#search_results').empty().html('<p><strong>' + totalResults + '</strong> ' + _("videos found") + '</p>');
             $('#items_container').show();
 			pageLoading = false;
+            current_page+=1
 		}
     }
 }

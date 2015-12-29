@@ -274,8 +274,9 @@
 	"Date": "Date",
 	"Title": "Titre",
 	"Most populars": "Plus populaires",
-	"Open with youtube-dl": "Open with youtube-dl",
-	"Unknown duration": "Unknown duration",
-	"Unknown": "Unknown",
-	"No results found": "No results found"
+	"Open with youtube-dl": "Ouvrir avec youtube-dl",
+	"Unknown duration": "durée inconnue",
+	"Unknown": "inconnue",
+	"No results found": "Aucun résultat trouvé",
+	"Total videos:": "Total videos:"
 }

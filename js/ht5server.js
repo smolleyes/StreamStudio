@@ -187,6 +187,41 @@ function startStreaming(req, res, width, height) {
 					}
 				});
 		}
+        if(playFromWat) {
+                console.log('play wat.tv stream')
+                var l = parsedLink.replace('/?file=','');
+                var link, quality;
+                if(l.indexOf('&quality') !== -1) {
+                    quality = link.split('&quality=')[1];
+                    link = link.split('&')[0]
+                } else {
+                    quality = "best";
+                }
+                console.log('Starting wat.tv streaming '+ link + " with quality " + quality);
+                ffmpegLive = true;
+                var st = spawn(livestreamerPath, ['-O',link, 'best']);
+                var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
+                            console.log('child process exited with code ' + code);
+                            res.end();
+                        });
+                st.stdout.pipe(ffmpeg.stdin);
+                stArr.push(st);
+                ffmpeg.stdout.pipe(res);
+                st.stderr.on('data', function(data) {
+                    console.log('grep stderr: ' + data);
+                    if(data.toString().match(/Failed to open segment/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Bandwith problem please try a lower quality !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                        initPlayer();
+                    } else if(data.toString().match(/No streams found on this URL/) !== null || data.toString().match(/requires a subscription/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams available for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                    } else if(data.toString().match(/Unable to open URL/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                    }
+                });
+        }
 		// play youtube dash
 		if(playFromYoutube && !upnpToggleOn) {
 			console.log('Opening youtube link')
@@ -425,27 +460,31 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     } 
 	if (host === undefined || link !== '') {
 		//local file...
-		if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
+        if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
 			if(link.indexOf('.mp3') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.mp4?e=') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1) {
-				args = ['-ss' , start,'-re','-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+				args = ['-ss' , start,'-re','-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-movflags', 'faststart','-threads', '0','-f', 'matroska','pipe:1'];
 			} else {
                 if(search_engine !== 'dailymotion') {
-				    args = ['-ss' , start,'-re','-i', ''+link+'','-sn','-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+				    args = ['-ss' , start,'-re','-i', ''+link+'','-sn','-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-movflags', 'faststart','-threads', '0','-f', 'matroska','pipe:1'];
 			    } else  {
-                    args = ['-ss' , start,'-i', ''+link+'','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                    args = ['-ss' , start,'-i', ''+link+'','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-movflags', 'faststart','-threads', '0','-f', 'matroska','pipe:1'];
                 }
             }
 		} else {
                     var vlink = decodeURIComponent(link).split('::')[0];
                     var alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
                     if(alink && alink.indexOf('videoplayback') !== -1) {
-                        args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy', '-threads', '0','-f','matroska', 'pipe:1'];
+                        args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy', '-movflags', 'faststart','-threads', '0','-f','matroska', 'pipe:1'];
                     } else {
-                        args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', 'libopus', '-threads', '0','-f','matroska', 'pipe:1'];
+                        args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', 'libopus','-movflags', 'faststart', '-threads', '0','-f','matroska', 'pipe:1'];
                     }          
 		}
 	} else {
-		args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'matroska', 'pipe:1'];
+        if(playFromWat) {
+            args = ['-re','-i','pipe:0','-c:v', 'copy','-c:a', 'copy', '-movflags', 'faststart','-threads', '0','-f','matroska', 'pipe:1'];
+        } else {
+            args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-movflags', 'faststart','-threads', '0','-f', 'matroska', 'pipe:1'];
+        }
 	}
 	console.log("spawn : " + args)
 	ffmpeg = spawn(ffmpegPath, args);

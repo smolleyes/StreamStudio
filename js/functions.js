@@ -91,7 +91,7 @@ function loadItem(item, count) {
                         resolution = '240p';
                     }   
                     var vlink = formats[i].url;
-                    if (vlink === 'null' || vlink.toLowerCase().indexOf('rtmp') !== -1 || formats[i].ext !== 'mp4' && formats[i].ext !== 'hls' && formats[i].ext !== 'webm' && formats[i].ext !== 'm3u8' && formats[i].ext !== 'mp3' && formats[i].ext !== 'aac') {
+                    if (vlink === 'null' || vlink.toLowerCase().indexOf('rtmp') !== -1 || formats[i].ext !== 'flv' && formats[i].ext !== 'mp4' && formats[i].ext !== 'hls' && formats[i].ext !== 'webm' && formats[i].ext !== 'm3u8' && formats[i].ext !== 'mp3' && formats[i].ext !== 'aac') {
                         continue;
                     }
                     var container = formats[i].ext;
@@ -126,6 +126,46 @@ function loadItem(item, count) {
         }
         if ($('#youtube_entry_res_' + pid + ' a.video_link').length === 0) {
             $('#youtube_entry_res_' + pid).parent().parent().remove();
+        }
+
+        if(item.webpage_url && item.webpage_url.indexOf('www.wat.tv') !== -1) {
+            var st = spawn(livestreamerPath, ['--stream-url', item.webpage_url]);
+            var out = '';
+            st.stdout.on('data', function(data) {
+                out = data.toString();
+            });
+            st.on('exit', function(code) {
+                if (code == 0) {
+                    if (out.indexOf('Available streams:') !== -1) {
+                        $('#youtube_entry_res_' + pid).empty();
+                        var list = out.replace('Available streams:', '').replace(/\(.*?\)/g, '').split(',');
+                        console.log(list)
+                        Iterator.iterate(list).forEach(function(quality) {
+                            var quality = quality.trim();
+                            if (quality !== 'audio') {
+                                $('#youtube_entry_res_' + pid).append('<li class="resolutions_container" style="width:auto;"><a class="video_link ytdlQualityLink" style="display:none;margin-left:10px;" href="' + item.webpage_url + ' " alt="' + quality + '"><span>' + quality + '</span></a><a href="' + vlink + '" alt="' + title + '.' + container + '::' + pid + '" title="' + _("Download") + '" class="download_file_https ytdlQualityLink">' + quality + '</a></li>');
+                            }
+                        });
+                    } else {
+                        $.notif({
+                            title: 'StreamStudio:',
+                            cls: 'red',
+                            icon: '&#59256;',
+                            timeout: 0,
+                            content: _("No streams found for this channel !"),
+                            btnId: 'ok',
+                            btnTitle: _('Ok'),
+                            btnColor: 'black',
+                            btnDisplay: 'block',
+                            updateDisplay: 'none'
+                        })
+                        //$('#youtube_entry_res_' + pid).parent().parent().remove();
+                    }
+                } else {
+                    console.log("livestreamer exit 1")
+                    $('#youtube_entry_res_' + pid).parent().parent().remove();
+                }
+            });
         }
 
         $('#search').show();

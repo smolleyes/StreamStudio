@@ -272,5 +272,9 @@
 	"Date": "Date",
 	"Title": "Titre",
 	"Most populars": "Most populars",
-	"Maximum resolution (youtube/dailymotion):": "Maximum resolution (youtube/dailymotion):"
+	"Maximum resolution (youtube/dailymotion):": "Maximum resolution (youtube/dailymotion):",
+	"Open with youtube-dl": "Open with youtube-dl",
+	"Unknown duration": "Unknown duration",
+	"Unknown": "Unknown",
+	"No results found": "No results found"
 }

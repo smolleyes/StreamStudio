@@ -30,6 +30,7 @@ var doNotSwitch = false;
 var currentMedia = {};
 var ChromecastInterval;
 var chromeCastplaying = false;
+var playFromWat = false;
 
 $(document).ready(function() {
 	
@@ -425,6 +426,7 @@ function startPlay(media) {
     playFromYoutube = false;
     var localLink = null;
     playYoutubeDash = false;
+    playFromWat = false;
     try {
         next_vid = media.next;
         var link = media.link;
@@ -448,6 +450,10 @@ function startPlay(media) {
 			playFromTwitch = true;
 			currentMedia.link = link.replace('&twitch','').replace('&external','');
 			launchPlay();
+    } else if (link.indexOf('wat.tv') !== -1) {
+      playFromWat = true;
+      currentMedia.link = link;
+      launchPlay();
 		// youtube dash
 		} else if (link.indexOf('dailymotion.com') !== -1 && link.indexOf('&quality=') !== -1) {
 			playFromDailymotionLive = true;
@@ -529,14 +535,14 @@ function launchPlay() {
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
 	console.log("VIDEORESOLUTION " + videoResolution)
-	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1 || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p' ) {
+	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1 || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p' && videoResolution !== '240p') {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
 	}
 
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.co') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' && videoResolution !== '240p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.co') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
@@ -608,34 +614,32 @@ function startExtPlayer(obj) {
 
 }
 
+var __ = require('underscore')
 
 function startVideo(vid_id, title) {
     if ($('#' + vid_id + ' a.video_link').length === 0) {
         return;
     }
     videoResolution = '';
-    var childs = $('#' + vid_id + ' a.video_link').get().reverse();
-    var elength = parseInt(childs.length);
-    if (elength > 1) {
-        for (var i = 0; i < elength; i++) {
-            var found = false;
-            var res = $(childs[i], this).attr('alt');
-            console.log(res,settings.resolution)
+    var arr = $('#' + vid_id + ' a.video_link').get()
+    var c = __.sortBy(arr, function(i) {
+      return parseInt($(i).attr('alt').replace('p',''));
+    });
+    var childs = c.reverse();
+    var found = false;
+    if (childs.length > 1) {
+        __.each(childs,function(child) {
+            var res = $(child).attr('alt');
+            console.log(res)
             if (res == settings.resolution) {
                 videoResolution = res;
-                childs[i].click();
-                break;
-            } else {
-                // if not found  select the highest resolution available...
-                if (i + 1 == elength) {
-                    if (found === false) {
-                    	videoResolution = $(childs[1]).attr('alt');
-                        childs[1].click();
-                    } else {
-                        continue;
-                    }
-                }
-            }
+                found = true;
+                child.click();
+            } 
+        });
+        if (!found) {
+          videoResolution = $(childs[0]).attr('alt');
+          childs[0].click();
         }
     } else {
         childs[0].click();
