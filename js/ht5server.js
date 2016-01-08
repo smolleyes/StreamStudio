@@ -57,7 +57,7 @@ function startStreaming(req, res, width, height) {
 			'Content-Type': 'video/mp4',
 			'Server':'CustomStreamer/0.0.1',
 			'transferMode.dlna.org': 'Streaming',
-			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'
+			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000'
 		});
 		res.setTimeout(10000000)
 		currentRes = res;
@@ -317,7 +317,7 @@ function startStreaming(req, res, width, height) {
                 downloadFileFromMega(megaName, decodeURIComponent(link), megaKey, true, megaSize, '');
             }
             //normal mega link
-        } else if (parsedLink.indexOf('mega.co') !== -1) {
+        } else if (parsedLink.indexOf('mega.nz') !== -1) {
             console.log("opening mega.co file: " + link);
             var file = mega.file(decodeURIComponent(link)).loadAttributes(function(err, file) {
 				if (err) { console.log(err)}
@@ -454,9 +454,9 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	}
 	if(!upnpToggleOn && search_engine !== 'twitch') {
 		link = decodeURIComponent(link);
-        audio = 'libvorbis';
+        audio = 'libmp3lame';
 	} else {
-        audio = 'libvorbis';
+        audio = 'libmp3lame';
     } 
 	if (host === undefined || link !== '') {
 		//local file...

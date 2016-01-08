@@ -1,5 +1,7 @@
 var mediaServer;
 playFromUpnp = false;
+var MediaRendererClient = require('upnp-mediarenderer-client');
+
 
 function browseUpnpDir(serverId, indexId, parentId) {
     console.log('loading file for server index ' + serverId + " at index " + indexId)
@@ -277,8 +279,8 @@ function loadUpnpQtip() {
           }
       });
       if(type == 'upnp') {
-        $("#upnpPopup input[name='"+cli._avTransports[upnpDevice]['friendlyName']+"']").prop('checked','checked');
-        mediaRenderer = new Plug.UPnP_AVTransport( cli._avTransports[upnpDevice], { debug: false } );
+        $('#upnpPopup input[name="'+cli._avTransports[upnpDevice]["friendlyName"]+'"]').prop('checked','checked');
+        mediaRenderer = new MediaRendererClient(cli._avTransports[upnpDevice].location);
       } else {
         mediaRenderer = __.some(chromecastDevices, function( el ) {
             return el.name === 'foo';
@@ -287,13 +289,12 @@ function loadUpnpQtip() {
   } else {
 	  if (upnpDevices.length > 0) {
 		upnpDevice = 0;
-		mediaRenderer = new Plug.UPnP_AVTransport( cli._avTransports[0], { debug: false } );
+		mediaRenderer = new MediaRendererClient(cli._avTransports[0].location);
 	  }
   }
   if (upnpDevices.length === 1) {
       upnpDevice = 0;
-      mediaRenderer = new Plug.UPnP_AVTransport( cli._avTransports[0], { debug: false } );
-      return;
+      mediaRenderer = new MediaRendererClient(cli._avTransports[0].location);
   } else if (upnpDevices.length === 0){
       var text = '<p>Aucun Freebox player allumé! <br>Allumez votre freebox player et réactivez ce bouton...</p>';
       $("#upnp-toggle").qtip({
@@ -348,178 +349,221 @@ function loadUpnpQtip() {
       }
     });
   }
+
 }
 
 var continueTransition = false;
 var transitionCount = 0;
 upnpStoppedAsked = false;
 var upnpDeviceState = '';
+var rendererState;
 function playUpnpRenderer(obj) {
     stopUpnp();
     cleanffar();
     if(mediaRendererType == "chromecast") {
         return playOnChromecast(obj);
     }
-    mediaRenderer.stop().then(function(response) {
-        setTimeout(function() {
-            // stop upnp file loading if needed
-            continueTransition = false;
-            timeUpdater = null;
-            transitionCount = 0;
-            if(obj.type === undefined) {
-                obj.type = "object.item.videoItem";
-            }
-            var uri = XMLEscape.xmlEscape(obj.link.replace('&upnp','').replace('&torrent','').replace('&direct',''));
-            var infos = JSON.parse(obj.data).protocolInfo;
-            var title = XMLEscape.escape(obj.title);
-            var type = obj.type;
-            currentMedia = obj;
-            
-            var metaString= '&lt;DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\" xmlns:sec=\"http://www.sec.co.kr/\"&gt;&lt;item id=\"0/0/912/145-0\" parentID=\"0/0/912\" restricted=\"1\"&gt;&lt;upnp:class&gt;'+type+'&lt;/upnp:class&gt;&lt;dc:title&gt;'+title+'&lt;/dc:title&gt;&lt;dc:creator&gt;Unknown Artist&lt;/dc:creator&gt;&lt;upnp:artist&gt;Unknown Artist&lt;/upnp:artist&gt;&lt;upnp:album&gt;Unknown Album&lt;/upnp:album&gt;&lt;res protocolInfo=\"'+infos+':*\"&gt;'+uri+'&lt;/res&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;'
-            mediaRenderer.setAVTransportURI("0",uri,metaString).then(function(response) {
-                if (response && response.data) {
-                    console.log('UPNP: Ok playing' + uri);
-                    // start watching for PLAYING state
-                    mediaRenderer.play().then(function(response) {
-                        upnpContinuePlay = true;
-                        continueTransition = true;
-                        transitionCount = 0;
-                        getRendererState('PLAYING');
-                    });
-                } else {
-                    console.log("ERROR UPNP " + response)
-                    mediaRenderer.stop().then(function(response) {
-                        continueTransition = false;
-                        upnpMediaPlaying = false;
-                        console.log('UPNP: No response for' + uri)
-                        getRendererState('STOPPED');
-                    });
-                }
-                
-            }).then( null, function( error ) { // Handle any errors
 
-                console.log( "An error occurred: " + error.description );
-
-            });
-        },2000);
-    });
-}
-
-function getRendererState(state) {
-    mediaRenderer.getTransportInfo().then(function(response) {
-        if (response && response.data) {
-            //console.log(response.data.CurrentTransportState, state, continueTransition , transitionCount)
-            //console.log(response.data.CurrentTransportState !== state && continueTransition, response.data.CurrentTransportState,state,continueTransition,transitionCount)
-            if(response.data.CurrentTransportState !== state && continueTransition) {
-                if(response.data.CurrentTransportState === 'TRANSITIONING') {
-                    if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
-                        upnpMediaPlaying = false;
-                        continueTransition = false;
-                        upnpStoppedAsked = true;
-                        stopUpnp();
-                    } else {
-                        transitionCount += 1;
-                        $('.mejs-time-current').width(0+'%');
-                        $('span.mejs-currenttime').text('--:--');
-                        $('span.mejs-duration').text('--:--');
-                        $('.mejs-overlay-play').hide();
-                        $('.mejs-overlay,.mejs-overlay-loading').show()
-                        setTimeout(function(){ 
-                            getRendererState(state);
-                        },1000);
-                    }
-                } else if (response.data.CurrentTransportState === "NO_MEDIA_PRESENT") {
-                    if(transitionCount < 10 ) {
-                        setTimeout(function(){
-                            transitionCount +=1;
-                            getRendererState('STOPPED');
-                        },1000);
-                    } else {
-                        upnpMediaPlaying = false;
-                        continueTransition = false;
-                        initPlayer()
-                        setTimeout(function(){
-                            getRendererState('STOPPED');
-                        },1000);
-                    }
+    try {
+        mediaRenderer = new MediaRendererClient(cli._avTransports[upnpDevice].location);
+        mediaRenderer.on('status', function(status) {
+          // Reports the full state of the AVTransport service the first time it fires, 
+          // then reports diffs. Can be used to maintain a reliable copy of the 
+          // service internal state. 
+          console.log(status);
+          rendererState = status;
+        });
+         
+        mediaRenderer.on('loading', function() {
+          console.log('loading');
+        });
+         
+        mediaRenderer.on('playing', function() {
+          console.log('playing');
+         upnpMediaPlaying = true;
+         setTimeout(function(){
+                $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+                updateMiniPlayer();
+                $('.mejs-overlay-button').hide();
+                $('.mejs-overlay-loading').hide();
+                $('.mejs-container p#fbxMsg').remove();
+                $('#fbxMsg2').remove()
+                if(search_engine == "grooveshark" || search_engine == "songza") {
+                    $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
                 } else {
                     $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-                    upnpMediaPlaying = true;
-                    if($('#fbxMsg2').length == 0 && search_engine == "grooveshark" || search_engine == "songza") {
-                        $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
-                        $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                    }
-                    if ($('#fbxMsg2').length > 0 && $('#fbxMsg2 img').attr('src') !== currentMedia.cover) {
-                        $('#fbxMsg2 img').attr('src',currentMedia.cover);
-                        $('#fbxMsg2 h3').text(currentMedia.title);
-                    }
-                    setTimeout(function(){ 
-                        getRendererState(state);
-                        getUpnpPosition();
-                    },1000);
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
                 }
+                $('.mejs-controls').width('100%');
+            },1000);
+        });
+         
+        mediaRenderer.on('paused', function() {
+          console.log('paused');
+        });
+         
+        mediaRenderer.on('stopped', function() {
+          console.log('stopped');
+          upnpMediaPlaying = false;
+          continueTransition = false;
+           stopUpnp();
+            cleanffar();
+        });
+    } catch(err) {
+        console.log(err)
+        return;
+    }
+ 
+    // Load a stream with subtitles and play it immediately
+    if(obj.title.indexOf('opus') !== -1) {
+        currentMedia.mime = 'audio/opus'
+        currentMedia.type = "audio"
+    }
+    var options = { 
+      autoplay: true,
+      contentType: currentMedia.mime || "video/mp4",
+      metadata: {
+        title: obj.title,
+        creator: '',
+        type: currentMedia.type || "video", // can be 'video', 'audio' or 'image' 
+        subtitlesUrl: ''
+      }
+    };
+
+    var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','');
+
+    console.log(options,mediaRenderer)
+    
+    setTimeout(function() {
+        mediaRenderer.load(uri, options, function(err, result) {
+            console.log(err,result)
+            if(err) throw err;
+            console.log('playing ...');
+            upnpContinuePlay = true;
+            continueTransition = true;
+            transitionCount = 0;
+            getRendererState('PLAYING');
+            setTimeout(function(){
+                $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+                updateMiniPlayer();
+                $('.mejs-overlay-button').hide();
+                $('.mejs-overlay-loading').hide();
+                $('.mejs-container p#fbxMsg').remove();
+                $('#fbxMsg2').remove()
+                if(search_engine == "grooveshark" || search_engine == "songza") {
+                    $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+                } else {
+                    $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+                }
+                $('.mejs-controls').width('100%');
+            },1000);
+        });
+    },2000);
+}
+
+
+
+function getRendererState(state) {
+   if(rendererState.TransportState !== state && continueTransition) {
+        if(rendererState.TransportState === 'TRANSITIONING') {
+            if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
+                upnpMediaPlaying = false;
+                continueTransition = false;
+                upnpStoppedAsked = true;
+                stopUpnp();
             } else {
-                console.log(state, upnpStoppedAsked)
-                if (state === 'PLAYING') {
-                    transitionCount = 0;
-                    upnpMediaPlaying = true;
-                    continueTransition = true;
-                    setTimeout(function(){
-                        $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-                        updateMiniPlayer();
-                        $('.mejs-overlay-button').hide();
-                        $('.mejs-overlay-loading').hide();
-                        $('.mejs-container p#fbxMsg').remove();
-                        $('#fbxMsg2').remove()
-                        if(search_engine == "grooveshark" || search_engine == "songza") {
-                            $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
-                            $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                        } else {
-                            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-                            $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                        }
-                        $('.mejs-controls').width('100%');
-                    },1000);
-                    // watch for STOPPED state
+                transitionCount += 1;
+                $('.mejs-time-current').width(0+'%');
+                $('span.mejs-currenttime').text('--:--');
+                $('span.mejs-duration').text('--:--');
+                $('.mejs-overlay-play').hide();
+                $('.mejs-overlay,.mejs-overlay-loading').show()
+                setTimeout(function(){ 
+                    getRendererState(state);
+                },1000);
+            }
+        } else if (rendererState.TransportState === "NO_MEDIA_PRESENT") {
+            if(transitionCount < 10 ) {
+                setTimeout(function(){
+                    transitionCount +=1;
                     getRendererState('STOPPED');
-                } else if (state === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
-                    upnpMediaPlaying = false;
-                    continueTransition = false;
-                    upnpStoppedAsked = false;
-                    if(!play_next && !play_prev) {
-                        setTimeout(function(){
-                            checkStopped()
-                        },2000);
-                    } else {
-                        play_next = false;
-                        play_prev = false;
-                    }
-                }
+                },1000);
+            } else {
+                upnpMediaPlaying = false;
+                continueTransition = false;
+                initPlayer()
+                setTimeout(function(){
+                    getRendererState('STOPPED');
+                },1000);
             }
         } else {
-
-            console.log("Service is reporting no response");
+            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+            upnpMediaPlaying = true;
+            if($('#fbxMsg2').length == 0 && search_engine == "grooveshark" || search_engine == "songza") {
+                $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
+                $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+            }
+            if ($('#fbxMsg2').length > 0 && $('#fbxMsg2 img').attr('src') !== currentMedia.cover) {
+                $('#fbxMsg2 img').attr('src',currentMedia.cover);
+                $('#fbxMsg2 h3').text(currentMedia.title);
+            }
+            setTimeout(function(){ 
+                getRendererState(state);
+                getUpnpPosition();
+            },1000);
         }
-    }).then( null, function( error ) { // Handle any errors
-        console.log( "An error occurred: " + error );
-    });
+    } else {
+        console.log(state, upnpStoppedAsked)
+        if (state === 'PLAYING') {
+            transitionCount = 0;
+            upnpMediaPlaying = true;
+            continueTransition = true;
+            setTimeout(function(){
+                $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+                updateMiniPlayer();
+                $('.mejs-overlay-button').hide();
+                $('.mejs-overlay-loading').hide();
+                $('.mejs-container p#fbxMsg').remove();
+                $('#fbxMsg2').remove()
+                if(search_engine == "grooveshark" || search_engine == "songza") {
+                    $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+                } else {
+                    $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+                }
+                $('.mejs-controls').width('100%');
+            },1000);
+            // watch for STOPPED state
+            getRendererState('STOPPED');
+        } else if (state === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
+            upnpMediaPlaying = false;
+            continueTransition = false;
+            upnpStoppedAsked = false;
+            if(!play_next && !play_prev) {
+                setTimeout(function(){
+                    checkStopped()
+                },2000);
+            } else {
+                play_next = false;
+                play_prev = false;
+            }
+        }
+    }
 }
 
 function checkStopped() {
     stopUpnp();
-    mediaRenderer.getTransportInfo().then(function(response) {
-        if (response && response.data) {
-            //console.log(response.data.CurrentTransportState, state, continueTransition , transitionCount)
-            //console.log(response.data.CurrentTransportState !== state && continueTransition, response.data.CurrentTransportState,state,continueTransition,transitionCount)
-            if(response.data.CurrentTransportState == 'STOPPED' || response.data.CurrentTransportState === 'NO_MEDIA_PRESENT') {
-                on_media_finished();
-            } else {
-                setTimeout(function(){
-                    checkStopped()
-                },1000);
-            }
-        }
-    });
+    if(rendererState.TransportState == 'STOPPED' || rendererState.TransportState === 'NO_MEDIA_PRESENT') {
+            on_media_finished();
+    } else {
+        setTimeout(function(){
+            checkStopped()
+        },1000);
+    }
 }
 
 function stopUpnp() {

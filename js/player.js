@@ -542,7 +542,7 @@ function launchPlay() {
 	}
 
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.co') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
@@ -552,12 +552,15 @@ function launchPlay() {
 		if(currentMedia.type === undefined) {
 			try {
 				if (mime.lookup(currentMedia.title).indexOf('audio/') !== -1 || mime.lookup(currentMedia.link).indexOf('audio/') !== -1) {
-					currentMedia.type = "object.item.audioItem.musicTrack";
+					currentMedia.type = "audio";
+          currentMedia.mime = mime.lookup(currentMedia.title) || "audio/mp3"
 				} else if (mime.lookup(currentMedia.title).indexOf('video/') !== -1 || mime.lookup(currentMedia.link).indexOf('video/') !== -1) {
-					currentMedia.type = "object.item.videoItem";
+					currentMedia.type = "video";
+          currentMedia.mime = mime.lookup(currentMedia.title) || "video/mp4"
 				}
 			} catch(err) {
-				currentMedia.type = "object.item.videoItem";
+				currentMedia.type = "video";
+        currentMedia.mime = "video/mp4"
 			}
 		}
 		if(mediaRendererType == 'upnp') {
