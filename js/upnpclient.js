@@ -10,6 +10,7 @@ function getUpnpPosition() {
 							mediaDuration = duration;
 							if(upnpToggleOn) {
 								mediaCurrentTime = position;
+								player.media.currentTime = position
 							} else {
 								player.media.currentTime = position;
 							}

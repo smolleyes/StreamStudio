@@ -186,19 +186,21 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(playFromMegaUser || playFromMega || upnpToggleOn && mediaRendererType !== 'chromecast') {
+		if(playFromMegaUser || playFromMega) {
 			return;
 		}
 		var pos = e.offsetX;
 		var pct = (( pos * 100) / $('#progress-bar').outerWidth(true)).toFixed(2);
+    console.log(pct)
 		var duree;
 		if(chromeCastplaying){
 			duree = mediaDuration;
 		} else {
-			duree = player.media.duration !== Infinity ? player.media.duration : mediaDuration;
+			duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
 		}
-		var newTime = Math.round((duree * pct) / 100);
-		mediaCurrentPct = pct;
+		var newTime = (pct <= 0.0001) ? 0 : pct * duree / 100;
+    mediaCurrentPct = pct;
+    mediaCurrentTime = newTime;
 		seekAsked = true;
 		console.log(transcoderEnabled, playYoutubeDash)
 		if(transcoderEnabled || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
@@ -219,12 +221,17 @@ $(document).ready(function() {
 			m.title = currentMedia.title;
 			m.cover = currentMedia.cover;
 			startPlay(m);
+      //player.media.setCurrentTime(newTime);
 		} else {
 			if(chromeCastplaying){
 				mediaRenderer.player.seek(newTime,function(){
 					console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
 				})
-			} else {
+			}else if (upnpMediaPlaying) {
+          mediaRenderer.seek(newTime,function(){
+            console.log('upnp seek to '+ mejs.Utility.secondsToTimeCode(newTime));
+          })
+      } else {
 				player.media.setCurrentTime(newTime);
 			}
 		}
@@ -268,6 +275,8 @@ function initPlayer() {
 	mediaDuration = 0;
 	mediaCurrentPct = 0;
 	seekAsked = false;
+  mediaCurrentPct = 0;
+  mediaCurrentTime = 0;
 	try {
 		$('.mejs-captions-button').remove();
 		$('.mejs-captions-layer').remove();
@@ -814,13 +823,18 @@ function updateProgressBar() {
 			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (player.media.currentTime) / mediaDuration)+'px');
 			$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(player.media.currentTime))
 			$('#subPlayer-img').attr('src',currentMedia.cover);
-		} catch(err) {}
+		} catch(err) { console.log(err)}
 	} else {
-		var duree = player.media.duration !== Infinity && !isNaN(player.media.duration) ? player.media.duration : mediaDuration;
+		var duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
       var current = player.media.currentTime;
       try {
-        var percentage = ((100 / duree) * (current+mediaCurrentTime));
+        if(transcoderEnabled) {
+          var percentage = ((100 / duree) * (current+mediaCurrentTime));
+        } else {
+          var percentage = ((100 / duree) * current);
+        }
+
       progressBar.value = percentage;
-    } catch(err) {}
+    } catch(err) {console.log(err)}
 	}
 }
