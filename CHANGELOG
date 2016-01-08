@@ -1,3 +1,10 @@
+V 2.7
+ * change upnp engine for more compatibility with some upnp renderers
+ * add seeking with upnp from streamstudio
+ * add play/pause with upnp from streamstudio
+ * youtube seeking fix
+ * gui fix
+
 V 2.6.8.1
  * fix youtube 240p
  * fix invalid time on dailymotion videos
