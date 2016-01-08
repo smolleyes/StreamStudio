@@ -51,6 +51,7 @@ $(document).ready(function() {
 			continueTransition = false;
 			upnpContinuePlay = false;
 			mediaRenderer.stop();
+      upnpStoppedAsked = true;
 			stopUpnp();
 		} catch(err) {}
         initPlayer();
@@ -78,6 +79,15 @@ $(document).ready(function() {
                 $('.mejs-overlay-button').hide();
                 play_on_fbx(currentMedia.link);
             }
+        }
+        if(upnpMediaPlaying) {
+          if(mediaRendererPaused) {
+            mediaRenderer.play()
+            mediaRendererPaused = false;
+          } else {
+            mediaRenderer.pause()
+            mediaRendererPaused = true;
+          }
         }
     });
     //transcoder button
@@ -166,15 +176,29 @@ $(document).ready(function() {
 	});
 	
 	$('#subPlayer-play, #subPlayer-pause').click(function() {
-		if(player.media.paused) {
-			if(player.media.src.indexOf('index.html') !== -1) {
-				startPlay(currentMedia);
-			} else {
-				player.play();
-			}
-		} else {
-			player.pause();
-		}
+		if(upnpMediaPlaying) {
+      if(mediaRendererPaused) {
+        mediaRenderer.play()
+        mediaRendererPaused = false;
+        $('#subPlayer-play').hide();
+        $('#subPlayer-pause').show();
+      } else {
+        mediaRenderer.pause()
+        mediaRendererPaused = true;
+        $('#subPlayer-play').show();
+        $('#subPlayer-pause').hide();
+      }
+    } else {
+      if(player.media.paused) {
+        if(player.media.src.indexOf('index.html') !== -1) {
+          startPlay(currentMedia);
+        } else {
+          player.play();
+        }
+      } else {
+        player.pause();
+      }
+    }
 	});
 	
 	$('#subPlayer-prev').click(function() {
@@ -333,8 +357,6 @@ function initPlayer() {
     player.current.width(0);
     $('#infosPage').remove();
 	$('#song-title').empty().append(_('Waiting...'));
-	$('.mejs-container #fbxMsg').remove();
-	$('#fbxMsg2').remove();
 	$(".mejs-overlay-loading").hide();
 	$(".mejs-overlay-button").show();
 	$(".mejs-overlay-play").show();
@@ -345,8 +367,11 @@ function initPlayer() {
 	$('#subPlayer-play').show();
 	$('#subPlayer-pause').hide();
 	$('#subPlayer-Progress progress').val(0);
-	$('#subPlayer-Timer .mejs-duration,.mejs-currenttime').text('00:00:00')
+  $('.mejs-time-current').width(0)
+  $('#progress-bar').val(0)
+	$('.mejs-duration,.mejs-currenttime').text('00:00:00')
 	$('#subPlayer-img').attr('src','images/play-overlay.png');
+  $('#fbxMsg,#fbxMsg2').remove();
 }
 
 function updateMiniPlayer() {

@@ -15,6 +15,7 @@ function getUpnpPosition() {
 								player.media.currentTime = position;
 							}
 							updateTimer.emit("timeupdate");
+							$('.mejs-time-buffering').hide()
 	         }
 	     	});
 		} else {

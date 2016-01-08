@@ -1,7 +1,7 @@
 var mediaServer;
 playFromUpnp = false;
 var MediaRendererClient = require('upnp-mediarenderer-client');
-
+var sanitize = require("sanitize-filename");
 
 function browseUpnpDir(serverId, indexId, parentId) {
     console.log('loading file for server index ' + serverId + " at index " + indexId)
@@ -379,32 +379,19 @@ function playUpnpRenderer(obj) {
         });
          
         mediaRenderer.on('playing', function() {
-          console.log('playing');
-         upnpMediaPlaying = true;
-         setTimeout(function(){
-                $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-                updateMiniPlayer();
-                $('.mejs-overlay-button').hide();
-                $('.mejs-overlay-loading').hide();
-                $('.mejs-container p#fbxMsg').remove();
-                $('#fbxMsg2').remove()
-                if(search_engine == "grooveshark" || search_engine == "songza") {
-                    $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
-                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                } else {
-                    $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-                    $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                }
-                $('.mejs-controls').width('100%');
-            },1000);
+            console.log('playing');
         });
          
         mediaRenderer.on('paused', function() {
-          console.log('paused');
+            console.log('paused');
+            $('#subPlayer-play').hide();
+            $('#subPlayer-pause').show();
+            $('.mejs-playpause-button button').click()
         });
          
         mediaRenderer.on('stopped', function() {
           console.log('stopped');
+          checkStopped()
         });
     } catch(err) {
         console.log(err)
@@ -420,12 +407,13 @@ function playUpnpRenderer(obj) {
       autoplay: true,
       contentType: currentMedia.mime || "video/mp4",
       metadata: {
-        title: obj.title,
+        title: sanitize(obj.title),
         creator: '',
         type: currentMedia.type || "video", // can be 'video', 'audio' or 'image' 
         subtitlesUrl: ''
       }
     };
+    mediaRendererPaused = false;
 
     var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','');
 
@@ -436,9 +424,15 @@ function playUpnpRenderer(obj) {
             console.log(err,result)
             if(err) throw err;
             console.log('playing ...');
+            $('.mejs-playpause-button button').click()
             upnpContinuePlay = true;
             continueTransition = true;
             transitionCount = 0;
+            upnpMediaPlaying = true;
+            $('#subPlayer-play').hide();
+            $('#subPlayer-pause').show();
+            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+            updateMiniPlayer()
             getRendererState('PLAYING');
         });
     },2000);
@@ -511,7 +505,6 @@ function getRendererState(state) {
                     continueTransition = true;
                     setTimeout(function(){
                         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-                        updateMiniPlayer();
                         $('.mejs-overlay-button').hide();
                         $('.mejs-overlay-loading').hide();
                         $('.mejs-container p#fbxMsg').remove();
@@ -561,7 +554,13 @@ function stopUpnp() {
 	// if user asked stop
 	if(upnpMediaPlaying === false) {
 		console.log("upnp stopped")
+        $('#progress-bar').val(0)
+        $('.mejs-duration,.mejs-currenttime').text('00:00:00')
 		continueTransition = false;
+        if(upnpStoppedAsked) {
+            initPlayer()
+            upnpStoppedAsked = false;
+        }
 		// else continue
 	} else {
 		console.log('upnp finished playing...')

@@ -115,6 +115,7 @@ var seriesUpdated = false;
 var chromecastPlaying = false;
 var videoResolution = false;
 var upnpPlayer;
+var mediaRendererPaused = false;
 
 //checks
 temp.mkdir(function(err,path){
