@@ -34,6 +34,9 @@ var Iterator = require('iterator').Iterator;
 var sanitize = require("sanitize-filename");
 var events = require("events");
 var EventEmitter = require("events").EventEmitter;
+var icecast = require('icecast-parser');
+var iceCastLink = null;
+var iceCastStation = null;
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {

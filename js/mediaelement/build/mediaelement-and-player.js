@@ -3253,7 +3253,7 @@ if (typeof jQuery != 'undefined') {
 								timefloat.show();
 						}
 					} else {
-						if(playFromMegaUser || playFromMega) {
+						if(playFromMegaUser || playFromMega || playFromIcecast) {
 							return;
 						}
 						if (x < offset.left) {

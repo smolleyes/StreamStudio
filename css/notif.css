@@ -148,7 +148,7 @@
     text-shadow: rgba(0, 0, 0, 0.4) 0px 1px 0px; }
   .notifications .error {
     background-color: #FA565D;
-    color: #FFF;
+    color: white !important;
     background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fa565d), color-stop(100%, #d1363d));
     background-image: -webkit-linear-gradient(top, #fa565d, #d1363d);
     background-image: -moz-linear-gradient(top, #fa565d, #d1363d);
@@ -156,6 +156,15 @@
     background-image: -ms-linear-gradient(top, #fa565d, #d1363d);
     background-image: linear-gradient(top, #fa565d, #d1363d);
     text-shadow: rgba(0, 0, 0, 0.4) 0px 1px 0px; }
+
+    .notification.red p,.notification.red h2,.notification.red > .left {
+      color:white;
+      padding-right: 10px;
+    }
+
+    .notification.red > .left { 
+
+    }
 
 @-moz-keyframes fadeOutLeft {
   0% {

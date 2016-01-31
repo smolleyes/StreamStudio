@@ -114,7 +114,15 @@ function startStreaming(req, res, width, height) {
         	link = link.replace(/ /g,'\ ');
         }
 
-        if(playFromDailymotionLive) {
+        if(playFromIcecast) {
+            console.log('play icecast/shoutcast live ', parsedLink)
+            ffmpegLive = true;
+            var ffmpeg = spawnFfmpeg(iceCastLink, device, '', '256k', 0, function(code) { // exit
+                console.log('child process exited with code ' + code);
+                res.end();
+            });
+            ffmpeg.stdout.pipe(res);
+        } else if(playFromDailymotionLive) {
 				console.log('play dailymotion live')
 				var l = parsedLink.replace('/?file=','');
 				var link, quality;
@@ -150,9 +158,7 @@ function startStreaming(req, res, width, height) {
 						initPlayer();
 					}
 				});
-		}
-
-        if(playFromTwitch) {
+		} else if(playFromTwitch) {
 				console.log('play twitch stream')
 				var l = parsedLink.replace('/?file=','');
 				var link, quality;
@@ -186,8 +192,7 @@ function startStreaming(req, res, width, height) {
 						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
 					}
 				});
-		}
-        if(playFromWat) {
+		} else if(playFromWat) {
                 console.log('play wat.tv stream')
                 var l = parsedLink.replace('/?file=','');
                 var link, quality;
@@ -221,9 +226,7 @@ function startStreaming(req, res, width, height) {
                         $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
                     }
                 });
-        }
-		// play youtube dash
-		if(playFromYoutube && !upnpToggleOn) {
+        } else if(playFromYoutube && !upnpToggleOn) {
 			console.log('Opening youtube link')
 			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
@@ -232,7 +235,7 @@ function startStreaming(req, res, width, height) {
             ffmpeg.stdout.pipe(res);
 		}
         //if tv/upnp
-        if(playFromUpnp){
+        else if(playFromUpnp){
 			console.log('opening upnp link ' + link) 
 			if(parsedLink.indexOf('freeboxtv') !== -1) {
 				link = parsedLink.replace('/?file=','');
@@ -245,7 +248,7 @@ function startStreaming(req, res, width, height) {
             ffmpeg.stdout.pipe(res);
 		}
 		// external link
-		if(playFromHttp || link.indexOf('&ext') !== -1){
+		else if(playFromHttp || link.indexOf('&ext') !== -1){
 			if(link.indexOf('&ext') !== -1) {
 				var link = link.split('&ext')[0];
 			}
@@ -265,7 +268,7 @@ function startStreaming(req, res, width, height) {
 			}
 		}
         // torrent link
-        if (torrentPlaying) {
+        else if (torrentPlaying) {
 			console.log('Opening torrent link')
 			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
@@ -274,7 +277,7 @@ function startStreaming(req, res, width, height) {
             ffmpeg.stdout.pipe(res);
         }
         // if local file
-        if (playFromFile) {
+        else if (playFromFile) {
 			console.log('Opening file link')
 			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
@@ -283,7 +286,7 @@ function startStreaming(req, res, width, height) {
             ffmpeg.stdout.pipe(res);
         }
         //if mega userstorage link
-        if (link.indexOf('userstorage.mega.co.nz') !== -1) {
+        else if (link.indexOf('userstorage.mega.co.nz') !== -1) {
 			console.log('Opening userstorage.mega.co.nz link')
             var newVar = currentMedia.title.split('.').slice(-1)[0];
             if ((in_array(newVar, videoArray)) && (parsedLink.indexOf('&download') === -1)) {
@@ -482,6 +485,8 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	} else {
         if(playFromWat) {
             args = ['-re','-i','pipe:0','-c:v', 'copy','-c:a', 'copy', '-movflags', 'faststart','-threads', '0','-f','matroska', 'pipe:1'];
+        } else if (playFromIcecast) {
+            args = ['-re','-i','pipe:0','-c:a', 'libopus','-b:a',bitrate,'-f', 'opus', '-threads','0',  'pipe:1'];
         } else {
             args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-movflags', 'faststart','-threads', '0','-f', 'matroska', 'pipe:1'];
         }
@@ -496,13 +501,16 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	ffmpeg.stderr.on('data', function(data) {
 		if(data) {
 			total_data += data.toString();
-			if (total_data.toString().match(/Duration:\s\d\d:\d\d:\d\d\.\d\d/)) {
+            if (total_data.toString().match(/Duration:\s\d\d:\d\d:\d\d\.\d\d/)) {
 				var time = total_data.toString().match(/Duration:\s(\d\d:\d\d:\d\d\.\d\d)/).toString().substring(10,21);
 				var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
 				total_data = '';
 				total_time = seconds;
 				mediaDuration = parseFloat(seconds);
-			}
+			} else if (playFromIcecast && total_data.toString().match(/Connection timed out/) !== null) {
+                $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:7000,content:_("Can't connect to this station, please retry later !"),btnId:'',btnTitle:'',btnColor:'black',btnDisplay: 'none',updateDisplay:'none'})
+                initPlayer();
+            }
 			console.log('grep stderr: ' + data);
 			
 			if (data.toString().substr(0,5) == 'frame') {

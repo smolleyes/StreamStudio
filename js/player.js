@@ -1,4 +1,5 @@
 var player;
+var Reader = require('radio-song');
 var searchTypes_select = 'videos';
 var selected_resolution = '1080p';
 var selected_category = '';
@@ -31,6 +32,8 @@ var currentMedia = {};
 var ChromecastInterval;
 var chromeCastplaying = false;
 var playFromWat = false;
+var playFromIcecast = false;
+var iceCastTimer = null;
 
 $(document).ready(function() {
 	
@@ -210,7 +213,7 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(playFromMegaUser || playFromMega) {
+		if(playFromMegaUser || playFromMega || playFromIcecast) {
 			return;
 		}
 		var pos = e.offsetX;
@@ -294,6 +297,7 @@ $(document).ready(function() {
 function initPlayer() {
 	// clean subtitles
 	clearInterval(ChromecastInterval);
+  stopIceTimer()
 	chromeCastplaying = false;
 	mediaCurrentTime = 0;
 	mediaDuration = 0;
@@ -301,6 +305,7 @@ function initPlayer() {
 	seekAsked = false;
   mediaCurrentPct = 0;
   mediaCurrentTime = 0;
+  playFromIcecast = false;
 	try {
 		$('.mejs-captions-button').remove();
 		$('.mejs-captions-layer').remove();
@@ -480,7 +485,13 @@ function startPlay(media) {
 		$('.mejs-overlay-play').hide();
         // check type of link to play
 		var linkType = link.split('&').pop();
-		if (linkType === 'twitch' || link.indexOf('twitch.tv') !== -1) {
+		if(playFromIcecast) {
+      iceCastLink = link;
+      $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+      launchPlay()
+      iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
+    }
+    if (linkType === 'twitch' || link.indexOf('twitch.tv') !== -1) {
 			playFromTwitch = true;
 			currentMedia.link = link.replace('&twitch','').replace('&external','');
 			launchPlay();
@@ -576,12 +587,12 @@ function launchPlay() {
 	}
 
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || playFromIcecast && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
 	
-	if(upnpToggleOn) {
+	if(upnpToggleOn) { 
 		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
 		if(currentMedia.type === undefined) {
 			try {
@@ -860,6 +871,37 @@ function updateProgressBar() {
         }
 
       progressBar.value = percentage;
-    } catch(err) {console.log(err)}
+    } catch(err) {
+    }
 	}
+}
+
+function getIcecastTitle() {
+  var args = ['-i',iceCastLink,'-f', 'ffmetadata', '-threads','0',  'pipe:1'];
+  var ffmpeg = spawn(ffmpegPath, args);
+  var total_data = '';
+  ffmpeg.stderr.on('data', function(data) {
+    if(data) {
+      total_data += data.toString();
+      console.log(total_data)
+      if(playFromIcecast && total_data.toString().match(/StreamTitle(.*?):(.*)/) !== null) {
+            currentMedia.title = total_data.toString().match(/StreamTitle(.*?):(.*)/)[2];
+            iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
+      } else if (playFromIcecast && total_data.toString().match(/TITLE(.*?):(.*)/) !== null) {
+            currentMedia.title = total_data.toString().match(/TITLE(.*?):(.*)/)[2];
+            iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
+      }
+      currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title; 
+      $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+    }
+  });
+}
+
+
+function iceTimer() {
+    getIcecastTitle()
+}
+
+function stopIceTimer() {
+  clearInterval(iceCastTimer);
 }

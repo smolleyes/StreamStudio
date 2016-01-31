@@ -278,5 +278,6 @@
 	"Unknown duration": "durée inconnue",
 	"Unknown": "inconnue",
 	"No results found": "Aucun résultat trouvé",
-	"Total videos:": "Total videos:"
+	"Total videos:": "Total de vidéos:",
+	"Can't connect to this station, please retry later !" : "Impossible de se connecter à cette station, merci de réessayer ultérieurement !"
 }

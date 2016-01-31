@@ -13,5 +13,5 @@
     "show": false,
     "frame":false
   },
-  "chromium-args":"--ignore-gpu-blacklist"
+  "chromium-args":"--ignore-gpu-blacklist --harmony"
 }
