@@ -213,7 +213,7 @@ $(document).ready(function() {
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
 	$('#progress-bar').click(function(e) {
-		if(playFromMegaUser || playFromMega || playFromIcecast) {
+		if(playFromMegaUser || playFromMega || engine && engine.engine_name == "Shoutcast") {
 			return;
 		}
 		var pos = e.offsetX;

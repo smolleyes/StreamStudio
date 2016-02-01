@@ -1,3 +1,6 @@
+V 2.8.5
+ * fix upnp seeking
+
 V 2.8.4
  * fix ffmpeg never killed 
 
