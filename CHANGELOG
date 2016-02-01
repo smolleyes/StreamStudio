@@ -1,3 +1,6 @@
+V 2.8
+  * add shoutcast/icecast plugin
+
 V 2.7
  * change upnp engine for more compatibility with some upnp renderers
  * add seeking with upnp from streamstudio
