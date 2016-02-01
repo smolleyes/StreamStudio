@@ -3,6 +3,8 @@ V 2.8.2
  * add notification for t411 tracker state
  * fix some encoding problems in the upnp client
  * fix shoutcast plugin
+ * update youtube-dl windows
+ * update livestreamer windows
 
 V 2.8.1
  * fix missing modules
