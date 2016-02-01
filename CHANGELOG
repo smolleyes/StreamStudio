@@ -1,3 +1,9 @@
+V 2.8.2
+ * fix upnp server
+ * add notification for t411 tracker state
+ * fix some encoding problems in the upnp client
+ * fix shoutcast plugin
+
 V 2.8.1
  * fix missing modules
 

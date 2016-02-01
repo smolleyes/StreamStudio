@@ -568,6 +568,9 @@ function loadTable(files) {
             }
         }
     })
+    if($('#playerToggle').attr('aria-expanded') == "false") {
+        $('#playerToggle').click();
+    }
 }
 
 function bytesToSize(bytes, precision) {

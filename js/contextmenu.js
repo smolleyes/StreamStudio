@@ -176,7 +176,7 @@ $(document).ready(function() {
     if(vlink.indexOf('file://') !== -1) {
       vlink = decodeURIComponent(vlink).replace("file://",'');
     }
-    getAuthTorrent(vlink,true,false)
+    getAuthTorrent(vlink,true,false,null)
 		$('#custom-menu').slideUp();
 	});
   // open torrent magnet

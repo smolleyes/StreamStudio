@@ -876,6 +876,27 @@ function getUserHome() {
 }
 
 function getAuthTorrent(url, stream, toFbx, cover) {
+    if(url.indexOf('t411') !== -1) {
+        $.get('http://irc.t411.in/ip/index.php',function(res) {
+            var state = $($(res).find('tr:contains("tracker")').find('th')[2]).text()
+            if(state !== "ON-LINE") {
+                $('#tab a[href="#tabpage_1"]').click();
+                t411.notif({
+                    title: 'StreamStudio:',
+                    cls: 'red',
+                    icon: '&#59256;',
+                    content: _("t411.in Tracker DOWN !"),
+                    btnId: '',
+                    btnTitle: '',
+                    btnColor: '',
+                    btnDisplay: 'none',
+                    updateDisplay: 'none',
+                    timeout: 0
+                });
+                return;
+            }
+        })
+    }
     if (url.indexOf('magnet:?xt') !== -1) {
         if (stream) {
             if (cover) {

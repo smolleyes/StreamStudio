@@ -280,6 +280,7 @@
 	"No results found": "Aucun résultat trouvé",
 	"Total videos:": "Total de vidéos:",
 	"Can't connect to this station, please retry later !": "Impossible de se connecter à cette station, merci de réessayer ultérieurement !",
-	"t411.in Tracker ON-LINE !": "t411.in Tracker ON-LINE !",
-	"Unknown station": "Unknown station"
+	"t411.in Tracker ON-LINE !": "t411.in Tracker OK !",
+	"Unknown station": "Station inconnue",
+	"t411.in Tracker DOWN" : "t411.in Tracker indisponible !"
 }

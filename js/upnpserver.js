@@ -363,7 +363,6 @@ function playUpnpRenderer(obj) {
     if(mediaRendererType == "chromecast") {
         return playOnChromecast(obj);
     }
-
     try {
         mediaRenderer = new MediaRendererClient(cli._avTransports[upnpDevice].location);
         mediaRenderer.on('status', function(status) {
@@ -403,11 +402,12 @@ function playUpnpRenderer(obj) {
         currentMedia.mime = 'audio/opus'
         currentMedia.type = "audio"
     }
+    obj.title = sanitize(XMLEscape.xmlEscape(obj.title.replace(/[^\x00-\x7F]/g, "")))
     var options = { 
       autoplay: true,
       contentType: currentMedia.mime || "video/mp4",
       metadata: {
-        title: sanitize(obj.title),
+        title: obj.title,
         creator: '',
         type: currentMedia.type || "video", // can be 'video', 'audio' or 'image' 
         subtitlesUrl: ''
