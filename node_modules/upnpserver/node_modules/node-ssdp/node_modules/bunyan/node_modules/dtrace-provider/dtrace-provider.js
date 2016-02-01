@@ -1,13 +1,14 @@
 var DTraceProvider;
 
 function DTraceProviderStub() {}
-DTraceProviderStub.prototype.addProbe = function() {
-    return {
-        'fire': function() { }
-    };
+DTraceProviderStub.prototype.addProbe = function(name) {
+    var p = { 'fire': function () {} };
+    this[name] = p;
+    return (p);
 };
 DTraceProviderStub.prototype.enable = function() {};
 DTraceProviderStub.prototype.fire = function() {};
+DTraceProviderStub.prototype.disable = function() {};
 
 var builds = ['Release', 'default', 'Debug'];
 
@@ -22,7 +23,7 @@ for (var i in builds) {
         if (process.platform == 'darwin' ||
             process.platform == 'solaris' ||
             process.platform == 'freebsd') {
-            console.log(e);
+            console.error(e);
         }
     }
 }
@@ -34,6 +35,6 @@ if (!DTraceProvider) {
 exports.DTraceProvider = DTraceProvider;
 exports.createDTraceProvider = function(name, module) {
     if (arguments.length == 2)
-        return (new DTraceProvider(name, module));
-    return (new DTraceProvider(name));
+        return (new exports.DTraceProvider(name, module));
+    return (new exports.DTraceProvider(name));
 };

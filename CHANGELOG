@@ -1,3 +1,6 @@
+V 2.8.1
+ * fix missing modules
+
 V 2.8
   * add shoutcast/icecast plugin
 
