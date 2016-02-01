@@ -885,11 +885,17 @@ function getIcecastTitle() {
       total_data += data.toString();
       console.log(total_data)
       if(playFromIcecast && total_data.toString().match(/StreamTitle(.*?):(.*)/) !== null) {
-            currentMedia.title = total_data.toString().match(/StreamTitle(.*?):(.*)/)[2];
-            iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
+        currentMedia.title = total_data.toString().match(/StreamTitle(.*?):(.*)/)[2];
+        iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
       } else if (playFromIcecast && total_data.toString().match(/TITLE(.*?):(.*)/) !== null) {
-            currentMedia.title = total_data.toString().match(/TITLE(.*?):(.*)/)[2];
-            iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
+        currentMedia.title = total_data.toString().match(/TITLE(.*?):(.*)/)[2];
+        iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
+      } else if (playFromIcecast && total_data.toString().match(/icy-name(.*?):(.*)/) !== null) {
+        currentMedia.title = '';
+        iceCastStation = total_data.toString().match(/icy-name(.*?):(.*)/)[2];
+      } else {
+        currentMedia.title = _("Unknown station")
+        iceCastStation = _("Unknown station")
       }
       currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title; 
       $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
