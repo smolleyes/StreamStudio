@@ -1,3 +1,6 @@
+V 2.8.4
+ * fix ffmpeg never killed 
+
 V 2.8.3
  * fix shoutcast title update system 
 

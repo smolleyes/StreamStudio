@@ -1,4 +1,4 @@
-var VERSION = "2.8.3";
+var VERSION = "2.8.4";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');

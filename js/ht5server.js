@@ -114,7 +114,7 @@ function startStreaming(req, res, width, height) {
         	link = link.replace(/ /g,'\ ');
         }
 
-        if(playFromIcecast) {
+        if(engine && engine.engine_name == "Shoutcast") {
             console.log('play icecast/shoutcast live ', parsedLink)
             ffmpegLive = true;
             var ffmpeg = spawnFfmpeg(iceCastLink, device, '', '256k', 0, function(code) { // exit
