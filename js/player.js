@@ -486,6 +486,7 @@ function startPlay(media) {
         // check type of link to play
 		var linkType = link.split('&').pop();
 		if(playFromIcecast) {
+      stopIceTimer()
       iceCastLink = link;
       $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
       launchPlay()
@@ -883,6 +884,10 @@ function getIcecastTitle() {
   ffmpeg.stderr.on('data', function(data) {
     if(data) {
       total_data += data.toString();
+    }
+  });
+
+  ffmpeg.on('exit', function (code) {
       console.log(total_data)
       if(playFromIcecast && total_data.toString().match(/StreamTitle(.*?):(.*)/) !== null) {
         currentMedia.title = total_data.toString().match(/StreamTitle(.*?):(.*)/)[2];
@@ -899,8 +904,7 @@ function getIcecastTitle() {
       }
       currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title; 
       $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-    }
-  });
+  });  
 }
 
 
