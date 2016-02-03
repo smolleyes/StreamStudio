@@ -76,7 +76,7 @@ $(document).on('click', '.youtube_downloads', function(e) {
         $('#youtube_entry_res_' + vid).append('<p style="font-size:12px;text-align:center;position:relative;top:3px;">'+_("Loading...")+'</p>')
         youtube.getVideoInfos('https://youtube.com/watch?v=' + vid, 0, 1, false,false, settings, function(datas) {
             var infos = datas[25];
-            var resolutions_string = ['1080p', '720p', '480p', '360p', '240p'];
+            var resolutions_string = ['2160p','1440p','1080p', '720p', '480p', '360p', '240p'];
             var resolutions = infos.resolutions;
             for (var i = 0; i < resolutions_string.length; i++) {
                 var resolution = resolutions_string[i];
@@ -787,7 +787,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
             <div><p style="margin-top:15px;"><a class="itemTitle" title="'+title+'"><b>' + text + '</b></a></p><div> \
             <p style="color:grey;font-size:10px;margin:-5px 0 5px 0;">'+_("Posted by:")+' '+author+'</p> \
         </div>');
-        var resolutions_string = ['1080p', '720p', '480p', '360p','240p'];
+        var resolutions_string = ['2160p','1440p','1080p', '720p', '480p', '360p','240p'];
         var resolutions = infos.resolutions;
         for (var i = 0; i < resolutions_string.length; i++) {
             try {

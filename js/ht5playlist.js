@@ -191,7 +191,7 @@ function showInfos(datas,next_vid,vid,flink,engine,title) {
 	link.next = next_vid;
 	link.title = title;
 	if (datas === 'null') {return;}
-    var resolutions_string = ['1080p','720p','480p','360p','240p'];
+    var resolutions_string = ['2160p','1440p','1080p','720p','480p','360p','240p'];
     if (engine === 'youtube') {
 		var resolutions = datas.resolutions;
 	} else {

@@ -450,7 +450,7 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 
 
 function spawnFfmpeg(link, device, host, bitrate,seekTo) {
-	var start = '00:00:00.00'
+	var start = '00:00:01.00'
     var args;
 	if(seekTo !== 0) {
 		start = seekTo;

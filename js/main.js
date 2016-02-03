@@ -279,11 +279,13 @@ var htmlContent =
                             <label>' + _("Maximum resolution (youtube/dailymotion):") + '</label> \
                             <li id="resolutions_select_cont" class="dropdown btn-default btn-sm"> \
                                 <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
-                                1080p \
+                                2160p \
                                 <span class="caret"></span> \
                                 </a> \
                                 <ul class="dropdown-menu" id="resolutions_select" role="menu" style="width:100%;"> \
-                                    <li class="active"><a href="#" data-value="1080p">1080p</a></li> \
+                                    <li class="active"><a href="#" data-value="2160p">2160p</a></li> \
+                                    <li><a href="#" data-value="1440p">1440p</a></li> \
+                                    <li><a href="#" data-value="1080p">1080p</a></li> \
                                     <li><a href="#" data-value="720p">720p</a></li> \
                                     <li><a href="#" data-value="480p">480p</a></li> \
                                     <li><a href="#" data-value="360p">360p</a></li> \
@@ -828,7 +830,7 @@ function main() {
                         var infos = datas[25];
                         mediaDuration = 0;
                         if (infos.upnp === false && !ext) {
-                            var resolutions_string = ['1080p', '720p', '360p', '240p'];
+                            var resolutions_string = ['2160p','1440p','1080p', '720p', '360p', '240p'];
                         } else {
                             var resolutions_string = ['720p', '360p'];
                         }
