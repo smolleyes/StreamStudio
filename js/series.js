@@ -329,20 +329,22 @@ function loadSerie(id) {
 }
 
 function loadSeasonTable(id, num) {
+    console.log('hereeeeeeeeeee')
     bongo.db('seriesDb').collection('series').find({
         'id': id
     }).toArray(function(error, list) {
         var html = '<div class="bigTable"><div class="panel panel-default"><div class="panel-heading"><h3 style="margin: -6px 0 0 0 !important;color:white;">' + _("Episodes list:") + '</h3></div><div class="nano"><div class="panel-body nano-content"><table class="table table-stripped table-hover table-bordered table-responsive serieTable"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th><th data-field="size">' + _("Seeders") + '</th><th data-field="size">' + _("Leechers") + '</th></tr></thead><tbody>';
         var count = 1;
         var infos = list[0];
+        var cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
         num = parseInt(num);
         try {
             $.each(list[0].seasons[num]['episode'], function(i, file) {
-                file.cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
+                file.cover = '';
                 if (list[0].engine == "eztv") {
                     file.imdbId = infos.eztvId;
                     file.engine = 'eztv';
-                    var hash = pt(file.torrents['480p'].url.match(/btih:(.*?)&/)[1]).infoHash;
+                    //var hash = pt(file.torrents['480p'].url.match(/btih:(.*?)&/)[1]).infoHash;
                     $.get('http://torrentproject.se/?s=' + hash + '&out=json&orderby=latest')
                         .done(function(data) {
                             if (parseInt(data.total_found) > 0) {
@@ -430,10 +432,10 @@ function loadSeasonTable(id, num) {
                     }
                     if (file.type == "complete") {
                         infos.ep = 'complete';
-                        html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                        html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + file.title + ' (' + _("Complete season torrent") + ')</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
                     } else {
                         infos.ep = count;
-                        html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data-infos="' + encodeURIComponent(JSON.stringify(infos)) + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
+                        html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
                     }
                     if (count == Object.keys(list[0].seasons[num]['episode']).length) {
                         html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';

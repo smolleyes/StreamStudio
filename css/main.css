@@ -72,6 +72,10 @@ position: relative !important;
 top: 2px !important;
 }
 
+.mejs-time-loaded {
+  max-width: 100% !important;
+}
+
 #countries_titleText {
 	display: none !important;
 }
@@ -125,10 +129,45 @@ button {
 	background: url('../images/convert-enabled.png') no-repeat !important;
 }
 
-button[aria-label="playlist"] {
+button[aria-label="playmode"] {
 	background: url('../js/mediaelement/build/playlist.png') no-repeat !important;
 	background-position-y: -48px !important;
+  position: absolute;
+  right: 120px;
+  top:3px;
 }
+
+.mejs-playlist-button {
+  position:absolute;
+  right: 170px;
+}
+
+.playerBarsLocker {
+  position:absolute;
+  right: 160px;
+}
+
+.mejs-stop-button {
+  position:absolute;
+  left: 20px;
+  top:2px;
+}
+
+.mejs-playpause-button {
+  position:absolute;
+  left: 40px;
+}
+
+.mejs-volume-button {
+  position:absolute !important;
+  right: 90px;
+}
+
+.mejs-fullscreen-button {
+  position:absolute;
+  right: 65px;
+}
+
 
 .bootstrap-select {
 	width: calc(100% - 11px) !important;
@@ -203,7 +242,9 @@ pre {
 }
 
 .mejs-time-total, .mejs-time-rail {
-	width: calc(100% - 340px) !important;
+  width: calc(100% - 395px) !important;
+  margin-left: 27px !important;
+  margin-right: 23px !important;
 }
 
 

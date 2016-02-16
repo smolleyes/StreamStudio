@@ -27,6 +27,7 @@ var numTry = 0;
 var streamInfo = {};
 var app = {};
 var mediaCover = '';
+var fromPlayList = false;
 
 // Minimum percentage to open video
 var MIN_PERCENTAGE_LOADED = 0.5;
@@ -55,10 +56,13 @@ $(document).on('click', '.closePopup', function() {
 
 $(document).off('click', '.loadStreaming');
 $(document).on('click', '.loadStreaming', function(evt) {
-    evt.preventDefault();
-    $.magnificPopup.close();
     var id = $(this).attr('data-id');
-    handleTorrent(torrentInfo, stateModel, id);
+    var tid = $(this).attr('id');
+    player.setCurrent(tid);
+    $('#'+tid).addClass('played');
+    BUFFERING_SIZE = parseInt($(this).attr('data-length')) * 1 / 100
+    changeTorrent(torrentInfo, stateModel, id)
+    fromPlayList = true;
 });
 
 $(document).off('click', '#closeMfp');
@@ -68,7 +72,8 @@ $(document).on('click', '#closeMfp', function(evt) {
     $('#tab a[href="#tabpage_' + activeTab + '"]').click();
 });
 
-function getTorrent(link, cover) {
+function getTorrent(link, cover, fallback) {
+    player.cleanTracks();
     if (link.toString().indexOf('magnet:?') !== -1) {
         if (cover) {
             mediaCover = cover;
@@ -108,13 +113,19 @@ function getTorrent(link, cover) {
             });
     } else {
         loadTorrent(link, cover || '')
+        console.log(link.toString())
     }
 }
 
-function loadTorrent(link, cover) {
-    initPlayer();
-    stopTorrent();
-    torrentInfo = {};
+function loadTorrent(link, cover,id, torrInfo) {
+    if(!torrInfo) {
+        initPlayer()
+        stopTorrent();
+        torrentInfo = {};
+    } else {
+        initPlayer(true)
+        torrentInfo = torrInfo;
+    }
     if (cover) {
         mediaCover = cover;
     } else {
@@ -155,38 +166,42 @@ function loadTorrent(link, cover) {
     playStarted = false;
     downloadedPct = 0;
     startLoading();
-    setTimeout(function() {
-        rTorrent(link, function(err, torrent, raw) {
-            if (err) {
-                console.log(err);
-                swal(_("Error!"), _("Can't get your torrent file, please retry!"), "error")
-                $('#preloadTorrent').empty();
-            } else {
-                title = torrent.name;
-                torrentInfo = {
-                    info: raw,
-                    title: title
-                };
-                try {
-                    if (torrent.files.length > 1) {
-                        analyseTorrent(torrent.files);
-                    } else {
-                        handleTorrent(torrentInfo, stateModel);
+    console.log(torrentInfo,id)
+    if(id) {
+        handleTorrent(torrentInfo, stateModel,id);
+    } else {
+        setTimeout(function() {
+            rTorrent(link, function(err, torrent, raw) {
+                if (err) {
+                    console.log(err);
+                    swal(_("Error!"), _("Can't get your torrent file, please retry!"), "error")
+                    $('#preloadTorrent').empty();
+                } else {
+                    title = torrent.name;
+                    torrentInfo = {
+                        info: raw,
+                        title: title
+                    };
+                    try {
+                        if (torrent.files.length > 1) {
+                            analyseTorrent(torrent.files);
+                        } else {
+                            analyseTorrent(torrent.files);
+                        }
+                    } catch (err) {
+                       analyseTorrent(torrent.files);
                     }
-                } catch (err) {
-                    handleTorrent(torrentInfo, stateModel);
                 }
-            }
-        });
-    }, 1000);
+            });
+        }, 1000);
+    }
 }
 
 
 function analyseTorrent(list) {
     var files = [];
-    var arr = ['nfo', 'txt', 'jpg', 'jpeg', 'png', 'pdf', 'html', 'torrent'];
     $.each(list, function(i, file) {
-        if (arr.indexOf(file.name.split('.').pop()) !== -1) {
+        if (videoArray.indexOf(file.name.split('.').pop()) == -1) {
             if (i + 1 == list.length) {
                 loadTable(files)
             }
@@ -318,7 +333,11 @@ app.updateStats = function(streamInfo) {
                 $('#fbxMsg2').remove();
             } catch (err) {}
             $('.mejs-container').append('<div id="fbxMsg2" class="preloadingMsg" style="height:calc(100% - 60px);"><div style="top:62%;position: relative;"><p style="font-weight:bold;text-align: center;">' + _("Please wait while loading your video... (Can take a few seconds)") + '</p></div></div>');
-            startPlay(stream);
+            if(fromPlayList) {
+                initPlay(stream)
+            } else {
+                startPlay(stream);
+            }
         } else {
             torrentSrc = videoStreamer.path;
             torrentName = videoStreamer.server.index.name;
@@ -329,6 +348,7 @@ app.updateStats = function(streamInfo) {
             }
             if (parseInt(downloadedPct) >= 100) {
                 var t = _('(%s%% downloaded)', 100);
+                $('#preloadTorrent').remove();
                 $("#song-title").empty().text(_('Playing: ') + torrentName + " " + t);
                 if (saveTorrent && !torrentSaved) {
                     saveToDisk(torrentSrc, torrentName);
@@ -349,7 +369,9 @@ app.updateStats = function(streamInfo) {
                     totalBytes = 0;
                 }
                 if (upnpToggleOn && upnpMediaPlaying && !upnpStoppedAsked) {
-                    $('.mejs-time-loaded').width(downloadedPct + '%')
+                    if(downloadedPct <= 100) {
+                        $('.mejs-time-loaded').width(downloadedPct + '%')
+                    }
                 }
                 $("#song-title").empty().text(_('Playing: ') + torrentName + " " + t);
             }
@@ -476,6 +498,7 @@ function handleTorrent(torrent, stateModel, id) {
                 analysed: true
             });
         } else {
+            //player.cleanTracks();
             videoStreamer = peerflix(torrent.info, {
                 connections: 150,
                 path: tmpFolder,
@@ -513,7 +536,7 @@ function handleTorrent(torrent, stateModel, id) {
             } catch (err) {}
             item.obj = videoStreamer;
             torrentsArr.push(item);
-            console.log('peerrlifx listening on http://' + ipaddress + ':' + videoStreamer.server.address().port + '/')
+            console.log('peerlifx listening on http://' + ipaddress + ':' + videoStreamer.server.address().port + '/')
             checkReady();
         });
 
@@ -537,35 +560,54 @@ function handleTorrent(torrent, stateModel, id) {
 
 
 function loadTable(files) {
-    var html = '<div style="margin-top:50px;" class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">' + _("Select the file to open...") + '</h3><a id="closeMfp" href="#" style="position:absolute;right:15px;top:60px;font-weight:bold;">X</a></div><div class="panel-body"><table class="table table-stripped table-hover table-bordered table-responsive"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th></tr></thead><tbody>';
-    $('#preloadTorrent').empty().remove();
-    $('#fbxMsg2').remove();
+    //var html = '<div style="margin-top:50px;" class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">' + _("Select the file to open...") + '</h3><a id="closeMfp" href="#" style="position:absolute;right:15px;top:60px;font-weight:bold;">X</a></div><div class="panel-body"><table class="table table-stripped table-hover table-bordered table-responsive"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th></tr></thead><tbody>';
+    //$('#preloadTorrent').empty().remove();
+    //$('#fbxMsg2').remove();
+    if(files.length == 0){
+        swal(_("error!"), _("No streamable files in this torrent !"), "error")
+        initPlayer();
+    }
+
     var list = ___.sortBy(files, function(obj) {
-        return obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/);
+        if(obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/)) {
+            return obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/);
+        } else {
+            return obj.name.toLowerCase().match(/\d{1,2}/);
+        }
     });
+    player.cleanTracks();
+    var tclass="soloTorrent"
+    if(files.length > 1 ) {
+        tclass='multiTorrent'
+    }
     $.each(list, function(i, file) {
+        console.log(file)
         var c = sdb.find({
-            "title": file.name
+             "title": file.name
         });
-        var viewed = c.length > 0 ? 'block' : 'none';
-        var watched = c.length > 0 ? _("already watched") : _("Not seen");
-        html += '<tr><td><a href="#" class="loadStreaming" data-id="' + file.index + '">' + file.name + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + bytesToSize(file.length, 2) + '</td></tr>';
-        if (i + 1 == list.length) {
-            $('#fbxMsg2').remove();
-            html += '</tbody></table></div></div>';
-            $.magnificPopup.open({
-                items: {
-                    src: html
-                },
-                type: 'inline',
-                prependTo: $('.mejs-container'),
-                closeOnContentClick: false
-                    // You may add options here, they're exactly the same as for $.fn.magnificPopup call
-                    // Note that some settings that rely on click event (like disableOn or midClick) will not work here
-            }, 0);
-            if ($('.loadStreaming').length == 1) {
-                $('.loadStreaming').click();
-            }
+        var viewed = c.length > 0 ? true : false;
+        // var watched = c.length > 0 ? _("already watched") : _("Not seen");
+        // html += '<tr><td><a href="#" class="loadStreaming" data-id="' + file.index + '">' + file.name + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + bytesToSize(file.length, 2) + '</td></tr>';
+        // if (i + 1 == list.length) {
+        //     $('#fbxMsg2').remove();
+        //     html += '</tbody></table></div></div>';
+        //     $.magnificPopup.open({
+        //         items: {
+        //             src: html
+        //         },
+        //         type: 'inline',
+        //         prependTo: $('.mejs-container'),
+        //         closeOnContentClick: false
+        //             // You may add options here, they're exactly the same as for $.fn.magnificPopup call
+        //             // Note that some settings that rely on click event (like disableOn or midClick) will not work here
+        //     }, 0);
+        //     if ($('.loadStreaming').length == 1) {
+        //         $('.loadStreaming').click();
+        //     }
+        // }
+        player.addTorrentTrack(file.index,file.name,bytesToSize(file.length, 2),file.length,tclass,viewed)
+        if(i+1 == list.length) {
+            $('.mejs-playlist ul li:not(.played):first').click()
         }
     })
     if($('#playerToggle').attr('aria-expanded') == "false") {
@@ -603,7 +645,7 @@ var loaded = 0;
 
 function increment(pct) {
     var loaded = parseInt(pct);
-    $('#counter').html(loaded + '%');
+    //$('#counter').html(loaded + '%');
     $('#drink').css('top', (100 - loaded * .9) + '%');
     if (loaded > 100) return;
     if (loaded > 25 && $('#cubes div:nth-child(1)').is(':hidden')) {

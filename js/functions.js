@@ -851,6 +851,7 @@ function stopTorrent(restart, data) {
         console.log(err)
         torrentPlaying = false;
     }
+    fromPlayList = false;
 
     player.currentTime = 0;
     player.current[0].style.width = 0;
@@ -870,12 +871,71 @@ function stopTorrent(restart, data) {
     }
 }
 
+function changeTorrent(torrentInfo, stateModel, id) {
+    $('#downloadStats').empty();
+    try {
+        videoStreamer.deselect()
+        videoStreamer.swarm.destroy()
+        wipeTmpFolder();
+    } catch (err) {}
+    if (torrentsArr.length > 0) {
+        $.each(torrentsArr, function(index, torrent) {
+            try {
+                console.log("stopping torrent :" + torrent.name);
+                var flix = torrent.obj;
+                torrentsArr.pop(index, 1);
+                flix.destroy();
+                delete flix;
+                $('.mejs-time-loaded').width(0 + '%');
+            } catch (err) {
+                console.log(err);
+            }
+        });
+    }
+    try {
+        torrentPlaying = false;
+        clearTimeout(statsUpdater);
+        streamInfo = {};
+        statsUpdater = null;
+        playStarted = false;
+    } catch (err) {
+        console.log(err)
+        torrentPlaying = false;
+    }
+    loadTorrent(null, null, id, torrentInfo)
+    fromPlayList = true;
+}
+
 // get user HOMEDIR
 function getUserHome() {
     return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 }
 
-function getAuthTorrent(url, stream, toFbx, cover) {
+function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
+    $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+    var obj = JSON.parse(settings.ht5Player);
+        if ((activeTab == 1 || activeTab == 2) && (search_engine === 'dailymotion' || search_engine === 'youtube' ||  engine.type == "video") && obj.name === "StreamStudio") {
+            $('#playerToggle').click();
+        }
+        $('#preloadTorrent').remove();
+        $('.mejs-container').append('<div id="preloadTorrent" \
+          style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
+          <p><b id="preloadProgress">' + _("Loading your torrent, please wait...") + '</b></p> \
+          <div id="torrLoader">  \
+          <div id="lemon"></div>  \
+        <div id="straw"></div>  \
+        <div id="glass">  \
+            <div id="cubes">  \
+                <div style="display:none;"></div>  \
+                <div style="display:none;"></div>  \
+                <div style="display:none;"></div>  \
+            </div>  \
+            <div id="drink"></div>  \
+            <span id="counter"></span>  \
+        </div>  \
+        <div id="coaster"></div>  \
+        </div> \
+          <div id="peerStats"></div></div>');
     if(url.indexOf('t411') !== -1) {
         $.get('http://irc.t411.in/ip/index.php',function(res) {
             var state = $($(res).find('tr:contains("tracker")').find('th')[2]).text()

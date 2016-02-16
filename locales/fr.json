@@ -282,5 +282,9 @@
 	"Can't connect to this station, please retry later !": "Impossible de se connecter à cette station, merci de réessayer ultérieurement !",
 	"t411.in Tracker ON-LINE !": "t411.in Tracker OK !",
 	"Unknown station": "Station inconnue",
-	"t411.in Tracker DOWN" : "t411.in Tracker indisponible !"
+	"t411.in Tracker DOWN": "t411.in Tracker indisponible !",
+	"Show/Hide Playlist": "Afficher/Cacher la Playlist",
+	"No streamable files in this torrent !": "Aucun fichier compatible streaming dans ce torrent... !",
+	"Can't get your torrent file !": "Impossible de télécharger votre torrent !",
+	"Search in the playlist...": "Rechercher dans la playlist..."
 }

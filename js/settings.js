@@ -16,6 +16,7 @@
 
 //nw window
 var gui = require('nw.gui');
+console.log(gui)
 var win = gui.Window.get();
  
 // create default settings or load from localstorage

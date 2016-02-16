@@ -1,4 +1,4 @@
-var VERSION = "2.9";
+var VERSION = "2.9.1";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -78,7 +78,7 @@ var current_channel_engine = '';
 var channelPagination = false;
 var searchDate = 'today';
 var searchDuration = '';
-var videoArray = ["avi", "webm", "mp4", "flv", "mkv", "mpeg", "mp3", "mpg", "wmv", "wma", "mov", "wav", "ogg", "flac", "opus","m4a","wma"];
+var videoArray = ["avi", "webm", "mp4", "flv", "mkv", "mpeg", "mp3", "mpg", "wmv", "wma", "mov", "wav", "ogg", "flac", "opus","m4a","wma","m4v","ogv"];
 current_search='';
 var exec_path = execDir;
 var pagination_init = false;

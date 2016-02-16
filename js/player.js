@@ -38,14 +38,39 @@ var iceCastTimer = null;
 $(document).ready(function() {
 	
 	player = MediaElementPlayer('#videoPlayer', {
-        features: ['playpause', 'progress', 'current', 'duration', 'tracks','stop', 'volume', 'fullscreen']
+        playlist: true,
+        playlistposition: 'top',
+        features: ['playlistfeature','playlist','playpause', 'progress', 'current', 'duration', 'tracks','stop', 'volume', 'fullscreen']
     });
+
+
+      $.each(['show', 'hide'], function (i, ev) {
+        var el = $.fn[ev];
+        $.fn[ev] = function () {
+          this.trigger(ev);
+          return el.apply(this, arguments);
+        };
+      });
+
+  $('.mejs-playlist').on('show', function() {
+    player.playlistToggle.removeClass('mejs-show-playlist').addClass('mejs-hide-playlist');
+    player.options.playlist = true;
+  });
+
+  $('.mejs-playlist').on('hide', function() {
+    player.playlistToggle.removeClass('mejs-hide-playlist').addClass('mejs-show-playlist');
+    player.options.playlist = false;
+  });
     
     // next signal and callback
     $(document).on('click', '.mejs-next-btn', function(e) {
-		e.preventDefault();
-		play_next = true;
+  		e.preventDefault();
+  		play_next = true;
+      if(fromPlayList) {
+        player.playNextTrack()
+      } else {
         getNext();
+      }
     });
     // stop button
     $(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
@@ -55,6 +80,7 @@ $(document).ready(function() {
 			upnpContinuePlay = false;
 			mediaRenderer.stop();
       upnpStoppedAsked = true;
+      fromPlayList = false;
 			stopUpnp();
 		} catch(err) {}
         initPlayer();
@@ -110,25 +136,25 @@ $(document).ready(function() {
 	 });
     
     //playlist buttons
-    $(document).on('click','#playlistBtn,#playlistBtnSub',function(e) {
+    $(document).on('click','#playModeBtn,#playlistBtnSub',function(e) {
 		e.preventDefault();
 		console.log('playlist clicked');
-		var pos = $('button[aria-label="playlist"]').css('backgroundPosition-y');
+		var pos = $('button[aria-label="playmode"]').css('backgroundPosition-y');
 		if(pos === '0px') {
-			$('button[aria-label="playlist"]').attr('style', 'background-position-y:-16px !important');
-			$('button[aria-label="playlist"]').attr('title',_('repeat mode'));
+			$('button[aria-label="playmode"]').attr('style', 'background-position-y:-16px !important');
+			$('button[aria-label="playmode"]').attr('title',_('repeat mode'));
 			playlistMode = 'loop';
 		//} else if(pos === '-16px') {
 			//$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
 			//$('button[aria-label="playlist"]').attr('title','shuffle mode');
 			//playlistMode = 'shuffle';
 		} else if (pos === '-16px') {
-			$('button[aria-label="playlist"]').attr('style', 'background-position-y:-48px !important');
-			$('button[aria-label="playlist"]').attr('title',_('play and stop mode (click to change)'));
+			$('button[aria-label="playmode"]').attr('style', 'background-position-y:-48px !important');
+			$('button[aria-label="playmode"]').attr('title',_('play and stop mode (click to change)'));
 			playlistMode = 'normal';
 		} else if (pos === '-48px') {
-			$('button[aria-label="playlist"]').attr('style', 'background-position-y:0px !important');
-			$('button[aria-label="playlist"]').attr('title',_('playlist mode'));
+			$('button[aria-label="playmode"]').attr('style', 'background-position-y:0px !important');
+			$('button[aria-label="playmode"]').attr('title',_('playlist mode'));
 			playlistMode = 'continue';
 		}
 	});
@@ -137,7 +163,11 @@ $(document).ready(function() {
     $(document).on('click', '.mejs-back-btn', function(e) {
         e.preventDefault();
         play_prev = true;
-        getPrev();
+        if(fromPlayList) {
+          player.playPrevTrack();
+        } else {
+          getPrev();
+        }
     });
     
     // player signals
@@ -152,7 +182,7 @@ $(document).ready(function() {
     player.media.addEventListener('pause', function() {
 		$('#subPlayer-play').show();
 		$('#subPlayer-pause').hide();
-		updateMiniPlayer();
+		  updateMiniPlayer();
     });
     player.media.addEventListener('seeking', function() {
 		$(".mejs-overlay-loading").show();
@@ -171,11 +201,22 @@ $(document).ready(function() {
 		$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
 		updateMiniPlayer();
     });
+
+    $(document).on('click','.playlistTrack',function(){
+      console.log($(this))
+      player.playTrack($(this),true,false)
+      player.playlistToggleClick();
+    })
+    player.playlistToggleClick()
     
 	//SubPlayer controls
 	$('#subPlayer-next').click(function() {
 		play_next = true;
-		getNext();
+    if(fromPlayList) {
+      player.playNextTrack()
+    } else {
+      getNext();
+    }
 	});
 	
 	$('#subPlayer-play, #subPlayer-pause').click(function() {
@@ -206,7 +247,11 @@ $(document).ready(function() {
 	
 	$('#subPlayer-prev').click(function() {
 		play_prev = true;
-		getPrev();
+    if(fromPlayList) {
+      player.playPrevTrack()
+    } else {
+      getNext();
+    }
 	});
 	
 	// subPlayer progress bar
@@ -294,8 +339,9 @@ $(document).ready(function() {
 });
 
 
-function initPlayer() {
+function initPlayer(stopTorrent) {
 	// clean subtitles
+  $('.soloTorrent').remove();
 	clearInterval(ChromecastInterval);
   stopIceTimer()
   cleanffar()
@@ -327,7 +373,8 @@ function initPlayer() {
 		} catch (err) {}
 	// stop torrents
 	try {
-		if(torrentPlaying) {
+    $("#preloadTorrent").remove();
+		if(torrentPlaying && !stopTorrent) {
 			stopTorrent();
 		}
 	} catch (err) {}
@@ -405,6 +452,14 @@ function updateMiniPlayer() {
 }
 
 function startPlay(media) {
+   player.addTrack(media)
+}
+
+function initPlay(media) {
+  player.playlistToggleClick();
+  $('.mejs-playlist').hide();
+  $('.mejs-playlist  > ul').hide();
+  $('.mejs-playlist').css('opacity',0);
 	try {
 		clearInterval(ChromecastInterval);
     clearInterval(iceCastTimer);

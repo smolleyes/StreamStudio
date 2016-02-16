@@ -450,6 +450,7 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 
 
 function spawnFfmpeg(link, device, host, bitrate,seekTo) {
+    console.log("opening link:" + link)
 	var start = '00:00:01.00'
     var args;
 	if(seekTo !== 0) {
@@ -474,8 +475,11 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 }
             }
 		} else {
-                    var vlink = decodeURIComponent(link).split('::')[0];
-                    var alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
+                    var alink,vlink;
+                    vlink = decodeURIComponent(link).split('::')[0];
+                    try {
+                        alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
+                    } catch(err) {}
                     if(alink && alink.indexOf('videoplayback') !== -1) {
                         args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy', '-movflags', 'faststart','-threads', '0','-f','matroska', 'pipe:1'];
                     } else {

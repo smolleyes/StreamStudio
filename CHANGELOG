@@ -1,3 +1,11 @@
+V 2.9.1
+ * add playlist system in the player
+ * possibility to stream multi files torrent file by file thru the playlist
+ * add new filters to t411 engine
+ * add new torrentproject engine, with search for files only torrents
+ * fix slow navigation between seasons in the series manager
+ * gui fixes...
+
 V 2.9
  * add 1440p and 2160p (4k) support for youtube
 

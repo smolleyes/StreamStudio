@@ -2261,7 +2261,10 @@ if (typeof jQuery != 'undefined') {
 			$('body').css({'cursor':'default'});
 			if($('#playerContainer').is(':visible')){
 				$('#playerTopBar').show();
-			}	
+			}
+			if($('.mejs-hide-playlist').length > 0 ) {
+				$('.mejs-playlist').show();
+			}
 			if (doAnimation) {
 				t.controls
 					.css('visibility','visible')
@@ -2283,8 +2286,11 @@ if (typeof jQuery != 'undefined') {
 					
 				
 			    if($('#playerContainer').is(':visible')){
-					$('#playerTopBar').show();
-				}	
+						$('#playerTopBar').show();
+					}
+					if($('.mejs-hide-playlist').length > 0 ) {
+						$('.mejs-playlist').show();
+					}
 				// any additional controls people might add and want to hide
 				t.container.find('.mejs-control')
 					.css('visibility','visible')
@@ -2300,7 +2306,7 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		hideControls: function(doAnimation) {
-			if(playerBarsLocked) {
+			if(playerBarsLocked || $('#box').is(':focus')) {
 				return;
 			}
 			var t = this;
@@ -2313,6 +2319,9 @@ if (typeof jQuery != 'undefined') {
 			if (!t.controlsAreVisible)
 				return;
 			$('#playerTopBar').hide();
+			if($('.mejs-hide-playlist').length > 0) {
+				$('.mejs-playlist').hide();
+			}
 			
 			if (doAnimation) {
 				// fade out main controls
@@ -2337,6 +2346,9 @@ if (typeof jQuery != 'undefined') {
 				}
 				// hide main controls
 				$('#playerTopBar').hide();
+				if($('.mejs-hide-playlist').length > 0) {
+					$('.mejs-playlist').hide();
+				}
 				t.controls
 					.css('visibility','hidden')
 					.css('display','block');		
@@ -3172,8 +3184,8 @@ if (typeof jQuery != 'undefined') {
 						layers.find('.mejs-poster').show();
 					}
 				});
-				$('<div class="mejs-button mejs-playlist-button mejs-playlist" id="playlistBtn">' +
-					'<button type="button" aria-controls="playlistBtnImg" title="'+_("play and stop")+'" aria-label="playlist"></button>' +
+				$('<div class="mejs-button mejs-playmode-button mejs-playmode" id="playModeBtn">' +
+					'<button type="button" aria-controls="playModeBtnImg" title="'+_("play and stop")+'" aria-label="playmode"></button>' +
 				'</div>')
 				.appendTo(controls);
 		}
@@ -3182,13 +3194,13 @@ if (typeof jQuery != 'undefined') {
 	$.extend(MediaElementPlayer.prototype, {
 		buildPlaylist: function(player, controls, layers, media) {
 			var t = this,
-				playlist = 
-				$('<div class="mejs-button mejs-playlist-button mejs-playlist" id="playlistBtn">' +
-					'<button type="button" aria-controls="playlistBtnImg" title="playlist" aria-label="playlist"></button>' +
+				playmode = 
+				$('<div class="mejs-button mejs-playmode-button mejs-playmode" id="playlistBtn">' +
+					'<button type="button" aria-controls="playModeBtnImg" title="play mode" aria-label="playmode"></button>' +
 				'</div>')
 				.appendTo(controls)
 				.click(function() {
-					console.log('playlist clicked')
+					console.log('playMode clicked')
 				});
 		}
 	});
