@@ -113,7 +113,6 @@ function getTorrent(link, cover, fallback) {
             });
     } else {
         loadTorrent(link, cover || '')
-        console.log(link.toString())
     }
 }
 
@@ -166,7 +165,6 @@ function loadTorrent(link, cover,id, torrInfo) {
     playStarted = false;
     downloadedPct = 0;
     startLoading();
-    console.log(torrentInfo,id)
     if(id) {
         handleTorrent(torrentInfo, stateModel,id);
     } else {
@@ -333,11 +331,7 @@ app.updateStats = function(streamInfo) {
                 $('#fbxMsg2').remove();
             } catch (err) {}
             $('.mejs-container').append('<div id="fbxMsg2" class="preloadingMsg" style="height:calc(100% - 60px);"><div style="top:62%;position: relative;"><p style="font-weight:bold;text-align: center;">' + _("Please wait while loading your video... (Can take a few seconds)") + '</p></div></div>');
-            if(fromPlayList) {
-                initPlay(stream)
-            } else {
-                startPlay(stream);
-            }
+            initPlay(stream)
         } else {
             torrentSrc = videoStreamer.path;
             torrentName = videoStreamer.server.index.name;
@@ -607,7 +601,11 @@ function loadTable(files) {
         // }
         player.addTorrentTrack(file.index,file.name,bytesToSize(file.length, 2),file.length,tclass,viewed)
         if(i+1 == list.length) {
-            $('.mejs-playlist ul li:not(.played):first').click()
+            if(list.length > 1) {
+                $('.mejs-playlist ul li:not(.played):first').click()
+            } else {
+                $('.mejs-playlist ul li:first').click()
+            }
         }
     })
     if($('#playerToggle').attr('aria-expanded') == "false") {

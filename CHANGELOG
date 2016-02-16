@@ -1,3 +1,7 @@
+V 2.9.2
+ * small playlist fixes
+ * remove torrent project from default plugins
+
 V 2.9.1
  * add playlist system in the player
  * possibility to stream multi files torrent file by file thru the playlist

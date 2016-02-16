@@ -1,7 +1,7 @@
 var engines = [];
-var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent'];
+var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject'];
 var pluginsDir;
-var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','kickass'];
+var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','kickass','torrent-project'];
 
 function initPlugins() {
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';

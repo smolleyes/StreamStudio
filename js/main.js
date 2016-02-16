@@ -332,6 +332,10 @@ var htmlContent =
                                     <label for="kickass">Kickass</label> \
                                     <input class="pluginCheckBox" type="checkbox" id="kickass" name="kickass"> \
                                 </div> \
+                                <div class="ItemCheckbox left"> \
+                                    <label for="torrent-project">Torrent-project</label> \
+                                    <input class="pluginCheckBox" type="checkbox" id="torrent-project" name="torrent-project"> \
+                                </div> \
                                 <div id="t411Login" style="display:none;"> \
                                     <p><u><b>' + _("T411 login informations:") + '</b></u></p> \
                                     <p style="font-size:10px;font-weight:bold;">'+_("Note: No informations are stored or sended to streamstudio's servers !")+'</p> \

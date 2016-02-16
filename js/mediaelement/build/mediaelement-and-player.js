@@ -3312,7 +3312,7 @@ if (typeof jQuery != 'undefined') {
 								}
 								m.title = currentMedia.title;
 								m.cover = currentMedia.cover;
-								startPlay(m);
+								initPlay(m);
 							}
 						}
 

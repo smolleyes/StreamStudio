@@ -235,7 +235,7 @@ $(document).ready(function() {
     } else {
       if(player.media.paused) {
         if(player.media.src.indexOf('index.html') !== -1) {
-          startPlay(currentMedia);
+          initPlay(currentMedia);
         } else {
           player.play();
         }
@@ -292,7 +292,7 @@ $(document).ready(function() {
 			}
 			m.title = currentMedia.title;
 			m.cover = currentMedia.cover;
-			startPlay(m);
+			initPlay(m);
       //player.media.setCurrentTime(newTime);
 		} else {
 			if(chromeCastplaying){
@@ -373,7 +373,6 @@ function initPlayer(stopTorrent) {
 		} catch (err) {}
 	// stop torrents
 	try {
-    $("#preloadTorrent").remove();
 		if(torrentPlaying && !stopTorrent) {
 			stopTorrent();
 		}
@@ -452,7 +451,7 @@ function updateMiniPlayer() {
 }
 
 function startPlay(media) {
-   player.addTrack(media)
+  player.addTrack(media)
 }
 
 function initPlay(media) {
@@ -502,7 +501,7 @@ function initPlay(media) {
 					console.log( 'Process %s has been killed!', pid );
 					extPlayerRunning = false;
 					setTimeout(function() {
-						startPlay(media);
+						initPlay(media);
 						extPlayerRunning = false;
 					},1000);
 					return;
@@ -891,7 +890,7 @@ function on_media_finished(){
 				playUpnpRenderer(currentMedia)
 			}
 		} else {
-			startPlay(currentMedia);
+			initPlay(currentMedia);
 		}
 	} else if (playlistMode === 'shuffle') {
 		
