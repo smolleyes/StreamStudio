@@ -1479,7 +1479,7 @@ function main() {
         var file = e.dataTransfer.files[0],
             reader = new FileReader();
         reader.onload = function(event) {};
-        if (file.type === "application/x-bittorrent") {
+        if (file.type === "application/x-bittorrent" || file.name.indexOf('.torrent') !== -1) {
             getTorrent(file.path);
         }
         return false;

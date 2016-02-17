@@ -372,6 +372,10 @@ function playUpnpRenderer(obj) {
           console.log(status);
           rendererState = status;
         });
+
+        mediaRenderer.on('error', function(err) {
+          console.log(err);
+        });
          
         mediaRenderer.on('loading', function() {
           console.log('loading');
@@ -402,7 +406,7 @@ function playUpnpRenderer(obj) {
         currentMedia.mime = 'audio/opus'
         currentMedia.type = "audio"
     }
-    obj.title = sanitize(XMLEscape.xmlEscape(obj.title.replace(/[^\x00-\x7F]/g, "")))
+    obj.title = sanitize(XMLEscape.xmlEscape(decodeURIComponent(obj.title.replace(/[^\x00-\x7F]/g, ""))))
     var options = { 
       autoplay: true,
       contentType: currentMedia.mime || "video/mp4",

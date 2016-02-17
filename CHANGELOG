@@ -1,3 +1,9 @@
+V 2.9.3
+ * fix youtube thru upnp (audio was missing)
+ * fix torrent drag n drop when file type was not detected
+ * fix seeking problem
+ * fix t411 engine default filters
+
 V 2.9.2
  * small playlist fixes
  * remove torrent project from default plugins

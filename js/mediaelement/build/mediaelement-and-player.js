@@ -3238,7 +3238,7 @@ if (typeof jQuery != 'undefined') {
 					// mouse position relative to the object
 					var x = e.pageX,
 						offset = total.offset(),
-						width = total.outerWidth(true),
+						width = total.outerWidth(true)-60,
 						percentage = 0,
 						newTime = 0,
 						pos = 0;
