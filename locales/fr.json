@@ -287,5 +287,6 @@
 	"No streamable files in this torrent !": "Aucun fichier compatible streaming dans ce torrent... !",
 	"Can't get your torrent file !": "Impossible de télécharger votre torrent !",
 	"Search in the playlist...": "Rechercher dans la playlist...",
-	"error!": "error!"
+	"error!": "erreur!",
+	"Keep torrent file after downloading ?": "Conserver les fichiers après téléchargement ?"
 }

@@ -1,3 +1,9 @@
+V 2.9.4
+ * add download popup frop drag n dropped torrents
+ * fix youtube engine
+ * fix some upnp problems
+ * add basic support for m3u files with http links thru drag n drop
+
 V 2.9.3
  * fix youtube thru upnp (audio was missing)
  * fix torrent drag n drop when file type was not detected

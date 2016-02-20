@@ -245,6 +245,7 @@ var showText = _('Show/Hide Playlist');
           nxt = current.siblings().first();
         }
       }
+      torObj.retried = false;
       if (nxt.length == 1) {
         nxt.addClass('played');
         nxt.click()
@@ -269,6 +270,7 @@ var showText = _('Show/Hide Playlist');
           prev = current.siblings().last();
         }
       }
+      torObj.retried = false;
       if (prev.length == 1) {
         current.removeClass('played');
         prev.click()
@@ -298,7 +300,7 @@ var showText = _('Show/Hide Playlist');
        container.empty();
        t.playlistTracks = new Array();
     },
-    addTrack : function(media) {
+    addTrack : function(media,dontPlay) {
       var t = this;
       var container = t.layers.find('.mejs-playlist > ul');
       media.link = media.link;
@@ -311,7 +313,9 @@ var showText = _('Show/Hide Playlist');
       $('.mejs-playlist').css('opacity',0);
       t.layers.find('li:first').addClass('playlistTrack played');
       $('#'+media.id).addClass('current').siblings().removeClass('current');
-      initPlay(media)
+      if(!dontPlay) {
+        initPlay(media)
+      }
     },
     addTorrentTrack : function(id,title,size,bytes,tclass,viewed) {
       var exClass = 'played'
@@ -322,6 +326,10 @@ var showText = _('Show/Hide Playlist');
       var container = t.layers.find('.mejs-playlist > ul');
       var tid= generateUUID();
       var dejaVu = viewed ? _('watched') : _('Not seen');
+      var media = {}
+      media.index=id;
+      media.id=tid;
+      t.playlistTracks.push(media)
       container.append('<li id="'+tid+'" data-id="'+id+'" data-length="'+bytes+'" title="' + title + '">' + title + ' | '+size+' | '+dejaVu+'</li>');
       t.layers.find('li:last').addClass('loadStreaming playFromplaylist '+ tclass + ' '+exClass);
       $('.mejs-playlist').hide();

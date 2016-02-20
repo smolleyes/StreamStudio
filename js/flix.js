@@ -13,6 +13,7 @@ var ___ = require('underscore');
 var pt = require('parse-torrent');
 
 var totalBuffered = 0;
+var retryLoading = false;
 
 var statsUpdater = null;
 var active = function(wire) {
@@ -72,8 +73,18 @@ $(document).on('click', '#closeMfp', function(evt) {
     $('#tab a[href="#tabpage_' + activeTab + '"]').click();
 });
 
-function getTorrent(link, cover, fallback) {
-    player.cleanTracks();
+var torObj = {}
+
+function getTorrent(link, cover, fallback,retried,id) {
+    console.log(torObj,link, cover, fallback,retried,id)
+    torObj.link = link;
+    torObj.cover = cover;
+    torObj.fallback = fallback;
+    torObj.retried = retried;
+    torObj.id = id;
+    if(!torObj.retried) {
+     player.cleanTracks();
+    } 
     if (link.toString().indexOf('magnet:?') !== -1) {
         if (cover) {
             mediaCover = cover;
@@ -270,7 +281,10 @@ app.updateStats = function(streamInfo) {
     this.percent = parseInt(swarm.downloaded / (BUFFERING_SIZE / 100)).toFixed(2);
     if (stateModel.state != 'ready') {
         if (stateModel.state === 'connecting') {
-            if (parseInt(stateModel.numTry) >= 90) {
+            if (parseInt(stateModel.numTry) >= 10 && !torObj.retried) {
+                stopTorrent();
+                getTorrent(torObj.link, torObj.cover, torObj.fallback, true, torObj.id);
+            } else if (parseInt(stateModel.numTry) >= 90) {
                 setTimeout(function() {
                     $('#preloadProgress').empty().append(_('Corrupted torrent or no seeders, can\'t open your torrent file'));
                 }, 5000);
@@ -485,6 +499,7 @@ function handleTorrent(torrent, stateModel, id) {
             tmpFolder = path;
         }
         if (typeof id !== "undefined") {
+            torObj.id = id;
             videoStreamer = peerflix(torrent.info, {
                 connections: 150,
                 path: tmpFolder,
@@ -560,6 +575,7 @@ function loadTable(files) {
     if(files.length == 0){
         swal(_("error!"), _("No streamable files in this torrent !"), "error")
         initPlayer();
+        $('#preloadTorrent').remove();
     }
 
     var list = ___.sortBy(files, function(obj) {
@@ -569,13 +585,11 @@ function loadTable(files) {
             return obj.name.toLowerCase().match(/\d{1,2}/);
         }
     });
-    player.cleanTracks();
     var tclass="soloTorrent"
     if(files.length > 1 ) {
         tclass='multiTorrent'
     }
     $.each(list, function(i, file) {
-        console.log(file)
         var c = sdb.find({
              "title": file.name
         });
@@ -599,10 +613,26 @@ function loadTable(files) {
         //         $('.loadStreaming').click();
         //     }
         // }
-        player.addTorrentTrack(file.index,file.name,bytesToSize(file.length, 2),file.length,tclass,viewed)
+        if(!torObj.retried) {
+            player.addTorrentTrack(file.index,file.name,bytesToSize(file.length, 2),file.length,tclass,viewed)
+        }
         if(i+1 == list.length) {
             if(list.length > 1) {
-                $('.mejs-playlist ul li:not(.played):first').click()
+                if(!torObj.id) {
+                    if($('.mejs-playlist ul li:not(.played)').length > 0) {
+                        $('.mejs-playlist ul li:not(.played):first').click()
+                    } else {
+                        $('.mejs-playlist ul li:first').click()
+                    }
+                } else {
+                    __.each(player.playlistTracks,function(track) {
+                        console.log(track, parseInt(torObj.id))
+                        if(parseInt(track.index) == parseInt(torObj.id)) {
+                            $('#'+track.id).click()
+                            torObj.id = null;
+                        }
+                    })
+                }
             } else {
                 $('.mejs-playlist ul li:first').click()
             }

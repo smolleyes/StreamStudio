@@ -419,7 +419,7 @@ function playUpnpRenderer(obj) {
     };
     mediaRendererPaused = false;
 
-    var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','');
+    var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','').trim();
 
     console.log(options,mediaRenderer)
     
@@ -502,11 +502,11 @@ function getRendererState(state) {
                     },1000);
                 }
             } else {
-                console.log(state, upnpStoppedAsked)
-                if (state === 'PLAYING') {
+                if (rendererState.TransportState === 'PLAYING') {
                     transitionCount = 0;
                     upnpMediaPlaying = true;
                     continueTransition = true;
+                    $('#subPlayer-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
                     setTimeout(function(){
                         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
                         $('.mejs-overlay-button').hide();
@@ -524,18 +524,19 @@ function getRendererState(state) {
                     },1000);
                 // watch for STOPPED state
                 getRendererState('STOPPED');
-                } else if (state === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
-                    upnpMediaPlaying = false;
-                    continueTransition = false;
-                    upnpStoppedAsked = false;
-                    if(!play_next && !play_prev) {
-                        setTimeout(function(){
-                            checkStopped()
-                        },2000);
-                    } else {
-                        play_next = false;
-                        play_prev = false;
-                    }
+                }
+                else if (rendererState.TransportState === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
+                     upnpMediaPlaying = false;
+                     continueTransition = false;
+                     upnpStoppedAsked = false;
+                //     if(!play_next && !play_prev) {
+                //         setTimeout(function(){
+                             checkStopped()
+                //         },2000);
+                //     } else {
+                //         play_next = false;
+                //         play_prev = false;
+                //     }
                 }
             }
         }
@@ -544,6 +545,7 @@ function getRendererState(state) {
 
 function checkStopped() {
     stopUpnp();
+    console.log('upnp state checkStopped '+rendererState.TransportState)
     if(rendererState.TransportState == 'STOPPED' || rendererState.TransportState === 'NO_MEDIA_PRESENT') {
             on_media_finished();
     } else {
@@ -557,7 +559,6 @@ function stopUpnp() {
 	continueTransition = false;
 	// if user asked stop
 	if(upnpMediaPlaying === false) {
-		console.log("upnp stopped")
         $('#progress-bar').val(0)
         $('.mejs-duration,.mejs-currenttime').text('00:00:00')
 		continueTransition = false;

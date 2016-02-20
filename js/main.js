@@ -1479,11 +1479,43 @@ function main() {
         var file = e.dataTransfer.files[0],
             reader = new FileReader();
         reader.onload = function(event) {};
-        if (file.type === "application/x-bittorrent" || file.name.indexOf('.torrent') !== -1) {
-            getTorrent(file.path);
+        if (file.type === "application/x-bittorrent" || path.extname(file.name).toLowerCase() == '.torrent') {
+            saveTorrent = false;
+            torrentSaved = false;
+            var html = '<div style="width:100%;height:100%;position:relative;top:0;left:0;"></div><div style="position: absolute;top: 50%;left: 50%;width: 500px;height: 500px;margin-top: -250px;margin-left: -250px;background: rgba(32, 32, 32, 0.63);border-radius: 3px;"><h3>'+file.name.replace('.torrent','')+'</h3><br><img style="width:180;height:240px;" src="images/bittorrent-logo1.jpg" /><br><br> \
+            <button type="button" id="dragTorrent_play" data="'+encodeURIComponent(JSON.stringify(file))+'" class="closePopup dragTorrent_play btn btn-success"> \
+                <span class="glyphicon glyphicon-play-circle"><span class="fbxMsg_glyphText">'+_("Start playing")+'</span></span> \
+            </button>  \
+            <button type="button" class="closePopup dragTorrent_download downloadText btn btn-info" href="'+file.path+'" id="downlink" data="'+encodeURIComponent(JSON.stringify(file))+'" title="'+ _("Download")+'">  \
+                <span class="glyphicon glyphicon-download"><span class="fbxMsg_glyphText">'+_("Download")+'</span>  \
+                </span>  \
+            </button>';
+
+            //if(freeboxAvailable) {
+                //html += '<button type="button"  href="'+obj.torrent+'" class="closePopup download_t411_torrentFile_fbx downloadText btn btn-info" id="t411_downlinkFbx_'+obj.id+'" data="'+encodeURIComponent(JSON.stringify(obj))+'" title="'+ _("Download")+'"><span class="glyphicon glyphicon-download-alt"><span class="fbxMsg_glyphText">'+_("Télécharger avec freebox")+'</span></span></button>';
+            //}
+            html += '<br/><br/><div><label>'+_("Keep torrent file after downloading ?")+'</label><input style="position:relative;left:10px;" type="checkbox" class="saveTorrentCheck" name="saveTorrentCheck"></input></div></div>';
+            // show
+            showPopup(html, 'body')
+        } else if (file.type == 'audio/x-mpegurl' || path.extname(file.name).toLowerCase() == '.m3u') {
+            parseM3uFile(file)
         }
         return false;
     };
+
+    $(document).on("click",".dragTorrent_play",function(){
+        var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+        console.log(obj)
+        getTorrent(obj.path);
+        $('#playerToggle')[0].click();
+    })
+
+    $(document).on("click",".dragTorrent_download",function(){
+        var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+        console.log(obj)
+        gui.Shell.openItem(obj.path);
+        $('#playerToggle')[0].click();
+    })
 
     win.on('maximize', function() {
         setTimeout(function() {

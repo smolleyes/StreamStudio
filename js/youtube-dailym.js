@@ -279,7 +279,7 @@ function getVideosDetails(datas, engine, sublist, vid) {
                             <span><i '+css+'></i>'+online+'</span> \
                             <span style="float:right;margin-right:5px;"><i class="glyphicon glyphicon-user"></i>'+("Viewers:")+' '+items[i].audience+'</span> \
                         </div> \
-                        <img src="' + items[i].thumbnail_240_url + '" class="video_thumbnail" /> \
+                        <img src="' + items[i].thumbnail_240_url.replace('https','http') + '" class="video_thumbnail" /> \
                         <div class="spiffy"><div class="inner one"></div><div class="inner two"></div><div class="inner three"></div></div> \
                         <div> \
                             <img data-link="http://www.dailymotion.com/video/'+vid+'" class="coverPlayImg preload_dailymotion_live" style="display:none;margin: -95px 0 0 -100px;" /> \
@@ -437,7 +437,7 @@ function loadPlaylistItems(item, engine) {
             <div id="optionsTopInfos" style="display:none;"> \
                 '+author+' \
             </div> \
-            <img src="' + thumb + '" class="video_thumbnail" /> \
+            <img src="' + thumb.replace('https','http') + '" class="video_thumbnail" /> \
             <div> \
                 <img id="' + pid + '::' + subLength + '::' + engine + '" class="coverPlayImg load_playlist" style="display:none;margin: -75px 0 0 -100px;" /> \
             </div> \
@@ -471,7 +471,7 @@ function loadChannelsItems(item, engine) {
             <div id="optionsTopInfos" style="display:none;"> \
                 <span><i class="glyphicon glyphicon-user"></i>'+_("Author:")+author+'</span> \
             </div> \
-            <img src="' + thumb + '" class="video_thumbnail" /> \
+            <img src="' + thumb.replace('https','http') + '" class="video_thumbnail" /> \
             <div> \
                 <img id="' + pid + '::' + length + '::' + engine + '::' + link + '" class="coverPlayImg load_channel" style="display:none;margin: -75px 0 0 -100px;" /> \
             </div> \
@@ -503,7 +503,7 @@ function loadChannelsItems(item, engine) {
             <div id="optionsTopInfos" style="display:none;"> \
                 <span style="display:none;"><i class="glyphicon glyphicon-user"></i>'+_("Author:")+author+'</span> \
             </div> \
-            <img src="' + thumb + '" class="video_thumbnail" /> \
+            <img src="' + thumb.replace('https','http') + '" class="video_thumbnail" /> \
             <div> \
                 <img id="' + pid + '::' + length + '::' + engine + '::' + link + '" class="coverPlayImg load_playlist" style="display:none;margin: -75px 0 0 -100px;" /> \
             </div> \
@@ -767,7 +767,7 @@ function printVideoInfos(infos, solo, sublist, sublist_id, engine) {
             <div id="optionsTopInfos" style="display:none;"> \
                 <span><i class="glyphicon glyphicon-eye-open"></i>'+_("Views:")+views+'</span> \
             </div> \
-            <img class="video_thumbnail" src="' + thumb + '" /> \
+            <img class="video_thumbnail" src="' + thumb.replace('https','http') + '" /> \
             <div class="spiffy"><div class="inner one"></div><div class="inner two"></div><div class="inner three"></div></div> \
             <div> \
                 <img id="'+vid+'" class="coverPlayImg start_video" style="display:none;margin: -90px 0 0 -100px;" /> \
@@ -903,7 +903,7 @@ function printYtVideoInfos(infos, solo, sublist, sublist_id, engine,fromPlaylist
                     <div id="optionsTopInfos" style="display:none;"> \
                         <span><i class="glyphicon glyphicon-eye-open"></i>'+_("Views:")+views+'</span> \
                     </div> \
-                    <img class="video_thumbnail" src="' + thumb + '" /> \
+                    <img class="video_thumbnail" src="' + thumb.replace('https','http') + '" /> \
                     <div class="spiffy"><div class="inner one"></div><div class="inner two"></div><div class="inner three"></div></div> \
                     <div> \
                         <img id="'+vid+'" class="coverPlayImg start_video" style="display:none;margin: -90px 0 0 -100px;" /> \

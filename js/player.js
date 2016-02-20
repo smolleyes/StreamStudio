@@ -173,8 +173,9 @@ $(document).ready(function() {
     // player signals
     player.media.addEventListener('ended', function() {
     	console.log('media finished')
-        updateMiniPlayer();
-        on_media_finished();
+      torObj.retried = false;
+      updateMiniPlayer();
+      on_media_finished();
 		$('.mejs-overlay-play').show();
 		$(".mejs-overlay-loading").hide();
     });
@@ -636,18 +637,30 @@ function launchPlay() {
 	
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	console.log("VIDEORESOLUTION " + videoResolution)
-	if(settings.transcoding && !upnpToggleOn && obj.name == 'StreamStudio' || upnpToggleOn && upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && currentMedia.title.indexOf('.avi') !== -1 || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
-		transcoderEnabled = true;
-	} else {
-		transcoderEnabled = false;
-	}
+  console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
+  var carray = ['mp3','mp4','opus','wav','flac','mkv','ts','mpeg','mpg','ogg','webm','ogv'];
+  var aArray = ['mp3','opus','wav','flac','m4a','wma'];
 
+  if(playFromYoutube) {
+    if(settings.transcoding || upnpTranscoding || upnpToggleOn || obj.name == 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p') {
+      transcoderEnabled = true;
+    } else {
+      transcoderEnabled = false;
+    }
+  } else {
+    if(settings.transcoding || upnpTranscoding || obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1  || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
+      transcoderEnabled = true;
+    } else {
+      transcoderEnabled = false;
+    }
+  }
+  console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
 	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || engine && engine.engine_name == "Shoutcast" && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || playFromYoutube && obj.name === 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p' || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
+	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || engine && engine.engine_name == "Shoutcast" && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
+  console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
 	
 	if(upnpToggleOn) { 
 		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
@@ -747,6 +760,7 @@ function startVideo(vid_id, title) {
           childs[0].click();
         }
     } else {
+        videoResolution = $(childs[0]).attr('alt');
         childs[0].click();
     }
 }
@@ -882,8 +896,8 @@ function getPrev() {
 function on_media_finished(){
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	if (playlistMode === 'normal' && !seekAsked) {
-		initPlayer();
-		$('#closePlayer').click();
+      initPlayer();
+		  $('#closePlayer').click();
 	} else if (playlistMode === 'loop') {
 		if(upnpToggleOn) {
 			if(upnpContinuePlay){
@@ -902,7 +916,12 @@ function on_media_finished(){
 		} else {
 			getNext();
 		}
-	} 
+	} else {
+    seekAsked = false;
+    if(!upnpStoppedAsked && playFromUpnp && player.playlistTracks.length !== 0 || !upnpStoppedAsked && fromPlayList && player.playlistTracks.length !== 0) {
+      player.playNextTrack()
+    }
+  }
 }
 
 function updateProgressBar() {

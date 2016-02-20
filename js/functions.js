@@ -1048,6 +1048,25 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
     }
 }
 
+function parseM3uFile(file) {
+    var dirname = path.dirname(file.path);
+    console.log(file,dirname)
+    var parsers = require("playlist-parser");
+    var M3U = parsers.M3U;
+    var playlist = M3U.parse(fs.readFileSync(file.path, { encoding: "utf8" }));
+    console.log(playlist)
+    if(playlist && playlist.length > 0) {
+        __.each(playlist,function(media) {
+            var f = {}
+            f.title = media.title;
+            f.link = media.file;
+            player.addTrack(f, true)
+        })
+    } else {
+        swal(_("error!"), _("Can't read your playlist file or playlist empty !"), "error")
+    }
+}
+
 function dirTree(filename) {
     var stats = fs.lstatSync(filename),
         info = {
