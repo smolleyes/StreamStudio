@@ -3,7 +3,7 @@ var path = require('path');
 
 function initCpbSearch(results,cb) {
 	if(results.page == 0) {
-		$.post('http://www.cpasbien.io/recherche/',{"champ_recherche":results.query}).done(function(datas){
+		$.post('http://www.cpasbien.cm/recherche/',{"champ_recherche":results.query}).done(function(datas){
 			var link = $($('#pagination a',datas)[0]).attr('href');
 			results.basePath = path.dirname(link);
 			return parseDatas(datas, results,cb);
@@ -34,7 +34,7 @@ function parseDatas(data, results,cb) {
 		Iterator.iterate(mlist).forEach(function (item,i) {
 			try {
 				var video = {};
-				video.torrentLink = 'http://www.cpasbien.io/telechargement/'+path.basename($(item).find('.titre').attr('href').replace('.html','.torrent'));
+				video.torrentLink = 'http://www.cpasbien.cm/telechargement/'+path.basename($(item).find('.titre').attr('href').replace('.html','.torrent'));
 				video.seeders = $(item).find('.up').text();
 				video.leechers = $(item).find('.down').text();
 				video.title = $(item).find('.titre').text();
