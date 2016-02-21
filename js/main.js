@@ -309,10 +309,6 @@ var htmlContent =
                                     <input class="pluginCheckBox" type="checkbox" id="vimeo" name="vimeo"> \
                                     </div>--> \
                                 <div class="ItemCheckbox left"> \
-                                    <label for="songza">Songza</label> \
-                                    <input class="pluginCheckBox" type="checkbox" id="songza" name="songza"> \
-                                </div> \
-                                <div class="ItemCheckbox left"> \
                                     <label for="twitch">Twitch</label> \
                                     <input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch"> \
                                 </div> \
