@@ -456,7 +456,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if(seekTo !== 0) {
 		start = seekTo;
 	}
-	if(!upnpToggleOn && search_engine !== 'twitch') {
+	if(upnpToggleOn || upnpToggleOn && search_engine == 'twitch') {
 		link = decodeURIComponent(link);
         audio = 'libmp3lame';
 	} else {
@@ -467,7 +467,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
             var obj = JSON.parse(settings.ht5Player);
             var carray = ['mp3','opus','wav','flac','m4a','wma','ape'];
-			if(link.indexOf('.mp3') !== -1 || link.indexOf('grooveshark.com/stream.php?') !== -1 || link.indexOf('.wav') !== -1 || link.indexOf('.mp4?e=') !== -1 || link.indexOf('.flac') !== -1 || link.indexOf('.opus') !== -1 || obj.name == 'StreamStudio' && carray.indexOf(currentMedia.title.split('.').pop()) !== -1) {
+			if(obj.name == 'StreamStudio' && carray.indexOf(currentMedia.title.split('.').pop()) !== -1) {
 				args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
 			} else {
                 if(search_engine !== 'dailymotion') {
@@ -485,7 +485,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
             if(alink && alink.indexOf('videoplayback') !== -1) {
                 args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
             } else {
-                args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', audio,'-threads', '0','-f','matroska', 'pipe:1'];
+                args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', 'libopus','-threads', '0','-f','matroska', 'pipe:1'];
             }          
 		}
 	} else {

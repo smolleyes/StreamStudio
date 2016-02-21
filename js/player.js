@@ -638,8 +638,8 @@ function launchPlay() {
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
   console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
-  var carray = ['mp3','mp4','opus','wav','flac','mkv','ts','mpeg','mpg','ogg','webm','ogv'];
-  var aArray = ['mp3','opus','wav','flac','m4a','wma'];
+  var carray = ['.mp3','.mp4','.opus','.wav','.flac','.mkv','.ts','.mpeg','.mpg','.ogg','.webm','.ogv'];
+  var aArray = ['.mp3','.opus','.wav','.flac','.m4a','.wma'];
 
   if(playFromYoutube) {
     if(settings.transcoding || upnpTranscoding || upnpToggleOn || obj.name == 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p') {
@@ -648,7 +648,8 @@ function launchPlay() {
       transcoderEnabled = false;
     }
   } else {
-    if(settings.transcoding || upnpTranscoding || obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1  || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
+    console.log(path.extname(currentMedia.title))
+    if(settings.transcoding || upnpTranscoding || obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.indexOf(path.extname(currentMedia.title)) == -1 || obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1  || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
       transcoderEnabled = true;
     } else {
       transcoderEnabled = false;

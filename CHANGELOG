@@ -1,3 +1,7 @@
+V 2.9.6
+ * fix continuous play mode in upnp
+ * fix ffmpeg visualisation, now all unsupported codecs will be decoded thru upnp 
+
 V 2.9.5
  * cpasbien domain change 
 
