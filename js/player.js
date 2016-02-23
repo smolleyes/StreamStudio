@@ -649,7 +649,7 @@ function launchPlay() {
     }
   } else {
     console.log(path.extname(currentMedia.title))
-    if(settings.transcoding || upnpTranscoding || obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.indexOf(path.extname(currentMedia.title)) == -1 || obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1  || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
+    if(settings.transcoding || upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.indexOf(path.extname(currentMedia.title)) == -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1  || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
       transcoderEnabled = true;
     } else {
       transcoderEnabled = false;

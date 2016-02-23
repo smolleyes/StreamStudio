@@ -1,3 +1,7 @@
+V 2.9.9 
+ * fix upnp (again...)
+ * fix progress bar in the player 
+
 V 2.9.8
  * update ffmpeg for all flavors linux/windows/osX
 

@@ -356,6 +356,7 @@ app.updateStats = function(streamInfo) {
             }
             if (parseInt(downloadedPct) >= 100) {
                 var t = _('(%s%% downloaded)', 100);
+                $('.mejs-time-loaded').width('100%')
                 $('#preloadTorrent').remove();
                 $("#song-title").empty().text(_('Playing: ') + torrentName + " " + t);
                 if (saveTorrent && !torrentSaved) {
@@ -376,11 +377,7 @@ app.updateStats = function(streamInfo) {
                     totalBuffered = 0;
                     totalBytes = 0;
                 }
-                if (upnpToggleOn && upnpMediaPlaying && !upnpStoppedAsked) {
-                    if(downloadedPct <= 100) {
-                        $('.mejs-time-loaded').width(downloadedPct + '%')
-                    }
-                }
+                $('.mejs-time-loaded').width(downloadedPct + '%')
                 $("#song-title").empty().text(_('Playing: ') + torrentName + " " + t);
             }
         }

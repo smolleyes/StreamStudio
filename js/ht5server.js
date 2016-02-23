@@ -531,7 +531,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 var total = pct+mediaCurrentPct;
 				if (parseInt(total) >= 100) {
 					return;
-				} else {
+				} else if (playFromYoutube) {
                    $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show(); 
                 }
 			}
