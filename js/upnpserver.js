@@ -547,7 +547,7 @@ function checkStopped() {
     stopUpnp();
     console.log('upnp state checkStopped '+rendererState.TransportState)
     if(rendererState.TransportState == 'STOPPED' || rendererState.TransportState === 'NO_MEDIA_PRESENT') {
-            on_media_finished();
+        on_media_finished();
     } else {
         setTimeout(function(){
             checkStopped()

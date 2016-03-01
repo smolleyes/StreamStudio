@@ -4,34 +4,50 @@ function checkUpdates() {
 		return;
 	}
 	try {
-		http.get('http://ubukey.fr/StreamStudio/update.html',function(res,err){
-			var datas = [];
-			res.on('data',function(chunk){
-				datas.push(chunk);
+		if(os.platform() == "linux" && execDir.indexOf('/opt') !== -1) {
+			console.log("Checking for updates on the PPA....");
+			exec("apt-cache show streamstudio | grep Version | sed -e 's/.*: //'", function(err, stdout, stderr) {
+			  if (err) {
+			    $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Unable to check the available version on the PPA !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+			    return;
+			  }
+			  console.log("online version : "+stdout.trim()+', current version : '+ settings.version);
+			  if(stdout.trim() == settings.version) {
+			  	$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Your software is up to date !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
+			  } else {
+			  	$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("A new version is available on the PPA !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+			  }
 			});
-			res.on('end',function(){
-				console.log("Checking for updates....");
-				var data = datas.join('');
-				var txt = $('p',data).prevObject[1].innerHTML;
-				online_version = txt;
-				try {
-					console.log("online version : "+online_version+', current version : '+ settings.version);
-				} catch(err){
-					console.log(err);
-					return;
-				}
-				if (online_version === undefined) {
-					$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Website ubukey.fr is unreachable !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-				} else if (online_version === settings.version) {
-					$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Your software is up to date !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
-				} else if (online_version !== settings.version && online_version !== undefined) {
-					$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("A new version is available !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-				} else {
-					$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("ubukey is unreachable !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-				}
-				//$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:7000,content:_("Please DONATE if you like this software !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+		} else {
+			http.get('http://ubukey.fr/StreamStudio/update.html',function(res,err){
+				var datas = [];
+				res.on('data',function(chunk){
+					datas.push(chunk);
+				});
+				res.on('end',function(){
+					console.log("Checking for updates....");
+					var data = datas.join('');
+					var txt = $('p',data).prevObject[1].innerHTML;
+					online_version = txt;
+					try {
+						console.log("online version : "+online_version+', current version : '+ settings.version);
+					} catch(err){
+						console.log(err);
+						return;
+					}
+					if (online_version === undefined) {
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Website ubukey.fr is unreachable !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+					} else if (online_version === settings.version) {
+						$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Your software is up to date !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
+					} else if (online_version !== settings.version && online_version !== undefined) {
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("A new version is available !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+					} else {
+						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("ubukey is unreachable !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+					}
+					//$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',timeout:7000,content:_("Please DONATE if you like this software !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'})
+				});
 			});
-		});
+		}
 	} catch (err) {
 		console.log("offline mode or update server down.... "+ err);
 	}
@@ -46,20 +62,46 @@ $(document).on('click','#updateBtn',function(e) {
 	if (process.platform === 'win32') {
 		file = 'streamstudio-setup.exe';
 		link = 'http://ubukey.fr/StreamStudio/windows/'+file;
+		return downloadUpdate(link,file);
 	} else if (process.platform === 'darwin') {
 		 file = 'streamstudio-osx.zip';
 		 link = 'http://www.ubukey.fr/StreamStudio/osx/'+file;
+		 return downloadUpdate(link,file);
 	} else {
-		if (arch === 'ia32') {
-			console.log('linux 32 bits detected...');
-			file = 'streamstudio-32.zip';
-		} else if (arch === 'x64') {
-			console.log('linux 64 bits detected...');
-			file = 'streamstudio-64.zip';
+		if(execDir.indexOf('/opt') !== -1) {
+			$.notif({title: 'StreamStudio update:',icon: '&#128229;',timeout:0,content:'',btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'block'});
+			$('#updateProgress strong').html(_('<br><br>Updating, please wait...'));
+			$('#updateProgress progress').remove()
+			var args = ['/opt/streamstudio/streamstudio-updater'];
+			var cmd = spawn("pkexec",args)
+			cmd.stderr.on('data',function(data){
+				console.log("stderr: " + data.toString())
+			})
+			cmd.stdout.on('data',function(data){
+				console.log("stderr: " + data.toString())
+			})
+			cmd.on('exit',function(code) {
+				$('.notification').click();
+				if(code == 0) {
+					$.notif({title: 'StreamStudio:',cls:'green',timeout:10000,icon: '&#10003;',content:_("Update successfully installed! please restart StreamStudio"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
+					return;
+				} else {
+					$.notif({title: 'StreamStudio:',cls:'red',timeout:10000,icon: '&#10006;',content:_("Update error, please report the problem... or try to reinstall manually !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
+					return;
+				}
+			})
+		} else {
+			if (arch === 'ia32') {
+				console.log('linux 32 bits detected...');
+				file = 'streamstudio-32.zip';
+			} else if (arch === 'x64') {
+				console.log('linux 64 bits detected...');
+				file = 'streamstudio-64.zip';
+			}
+			link = 'http://ubukey.fr/StreamStudio/'+file;
+			return downloadUpdate(link,file);
 		}
-		link = 'http://ubukey.fr/StreamStudio/'+file;
 	}
-	return downloadUpdate(link,file);
 });
 
 $(document).on('click','#startWinUpdate',function(e) {

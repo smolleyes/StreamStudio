@@ -280,13 +280,16 @@
 	"No results found": "Aucun résultat trouvé",
 	"Total videos:": "Total de vidéos:",
 	"Can't connect to this station, please retry later !": "Impossible de se connecter à cette station, merci de réessayer ultérieurement !",
-	"t411.in Tracker ON-LINE !": "t411.in Tracker OK !",
+	"t411.ch Tracker ON-LINE !": "t411.ch Tracker OK !",
 	"Unknown station": "Station inconnue",
-	"t411.in Tracker DOWN": "t411.in Tracker indisponible !",
+	"t411.ch Tracker DOWN": "t411.ch Tracker indisponible !",
 	"Show/Hide Playlist": "Afficher/Cacher la Playlist",
 	"No streamable files in this torrent !": "Aucun fichier compatible streaming dans ce torrent... !",
 	"Can't get your torrent file !": "Impossible de télécharger votre torrent !",
 	"Search in the playlist...": "Rechercher dans la playlist...",
 	"error!": "erreur!",
-	"Keep torrent file after downloading ?": "Conserver les fichiers après téléchargement ?"
+	"Keep torrent file after downloading ?": "Conserver les fichiers après téléchargement ?",
+	"Updating, please wait...": "Mise à jour en cours, merci de patienter...",
+	"Unable to check the available version on the PPA !" : "Impossible de vérifier la version disponible dans le PPA !",
+	"A new version is available on the PPA !" : "Une nouvelle version est disponible dans le PPA !"
 }

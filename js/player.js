@@ -545,6 +545,7 @@ function initPlay(media) {
 		if(engine && engine.engine_name == "Shoutcast") {
       stopIceTimer()
       iceCastLink = link;
+      playFromIcecast = true;
       $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
       launchPlay()
       iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
@@ -655,6 +656,7 @@ function launchPlay() {
       transcoderEnabled = false;
     }
   }
+  
   console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
 	// add link for transcoding
 	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled || playFromWat || engine && engine.engine_name == "Shoutcast" && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {

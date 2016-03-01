@@ -937,7 +937,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
         </div> \
           <div id="peerStats"></div></div>');
     if(url.indexOf('t411') !== -1) {
-        $.get('http://irc.t411.in/ip/index.php',function(res) {
+        $.get('http://irc.t411.ch/ip/index.php',function(res) {
             var state = $($(res).find('tr:contains("tracker")').find('th')[2]).text()
             if(state !== "ON-LINE") {
                 $('#tab a[href="#tabpage_1"]').click();
@@ -945,7 +945,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                     title: 'StreamStudio:',
                     cls: 'red',
                     icon: '&#59256;',
-                    content: _("t411.in Tracker DOWN !"),
+                    content: _("t411.ch Tracker DOWN !"),
                     btnId: '',
                     btnTitle: '',
                     btnColor: '',
