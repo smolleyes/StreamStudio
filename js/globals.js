@@ -37,6 +37,8 @@ var EventEmitter = require("events").EventEmitter;
 var icecast = require('icecast-parser');
 var iceCastLink = null;
 var iceCastStation = null;
+var rendererState;
+var upnpLoading = false;
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {

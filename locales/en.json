@@ -276,5 +276,7 @@
 	"Open with youtube-dl": "Open with youtube-dl",
 	"Unknown duration": "Unknown duration",
 	"Unknown": "Unknown",
-	"No results found": "No results found"
+	"No results found": "No results found",
+	"Show/Hide Playlist": "Show/Hide Playlist",
+	"Search in the playlist...": "Search in the playlist..."
 }

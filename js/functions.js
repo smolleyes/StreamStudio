@@ -292,7 +292,7 @@ function loadchildrens(childs, parent, close) {
             if (child.type === "file") {
                 var id = Math.floor(Math.random() * 1000000);
                 var ext = child.name.split('.').pop().toLowerCase();
-                if (ext === 'webm' || ext == '3gp' || ext === 'm4a' || ext === 'mp4' || ext === 'flac' || ext === 'wav' || ext === 'mpg' || ext === 'opus' || ext === 'avi' || ext === 'mpeg' || ext === 'mkv' || ext === 'mp3' || ext === 'ogg' || ext === 'mov') {
+                if (ext === 'webm' || ext === 'aac' ||  ext == '3gp' || ext === 'm4a' || ext === 'mp4' || ext === 'flac' || ext === 'wav' || ext === 'mpg' || ext === 'opus' || ext === 'avi' || ext === 'mpeg' || ext === 'mkv' || ext === 'mp3' || ext === 'ogg' || ext === 'mov') {
                     var obj = {
                         "attr": {
                             "id": id

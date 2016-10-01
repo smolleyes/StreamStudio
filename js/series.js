@@ -368,7 +368,7 @@ function loadSeasonTable(id, num) {
                             if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
                                 file.title += ' (VOSTFR)';
                             }
-                            if (newItem) {
+                            if (newItem && c.length == 0) {
                                 file.title += _(" (NEW)");
                             }
                             if (file.type == "complete") {
@@ -399,7 +399,7 @@ function loadSeasonTable(id, num) {
                             if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
                                 file.title += ' (VOSTFR)';
                             }
-                            if (newItem) {
+                            if (newItem && c.length == 0) {
                                 file.title += _(" (NEW)");
                             }
                             if (file.type == "complete") {

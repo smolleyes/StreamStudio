@@ -1,8 +1,11 @@
 var mediaDuration;
 var stArr = [];
 
+var request = require('request')
+
 function startHt5Server() {
 	ht5Server = http.createServer(function(req, res) {
+        console.log("MAINREQUEST : ", req)
 		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
             if(upnpToggleOn && mediaRendererType == "chromecast") {
                 cleanffar();
@@ -13,28 +16,139 @@ function startHt5Server() {
 	console.log('StreamStudio Transcoding Server ready on port 8887');
 }
 
+var isNumber = function (n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+};
+
+var downloadHeader = function (req,resp, info,res) {
+    try {
+    var code = 200;
+    var header;
+
+    // 'Connection':'close',
+    // 'Cache-Control':'private',
+    // 'Transfer-Encoding':'chunked'
+    settings.forceDownload = false
+    info.file="test.mp4"
+
+    if (settings.forceDownload) {
+        header = {
+            Expires: 0,
+            //"Cache-Control": "must-revalidate, post-check=0, pre-check=0",
+            //"Cache-Control": "private",
+            "Content-Type": info.mime,
+            //"Content-Disposition": "attachment; filename=" + info.file + ";"
+        };
+    } else {
+        header = {
+            //"Cache-Control": "public",
+            "Connection": "closed",
+            "Content-Type": info.mime,
+            //"Content-Disposition": "inline; filename=" + info.file + ";"
+        };
+
+        if (info.rangeRequest) {
+           code = 206;
+            header.Status = "206 Partial Content";
+            header["Accept-Ranges"] = "bytes";
+            header["Content-Range"] = "bytes " + info.start + "-" + info.end + "/" + info.size;
+        }
+    }
+
+        if (req.headers.origin) header['Access-Control-Allow-Origin'] = req.headers.origin
+        //header.Pragma = "public";
+        //header["Content-Transfer-Encoding"] = "binary";
+        header["Content-Length"] = info.size;
+        header["transferMode.dlna.org"] = 'Streaming';
+        header["contentFeatures.dlna.org"] ='DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000';
+        //header["realTimeInfo.dlna.org"] = "DLNA.ORG_TLAG=*";
+
+
+        console.log('FFFMPEGGG HEADERSSSSSSSSSSSS', res)
+
+        res.writeHead(code,header)
+    } catch(err) {
+        console.log(err)
+    }
+};
+
 function startProxyServer() {
+    if(ffmpegLive) {
+        return;
+    }
+    var pump = require('pump')
+    console.log("REQUEST PROXY SERVER")
 	proxyServer = http.createServer(function(req, resp) {
+        console.log("STREAMING REQ: " ,req)
+        resp.setHeader("connection","closed")
 		if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
-			var url = req.url.split('?link=')[1];
-			var jqxhr = $.get(url, function(data) {
-			})
-			.done(function(data) {
-				if(typeof(data) === 'object'){
-					resp.writeHead(200,{'Content-type': 'application/json;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-					resp.end(JSON.stringify(data));
-				} else {
-					resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-					resp.end(data);
-				}
-			})
-			.fail(function(err) {
-				console.log(err)
-				resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-				resp.end(err);
-			});
+            ffmpegLive = true
+            try {
+                var link = currentMedia.upnplink;
+
+    			var info ={}
+
+                var reqUrl = url.parse(link, true);
+
+                info.path = typeof reqUrl.pathname === "string" ? reqUrl.pathname.substring(1) : undefined;
+        
+                if (info.path) {
+                    try {
+                        info.path = decodeURIComponent(info.path);
+                    } catch (exception) {
+                        // Can throw URI malformed exception.
+                        handler.emit("badRequest", res);
+                        return false;
+                    }
+                }
+                info.file = info.path+'.mpeg';
+
+                var file = fs.createWriteStream('/tmp/test.mp4')
+
+                var range = typeof req.headers.range === "string" ? req.headers.range : undefined;
+                console.log("RANGE", range)
+
+                  request
+                  .get(link)
+                  .on('response', function(response) {
+
+                    info.start = 0;
+                    info.end = parseInt(response.headers['content-length']) - 1;
+                    info.size = parseInt(response.headers['content-length']);
+                    info.mime = response.headers['content-type']
+                    info.modified = new Date();
+                    info.rangeRequest = false;
+
+                    if (range !== undefined && range.match(/(.*)=(\d*)-(\d*)/) != null) {
+                        // Check range contains numbers and they fit in the file.
+                        // Make sure info.start & info.end are numbers (not strings) or stream.pipe errors out if start > 0.
+                        info.start = isNumber(range[1]) && range[1] >= 0 && range[1] < info.end ? range[1] - 0 : info.start;
+                        info.end = isNumber(range[2]) && range[2] > info.start && range[2] <= info.end ? range[2] - 0 : info.end;
+                        info.rangeRequest = true;
+                        
+                    } else if (reqUrl.query.start || reqUrl.query.end) {
+                        // This is a range request, but doesn't get range headers. So there.
+                        info.start = isNumber(reqUrl.query.start) && reqUrl.query.start >= 0 && reqUrl.query.start < info.end ? reqUrl.query.start - 0 : info.start;
+                        info.end = isNumber(reqUrl.query.end) && reqUrl.query.end > info.start && reqUrl.query.end <= info.end ? reqUrl.query.end - 0 : info.end;
+                        
+                    }
+                    if (req.headers.origin) response.setHeader('Access-Control-Allow-Origin', req.headers.origin)
+
+                    downloadHeader(req,response,info,resp)
+                    //resp.writeHead(200,{'Content-type': ''+response.headers['content-type']+'',"Connection":"closed",'Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000'});
+                    // if(info.rangeRequest) {
+                    //     resp.writeHead(206, { 'Content-Range': 'bytes ' + info.start + '-' + info.end + '/' + info.size, 'Accept-Ranges': 'bytes', 'Content-Length': info.size, 'Content-Type': info.mime });
+                    // } else {
+                    //     resp.writeHead(200, { 'Content-Length': info.size, 'Content-Type': info.mime });
+                    // }
+                  }).pipe(resp)
+
+            } catch(err) {
+                console.log(err)
+            }
+            
 		}
-	}).listen(8081);
+	}).listen(4745);
 }
 
 function startStreaming(req, res, width, height) {
@@ -51,14 +165,68 @@ function startStreaming(req, res, width, height) {
         var device = deviceType(req.headers['user-agent']);
 		$('.mejs-overlay, .mejs-overlay-loading').show();
 		$('.mejs-overlay-play').hide();
-		res.writeHead(200, { // NOTE: a partial http response
-			// 'Date':date.toUTCString(),
-			'Connection': 'closed',
-			'Content-Type': 'video/mp4',
-			'Server':'CustomStreamer/0.0.1',
-			'transferMode.dlna.org': 'Streaming',
-			'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000'
-		});
+
+        var info = {}
+
+        var reqUrl = url.parse(req.url, true);
+
+        info.path = typeof reqUrl.pathname === "string" ? reqUrl.pathname.substring(1) : undefined;
+        
+        if (info.path) {
+            try {
+                info.path = decodeURIComponent(info.path);
+            } catch (exception) {
+                // Can throw URI malformed exception.
+                handler.emit("badRequest", res);
+                return false;
+            }
+        }
+
+        info.file = "truc.mp4"
+
+        var range = typeof req.headers.range === "string" ? req.headers.range : undefined;
+        info.start = 0;
+        console.log('REESSS', res)
+        try {
+            info.end = parseInt(res.headers['content-length']) - 1 || 0;
+            info.size = parseInt(res.headers['content-length']);
+        } catch(err) {
+            info.end = 0;
+            info.size = 0;
+        }
+        info.rangeRequest = false;
+
+        if (range !== undefined && (range = range.match(/bytes=(.+)-(.+)?/)) !== null) {
+            // Check range contains numbers and they fit in the file.
+            // Make sure info.start & info.end are numbers (not strings) or stream.pipe errors out if start > 0.
+            info.start = isNumber(range[1]) && range[1] >= 0 && range[1] < info.end ? range[1] - 0 : info.start;
+            info.end = isNumber(range[2]) && range[2] > info.start && range[2] <= info.end ? range[2] - 0 : info.end;
+            info.rangeRequest = true;
+        } else if (reqUrl.query.start || reqUrl.query.end) {
+            // This is a range request, but doesn't get range headers. So there.
+            info.start = isNumber(reqUrl.query.start) && reqUrl.query.start >= 0 && reqUrl.query.start < info.end ? reqUrl.query.start - 0 : info.start;
+            info.end = isNumber(reqUrl.query.end) && reqUrl.query.end > info.start && reqUrl.query.end <= info.end ? reqUrl.query.end - 0 : info.end;
+        }
+
+        var ocode = 200
+        if(info.rangeRequest) {
+            ocode = 206
+        }
+
+        console.log("REQUEST BEFORE HEADER", req.headers)
+        if (req.headers.origin) res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
+        res.setHeader("accept-ranges","bytes");
+        res.setHeader("content-length",5421445);
+        res.setHeader("content-range","bytes"+ info.start+"-5421444/5421445");//+info.end+"/"+info.size
+        res.setHeader("content-type","video/mpeg");
+        res.setHeader("contentfeatures.dlna.org","DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000")
+        res.setHeader("transfermode.dlna.org","Streaming")
+        //res.setHeader("statusMessage","Partial Content")
+        if (req.method === 'HEAD') return res.end()
+
+        console.log('FFFMPEGGG HEADERSSSSSSSSSSSS', res)
+
+
 		res.setTimeout(10000000)
 		currentRes = res;
         var linkParams = parsedLink.split('&');
@@ -78,6 +246,9 @@ function startStreaming(req, res, width, height) {
             sheight = 480;
         }
         var link = parsedLink.split('?file=')[1];
+        if(upnpTranscoding) {
+            link = currentMedia.upnplink
+        }
 		
         if (parsedLink.indexOf('&key') !== -1) {
             megaKey = linkParams[1].replace('key=', '');
@@ -425,6 +596,7 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
 		}
 	}); 
     p.on('exit',function(code){
+                   
 		if(code === 0 && mediaDuration !== 0) {
 			if(playFromYoutube) {
 				var ffmpeg = spawnFfmpeg(olink, device, '', bitrate,seekTo, function(code) { // exit
@@ -456,11 +628,11 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 	if(seekTo !== 0) {
 		start = seekTo;
 	}
-	if(upnpToggleOn || upnpToggleOn && search_engine == 'twitch') {
+	if(upnpToggleOn || upnpToggleOn && search_engine == 'twitch' || upnpTranscoding) {
 		link = decodeURIComponent(link);
         audio = 'libmp3lame';
 	} else {
-        audio = 'libopus';
+        audio = 'libmp3lame';
     } 
 	if (host === undefined || link !== '') {
 		//local file...
@@ -468,7 +640,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         var w = window.innerWidth
         if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
             var obj = JSON.parse(settings.ht5Player);
-            var carray = ['mp3','opus','wav','flac','m4a','wma','ape'];
+            var carray = ['wma','ape'];
 			if(obj.name == 'StreamStudio' && carray.indexOf(currentMedia.title.split('.').pop()) !== -1 || playFromIcecast) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18" 
@@ -490,7 +662,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
             if(alink && alink.indexOf('videoplayback') !== -1) {
                 args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
             } else {
-                args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', 'libopus','-threads', '0','-f','matroska', 'pipe:1'];
+                args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', 'libmp3lame','-threads', '0','-f','matroska', 'pipe:1'];
             }          
 		}
 	} else {

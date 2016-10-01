@@ -2508,3 +2508,66 @@ float: right !important;
 top: 7px;
 position: relative !important;
 }
+
+
+/* mp3 stream cols */
+#mp3stream_cont {
+  position:fixed;
+  height: calc(100% - 220px);
+  width: calc(100% - 18%);
+}
+
+  #mp3stream_cont h5:first-child {
+    text-align:center;
+    font-weight:bold;
+    background: black;
+    padding: 10px;
+    margin-top: 0;
+    margin-bottom:0;
+  }
+
+  .mp3col {
+    height: calc(100% - 20px);
+    border:0.1em solid rgba(255, 255, 255, 0);
+    padding: 0 !important;
+  }
+    #artists,#albums,#songs {
+      overflow:scroll;
+      height: 100%;
+    }
+    .mp3-artist-row,.mp3-album-row,.mp3-song-row {
+      display : flex;
+      height : 120px;
+      margin: 10px 0px 10px -39px;
+      background: rgba(0, 0, 0, 0.23);
+      padding:10px;
+    }
+      .mp3-artist-row:hover,.mp3-album-row:hover,.mp3-song-row:hover {
+        background: rgba(0, 0, 0, 0.50);
+        cursor: pointer;
+      }
+
+      .mp3-cover {
+        width: 110px;
+        border-radius: 4px;
+      }
+
+      .mp3-artist-text,.mp3-album-title {
+          margin-left: 10px;
+          color: white;
+          margin-top: 5px;
+      }
+
+      .mp3-album-date {
+        margin: auto;
+        color: grey;
+        font-size:10px;
+      }
+
+    .mp3-song-row {
+      height:50px;
+    }
+    .mp3-play-image {
+      margin: auto;
+      width: 25px;
+    }

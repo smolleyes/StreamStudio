@@ -241,28 +241,34 @@ function loadUpnpRenderers() {
 	$('#upnpPopup').empty();
 	$.each(list,function(index,item) {
 		var name = item.friendlyName;
+        if(name !== "") {
 		if (upnpDevices.length === 0) {
-			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" checked="true" value="'+name+'"> <br />');
-		} else {
-			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" value="'+name+'"> <br />');
-		}
-		upnpDevices.push(name);
-		if(index+1 === list.length) {
-			return loadUpnpQtip();
-		}
+    			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" checked="true" value="'+name+'"> <br />');
+    		} else {
+    			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" value="'+name+'"> <br />');
+    		}
+            upnpDevices.push(name);
+    		if(index+1 === list.length) {
+    			return loadUpnpQtip();
+    		}
+        }
 	});
 
     $.each(chromecastDevices,function(index,item) {
         var name = item.name;
         var id = item.id;
-        if (upnpDevices.length === 0) {
-            $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
-        } else {
-            $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
-        }
-        upnpDevices.push(name);
-        if(index+1 === chromecastDevices.length) {
-            return loadUpnpQtip();
+        if(name !== "") {
+            if (upnpDevices.length === 0) {
+                $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
+            } else {
+                $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
+            }
+            
+            upnpDevices.push(name);
+            
+            if(index+1 === chromecastDevices.length) {
+                return loadUpnpQtip();
+            }
         }
     });
 }
@@ -271,30 +277,14 @@ function loadUpnpRenderers() {
 function loadUpnpQtip() {
   var type = 'upnp';
   if (upnpDevice !== null) {
-      $("#upnpPopup input").each(function(){
-          var name = $(this).prop('name');
-          type = $(this).attr('data-type');
-          if (name !== upnpDevice) {
-              $(this).prop('checked','');
-          }
-      });
       if(type == 'upnp') {
-        $('#upnpPopup input[name="'+cli._avTransports[upnpDevice]["friendlyName"]+'"]').prop('checked','checked');
-        mediaRenderer = new MediaRendererClient(cli._avTransports[upnpDevice].location);
+        mediaRendererType = "upnp"
       } else {
-        mediaRenderer = __.some(chromecastDevices, function( el ) {
-            return el.name === 'foo';
-        });
+        mediaRendererType = "chromecast"
       }
-  } else {
-	  if (upnpDevices.length > 0) {
-		upnpDevice = 0;
-		mediaRenderer = new MediaRendererClient(cli._avTransports[0].location);
-	  }
   }
   if (upnpDevices.length === 1) {
       upnpDevice = 0;
-      mediaRenderer = new MediaRendererClient(cli._avTransports[0].location);
   } else if (upnpDevices.length === 0){
       var text = '<p>Aucun Freebox player allumé! <br>Allumez votre freebox player et réactivez ce bouton...</p>';
       $("#upnp-toggle").qtip({
@@ -356,10 +346,9 @@ var continueTransition = false;
 var transitionCount = 0;
 upnpStoppedAsked = false;
 var upnpDeviceState = '';
-var rendererState;
+var rendererState = {};
+rendererState.TransportState = "STOPPED";
 function playUpnpRenderer(obj) {
-    stopUpnp();
-    cleanffar();
     if(mediaRendererType == "chromecast") {
         return playOnChromecast(obj);
     }
@@ -368,36 +357,34 @@ function playUpnpRenderer(obj) {
         mediaRenderer.on('status', function(status) {
           // Reports the full state of the AVTransport service the first time it fires, 
           // then reports diffs. Can be used to maintain a reliable copy of the 
-          // service internal state. 
-          console.log(status);
+          // service internal state.
+          //console.log("UPNP STATUS EVENT: ", status)
           rendererState = status;
         });
 
         mediaRenderer.on('error', function(err) {
-          console.log(err);
+          console.log("ERREUR UPNP:", err.message);
         });
          
         mediaRenderer.on('loading', function() {
-          console.log('loading');
+          console.log('UPNP LOADING EVENT');
         });
          
         mediaRenderer.on('playing', function() {
-            console.log('playing');
+            upnpMediaPlaying = true;
+            console.log('UPNP PLAYING EVENT');
         });
          
         mediaRenderer.on('paused', function() {
-            console.log('paused');
-            $('#subPlayer-play').hide();
-            $('#subPlayer-pause').show();
-            $('.mejs-playpause-button button').click()
+            console.log('UPNP PAUSE EVENT');
         });
          
         mediaRenderer.on('stopped', function() {
-          console.log('stopped');
+          console.log('UPNP EVENT STOP');
           checkStopped()
         });
     } catch(err) {
-        console.log(err)
+        console.log("UPNP ERREUR CATCH IN playUpnpRenderer:", err)
         return;
     }
  
@@ -407,140 +394,117 @@ function playUpnpRenderer(obj) {
         currentMedia.type = "audio"
     }
     obj.title = sanitize(XMLEscape.xmlEscape(decodeURIComponent(obj.title.replace(/[^\x00-\x7F]/g, ""))))
+
     var options = { 
       autoplay: true,
-      contentType: currentMedia.mime || "video/mp4",
+      contentType: "video/mpeg",
       metadata: {
         title: obj.title,
-        creator: '',
         type: currentMedia.type || "video", // can be 'video', 'audio' or 'image' 
         subtitlesUrl: ''
       }
     };
+     console.log("SET UPnP_ContentDirectory OPTIONS: ", options)
     mediaRendererPaused = false;
 
-    var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','').trim();
-
-    console.log(options,mediaRenderer)
+    var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','').replace(/&/g,"&amp;").trim();
     
-    setTimeout(function() {
-        mediaRenderer.load(uri, options, function(err, result) {
-            console.log(err,result)
-            if(err) throw err;
-            console.log('playing ...');
-            $('.mejs-playpause-button button').click()
-            upnpContinuePlay = true;
-            continueTransition = true;
-            transitionCount = 0;
-            upnpMediaPlaying = true;
-            $('#subPlayer-play').hide();
-            $('#subPlayer-pause').show();
-            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
-            updateMiniPlayer()
-            getRendererState('PLAYING');
-        });
-    },2000);
+    mediaRenderer.load(uri.trim(), options, function(err, result) {
+        if(err) throw err;
+        upnpContinuePlay = true;
+        continueTransition = true;
+        transitionCount = 0;
+        upnpMediaPlaying = false;
+        $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
+        getRendererState('PLAYING');
+    });
 }
 
 
 
 function getRendererState(state) {
-    mediaRenderer.getState(function(err,res){
-        if(err) {
-            upnpMediaPlaying = false;
-            continueTransition = false;
-            stopUpnp();
-            cleanffar();
-        } else {
-            rendererState.TransportState = res.CurrentTransportState;
-            if(rendererState.TransportState !== state && continueTransition) {
-                if(rendererState.TransportState === 'TRANSITIONING') {
-                    if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
-                        upnpMediaPlaying = false;
-                        continueTransition = false;
-                        upnpStoppedAsked = true;
-                        stopUpnp();
-                    } else {
-                        transitionCount += 1;
-                        $('.mejs-time-current').width(0+'%');
-                        $('span.mejs-currenttime').text('--:--');
-                        $('span.mejs-duration').text('--:--');
-                        $('.mejs-overlay-play').hide();
-                        $('.mejs-overlay,.mejs-overlay-loading').show()
-                        setTimeout(function(){ 
-                            getRendererState(state);
-                        },1000);
-                    }
-                } else if (rendererState.TransportState === "NO_MEDIA_PRESENT") {
-                    if(transitionCount < 10 ) {
-                        setTimeout(function(){
-                            transitionCount +=1;
-                            getRendererState('STOPPED');
-                        },1000);
-                    } else {
-                        upnpMediaPlaying = false;
-                        continueTransition = false;
-                        initPlayer()
-                        setTimeout(function(){
-                            getRendererState('STOPPED');
-                        },1000);
-                    }
-                } else {
-                    $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-                    upnpMediaPlaying = true;
-                    if($('#fbxMsg2').length == 0 && search_engine == "grooveshark" || search_engine == "songza") {
-                        $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
-                        $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                    }
-                    if ($('#fbxMsg2').length > 0 && $('#fbxMsg2 img').attr('src') !== currentMedia.cover) {
-                        $('#fbxMsg2 img').attr('src',currentMedia.cover);
-                        $('#fbxMsg2 h3').text(currentMedia.title);
-                    }
-                    setTimeout(function(){ 
-                        getRendererState(state);
-                        getUpnpPosition();
-                    },1000);
-                }
+    if(rendererState.TransportState !== state && continueTransition) {
+        if(rendererState.TransportState === 'TRANSITIONING') {
+            if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
+                upnpMediaPlaying = false;
+                continueTransition = false;
+                upnpStoppedAsked = true;
+                stopUpnp();
             } else {
-                if (rendererState.TransportState === 'PLAYING') {
-                    transitionCount = 0;
-                    upnpMediaPlaying = true;
-                    continueTransition = true;
-                    $('#subPlayer-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-                    setTimeout(function(){
-                        $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-                        $('.mejs-overlay-button').hide();
-                        $('.mejs-overlay-loading').hide();
-                        $('.mejs-container p#fbxMsg').remove();
-                        $('#fbxMsg2').remove()
-                        if(search_engine == "grooveshark" || search_engine == "songza") {
-                            $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
-                            $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 50px;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                        } else {
-                            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-                            $('.mejs-container').append('<p id="fbxMsg" style="height:100px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                        }
-                        $('.mejs-controls').width('100%');
-                    },1000);
-                // watch for STOPPED state
-                getRendererState('STOPPED');
-                }
-                else if (rendererState.TransportState === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
-                     upnpMediaPlaying = false;
-                     continueTransition = false;
-                     upnpStoppedAsked = false;
-                //     if(!play_next && !play_prev) {
-                //         setTimeout(function(){
-                             checkStopped()
-                //         },2000);
-                //     } else {
-                //         play_next = false;
-                //         play_prev = false;
-                //     }
-                }
+                transitionCount += 1;
+                $('.mejs-time-current').width(0+'%');
+                $('span.mejs-currenttime').text('--:--');
+                $('span.mejs-duration').text('--:--');
+                $('.mejs-overlay-play').hide();
+                $('.mejs-overlay,.mejs-overlay-loading').show()
+                setTimeout(function(){ 
+                    getRendererState(state);
+                },1000);
             }
+        } else if (rendererState.TransportState === "NO_MEDIA_PRESENT") {
+            if(transitionCount < 10 ) {
+                setTimeout(function(){
+                    transitionCount +=1;
+                    getRendererState('STOPPED');
+                },1000);
+            } else {
+                upnpMediaPlaying = false;
+                continueTransition = false;
+                //initPlayer()
+                setTimeout(function(){
+                    getRendererState('STOPPED');
+                },1000);
+            }
+        } else {
+            updateMiniPlayer()
+            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+            upnpMediaPlaying = true;
+            if ($('#fbxMsg2').length > 0 && $('#fbxMsg2 img').attr('src') !== currentMedia.cover) {
+                $('#fbxMsg2 img').attr('src',currentMedia.cover);
+                $('#fbxMsg2 h3').text(currentMedia.title);
+            }
+
+            setTimeout(function(){ 
+                getRendererState(state);
+                 getUpnpPosition();
+            },1000);
         }
-    })
+    } else {
+        if (rendererState.TransportState === 'PLAYING') {
+            transitionCount = 0;
+            upnpMediaPlaying = true;
+            continueTransition = true;
+            upnpLoading = false;
+            updateMiniPlayer()
+            $('#subPlayer-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+            setTimeout(function(){
+                $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+                $('.mejs-overlay-button').hide();
+                $('.mejs-overlay-loading').hide();
+                $('.mejs-container p#fbxMsg').remove();
+                $('#fbxMsg2').remove()
+                $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+                $('.mejs-container').append('<p id="fbxMsg" style="height:300px !important;position: absolute;top: 50%;margin: 0 50%;margin-top:-150px;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+                $('.mejs-controls').width('100%');
+            },1000);
+        // watch for STOPPED state
+        getRendererState('STOPPED');
+        }
+        else if (rendererState.TransportState === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
+             upnpMediaPlaying = false;
+             continueTransition = false;
+             upnpStoppedAsked = false;
+        //     if(!play_next && !play_prev) {
+        //         setTimeout(function(){
+                     checkStopped()
+        //         },2000);
+        //     } else {
+        //         play_next = false;
+        //         play_prev = false;
+        //     }
+        }
+    }
+    
 }
 
 function checkStopped() {
@@ -556,14 +520,13 @@ function checkStopped() {
 }
 
 function stopUpnp() {
-	continueTransition = false;
 	// if user asked stop
 	if(upnpMediaPlaying === false) {
         $('#progress-bar').val(0)
         $('.mejs-duration,.mejs-currenttime').text('00:00:00')
 		continueTransition = false;
         if(upnpStoppedAsked) {
-            initPlayer()
+            //initPlayer()
             upnpStoppedAsked = false;
         }
 		// else continue
@@ -573,12 +536,7 @@ function stopUpnp() {
 		upnpMediaPlaying = false;
 		playFromUpnp = false;
 		upnpStoppedAsked = false;
-        $("#subPlayer-title").text(' '+_('Waiting...'));
-        $('#subPlayer-play').show();
-        $('#subPlayer-pause').hide();
-        $('#subPlayer-Progress progress').val(0);
-        $('#subPlayer-Timer .mejs-duration,.mejs-currenttime').text('00:00:00')
-        $('#subPlayer-img').attr('src','images/play-overlay.png');
+        //initPlayer()
 	}
 }
 
@@ -604,10 +562,11 @@ function startUPNPserver() {
 }
 
 function playOnChromecast(currentMedia,yt) {
-    if(!yt && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && currentMedia.link.indexOf('stream.php?streamKey') == -1 && currentMedia.link.indexOf('vp8') == -1 && currentMedia.link.indexOf('mp4') == -1 && currentMedia.link.indexOf('.ogg') == -1 && currentMedia.link.indexOf('.wav') == -1 && currentMedia.link.indexOf('.mp3') == -1 && currentMedia.link.indexOf('.mp4') == -1 && currentMedia.title.indexOf('.mkv') == -1 && currentMedia.title.toLowerCase().indexOf('264') == -1 || currentMedia.title.toLowerCase().indexOf('ac3') !== -1 || currentMedia.title.toLowerCase().indexOf('dts') !== -1 || currentMedia.title.toLowerCase().indexOf('hevc') !== -1 || currentMedia.title.toLowerCase().indexOf('x265') !== -1 && currentMedia.link.indexOf('videoplayback?') == -1) {
+    if(transcoderEnabled) {
         var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.replace('&upnp','');
         currentMedia.link = link;
     }
+    mediaRenderer = upnpDevice;
     mediaRenderer.play(currentMedia.link,null,null,win.window);
     ChromecastInterval = setInterval(getChromeCastPos,1000);
     mediaRenderer.on('status',function(status) {
@@ -627,7 +586,7 @@ function playOnChromecast(currentMedia,yt) {
                 $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;width:200px;max-height:200px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
                 $('.mejs-container').append('<p id="fbxMsg" style="height:45px !important;position: absolute;top: 50%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;top: calc(50% - 200px);">'+_("Playing on your Chromecast device !")+'</p>')
             } else {
-                $('.mejs-container').append('<p id="fbxMsg" style="height:45px !important;position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;">'+currentMedia.title+' <br/> '+_("Playing on your Chromecast device !")+'</p>')
+                $('.mejs-container').append('<p id="fbxMsg" style="height:200px !important;position: absolute;top: 50%;margin: 0 50%;margin-top:-100px;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;">'+currentMedia.title+' <br/> '+_("Playing on your Chromecast device !")+'</p>')
             }
             $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
         } else if(status.playerState == 'BUFFERING') {

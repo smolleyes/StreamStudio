@@ -1418,21 +1418,12 @@ function main() {
                         upnpDevice = el._index
                     }
                     mediaRendererType = 'upnp';
-                    mediaRenderer = new Plug.UPnP_AVTransport(cli._avTransports[upnpDevice], {
-                        debug: false
-                    });
-                    if (upnpMediaPlaying) {
-                        initPlayer();
-                    }
                 });
             } else {
                 __.some(chromecastDevices, function(el, index) {
                     if (el.name === selected) {
-                       mediaRenderer = el.device
+                       upnpDevice= el.device
                        mediaRendererType = "chromecast"
-                    }
-                    if (upnpMediaPlaying) {
-                        initPlayer();
                     }
                 });
             }
@@ -1570,9 +1561,6 @@ function main() {
     });
     
     cli.searchDevices();
-    setTimeout(function(){
-        cli.searchDevices();
-    },2000)
 }
 
 $(document).bind("scrollend", ".nano",function(e){

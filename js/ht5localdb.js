@@ -157,7 +157,7 @@ function scanForDirs(dir,parent,list) {
 				} else {
 					var id = Math.floor(Math.random()*1000000);
 					var ext = path.extname(file);
-					if ((ext === '.webm') || (ext === '.m4a') || (ext === '.wma')|| (ext === '.mp4') || (ext === '.flac') || (ext === '.wav') || (ext === '.mpg') || (ext === '.opus') || (ext === '.avi') || (ext === '.mpeg') || (ext === '.mkv') || (ext === '.mp3') || (ext === '.ogg')) {
+					if ((ext === '.webm') || (ext === '.aac') || (ext === '.m4a') || (ext === '.wma')|| (ext === '.mp4') || (ext === '.flac') || (ext === '.wav') || (ext === '.mpg') || (ext === '.opus') || (ext === '.avi') || (ext === '.mpeg') || (ext === '.mkv') || (ext === '.mp3') || (ext === '.ogg')) {
 							var obj = {
 							"attr" : { "id" : id },
 							"icon" : "js/jstree/themes/default/movie_file.png",

@@ -8,7 +8,7 @@ function getUpnpPosition() {
 							$('span.mejs-currenttime').text(secondstotime(position));
 							$('span.mejs-duration').text(secondstotime(duration));
 							mediaDuration = duration;
-							if(upnpToggleOn) {
+							if(upnpMediaPlaying) {
 								mediaCurrentTime = position;
 								player.media.currentTime = position
 							} else {
@@ -18,8 +18,6 @@ function getUpnpPosition() {
 							$('.mejs-time-buffering').hide()
 	         }
 	     	});
-		} else {
-				console.log("Upnp stopping...");
 		}
 	});
 }

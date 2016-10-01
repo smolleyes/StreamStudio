@@ -245,10 +245,13 @@ var showText = _('Show/Hide Playlist');
           nxt = current.siblings().first();
         }
       }
+      console.log(nxt,t)
       torObj.retried = false;
       if (nxt.length == 1) {
         nxt.addClass('played');
         nxt.click()
+      } else {
+        getNext();
       }
     },
     playPrevTrack: function() {
@@ -278,6 +281,17 @@ var showText = _('Show/Hide Playlist');
     },
     setCurrent : function(id) {
       $('#'+id).addClass('current').siblings().removeClass('current');
+      $('#songs li#'+id).addClass('highlight').siblings().removeClass('highlight');
+    },
+    playTrackId: function(id) {
+      $('.mejs-playlist').hide();
+      track = __.find(this.playlistTracks, function(b){
+        return b.id === id;
+      });
+      $('#'+id).addClass('current').siblings().removeClass('current');
+      $('#songs li#'+id).addClass('highlight').siblings().removeClass('highlight');
+      initPlay(track)
+      $("#loading p").empty()
     },
     playTrack: function(track) {
       $('.mejs-playlist').hide();
@@ -285,7 +299,9 @@ var showText = _('Show/Hide Playlist');
       track = __.find(this.playlistTracks, function(b){
         return b.id === id;
       });
+      console.log('playing track :' + id)
       $('#'+id).addClass('current').siblings().removeClass('current');
+      $('#songs li#'+id).addClass('highlight').siblings().removeClass('highlight');
       initPlay(track)
     },
     playTrackURL: function(url) {
@@ -305,14 +321,17 @@ var showText = _('Show/Hide Playlist');
       var container = t.layers.find('.mejs-playlist > ul');
       media.link = media.link;
       media.title = media.title;
-      media.id = generateUUID();
+      if(!media.id) {
+        media.id = generateUUID();
+      }
       t.playlistTracks.push(media)
-      container.prepend('<li id="'+media.id+'" title="' + media.title + '">' + media.title + '</li>');
+      container.append('<li id="'+media.id+'" title="' + media.title + '">' + media.title + '</li>');
       $('.mejs-playlist').hide();
       $('.mejs-playlist  > ul').hide();
       $('.mejs-playlist').css('opacity',0);
-      t.layers.find('li:first').addClass('playlistTrack played');
-      $('#'+media.id).addClass('current').siblings().removeClass('current');
+      //t.layers.find('li:first').addClass('playlistTrack played');
+      $('#'+media.id).addClass('playlistTrack current').siblings().removeClass('current');
+      $('#songs li#'+media.id).addClass('highlight').siblings().removeClass('highlight');
       if(!dontPlay) {
         initPlay(media)
       }
