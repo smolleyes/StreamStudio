@@ -363,12 +363,13 @@ function loadSeasonTable(id, num) {
                             });
                             var viewed = c.length > 0 ? 'block' : 'none';
                             var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                            var newItem = file.newItem ? 'newEpisode' : '';
+                            var watchedCheck =  c.length > 0 ? true : false;
+                            var newItem = !watchedCheck ? 'newEpisode' : '';
                             infos.season = parseInt(num);
                             if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
                                 file.title += ' (VOSTFR)';
                             }
-                            if (newItem && c.length == 0) {
+                            if (newItem) {
                                 file.title += _(" (NEW)");
                             }
                             if (file.type == "complete") {
@@ -394,12 +395,13 @@ function loadSeasonTable(id, num) {
                             });
                             var viewed = c.length > 0 ? 'block' : 'none';
                             var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                            var newItem = file.newItem ? 'newEpisode' : '';
+                            var watchedCheck =  c.length > 0 ? true : false;
+                            var newItem = !watchedCheck ? 'newEpisode' : '';
                             infos.season = parseInt(num);
                             if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
                                 file.title += ' (VOSTFR)';
                             }
-                            if (newItem && c.length == 0) {
+                            if (newItem) {
                                 file.title += _(" (NEW)");
                             }
                             if (file.type == "complete") {
@@ -421,8 +423,9 @@ function loadSeasonTable(id, num) {
                         "title": file.torrentTitle
                     });
                     var viewed = c.length > 0 ? 'block' : 'none';
+                    var watchedCheck =  c.length > 0 ? true : false;
                     var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                    var newItem = file.newItem ? 'newEpisode' : '';
+                    var newItem = !watchedCheck ? 'newEpisode' : '';
                     infos.season = parseInt(num);
                     if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
                         file.title += ' (VOSTFR)';

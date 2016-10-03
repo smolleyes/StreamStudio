@@ -1,4 +1,4 @@
-var VERSION = "2.9.9.1";
+var VERSION = "2.9.9.2";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -39,6 +39,7 @@ var iceCastLink = null;
 var iceCastStation = null;
 var rendererState;
 var upnpLoading = false;
+var tseWin = false; // hidden window for cloudflare
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
@@ -139,7 +140,7 @@ if (process.platform === 'win32') {
     if( ! fs.existsSync(confDir+'//images') ) { mkdirp(confDir+'//images'); }
     livestreamerPath = execDir+'/livestreamer/livestreamer.exe';
     ffmpegPath = execDir + '/ffmpeg.exe';
-    
+
 } else if (process.platform === 'linux' || process.platform === 'darwin') {
     confDir = getUserHome()+'/.config/StreamStudio';
     ffmpegPath = execDir + '/ffmpeg';
@@ -150,7 +151,7 @@ if (process.platform === 'win32') {
 		if(res) {
 			livestreamerPath = "/usr/bin/livestreamer";
 		} else {
-			fs.exists('/usr/local/bin/livestreamer',function(res) { 
+			fs.exists('/usr/local/bin/livestreamer',function(res) {
 				if(res) {
 					livestreamerPath = "/usr/local/bin/livestreamer";
 				} else {

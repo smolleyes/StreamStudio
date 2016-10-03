@@ -1,4 +1,4 @@
-//~ Copyright (C) 
+//~ Copyright (C)
 //
 //~ This program is free software; you can redistribute it and/or
 //~ modify it under the terms of the GNU General Public License
@@ -309,10 +309,6 @@ var htmlContent =
                                     <input class="pluginCheckBox" type="checkbox" id="vimeo" name="vimeo"> \
                                     </div>--> \
                                 <div class="ItemCheckbox left"> \
-                                    <label for="twitch">Twitch</label> \
-                                    <input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch"> \
-                                </div> \
-                                <div class="ItemCheckbox left"> \
                                     <label for="thepiratebay">ThePiratebay</label> \
                                     <input class="pluginCheckBox" type="checkbox" id="thepiratebay" name="thepiratebay"> \
                                 </div> \
@@ -325,8 +321,8 @@ var htmlContent =
                                     <input class="pluginCheckBox" type="checkbox" id="t411" name="t411"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
-                                    <label for="kickass">Kickass</label> \
-                                    <input class="pluginCheckBox" type="checkbox" id="kickass" name="kickass"> \
+                                    <label for="mp3stream">Mp3stream</label> \
+                                    <input class="pluginCheckBox" type="checkbox" id="mp3stream" name="mp3stream"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
                                     <label for="torrent-project">Torrent-project</label> \
@@ -516,7 +512,7 @@ $(document).ready(function() {
           // Do nothing if target element is select2 input
           if( $(e.target).hasClass('.saveTorrentCheck') ) {
             return true;
-          } 
+          }
           // Else call parent method
           $.magnificPopup.proto._onFocusIn.call(this,e);
     };
@@ -613,7 +609,7 @@ function main() {
             engine.pageLoading = false;
             current_page = engine.currentPage;
             engine.pageLoading = false;
-        } catch(err){}        
+        } catch(err){}
         pageLoading = false;
         updateLazy = false;
         pageLoading = false;
@@ -715,7 +711,7 @@ function main() {
                 } else {
                     $("#homeTopButton").click();
                     $('.navbar-header').show();
-                }          
+                }
             }
             itemsCount = 0;
         }
@@ -735,7 +731,7 @@ function main() {
             } else {
                 $("#homeTopButton").click();
                  $('.navbar-header').show();
-            }            
+            }
         }
         itemsCount = 0;
     });
@@ -1559,7 +1555,7 @@ function main() {
     $('.tab-content').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
         updateScroller();
     });
-    
+
     cli.searchDevices();
 }
 

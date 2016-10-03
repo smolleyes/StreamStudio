@@ -136,9 +136,10 @@ function printSearchResults(items,cb,query,engine) {
 function searchTVdbAllById(id, cb, query,fromSearch,engine,eztvId) {
     var serie = {};
     serie.eztvId= null;
-    serie.engine = engine; 
+    serie.engine = engine;
     tvdb.getSeriesAllById(id)
         .then(function(res) {
+          console.log(res)
             serie.infos = res;
             serie.name = res.SeriesName.replace(/\(.*\)/, '').trim();
             serie.id = res.id;
@@ -154,6 +155,7 @@ function searchTVdbAllById(id, cb, query,fromSearch,engine,eztvId) {
             }
         })
         .catch(function(error) {
+          console.log(error)
             serie.success = false;
             serie.error = error;
             cb(serie);

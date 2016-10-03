@@ -11,7 +11,7 @@ function analyseCpbDatas(results,cb) {
 	var seasons = {};
 	var fr = [];
 	var vost = [];
-	results.sucess = true;
+	results.success = true;
 	Iterator.iterate(results.list).forEach(function (src,index) {
 		try {
 			var item = {};
@@ -44,7 +44,7 @@ function analyseCpbDatas(results,cb) {
 			if(vost.length == 0) {
 				verifySerie(datas,cb)
 			} else {
-				// else parse vost then call omgtorrent in callback 
+				// else parse vost then call omgtorrent in callback
 				storeCpbDatas(vost,datas,function(datas){
 					verifySerie(datas,cb)
 				});
@@ -109,6 +109,9 @@ function verifySerie(results,cb) {
 	results.seasonsCount = 0;
 	//console.log(results)
 	if(Object.keys(results.seasons).length == 0) {
+		if(Object.keys(results.list).length !== 0) {
+			return buildSeasons(results,cb)
+		}
 		swal(_("Error!"), _("No torrents found for %s, sorry !",results.name), "error");
 		return loadMySeries();
 	}
@@ -125,11 +128,39 @@ function verifySerie(results,cb) {
 	});
 }
 
+function buildSeasons(results,cb) {
+	var seasons = results.seasons
+	var list = results.list
+	var episodes = results.infos['Episodes']
+	Iterator.iterate(list).forEach(function(e) {
+		var epNum = parseInt(e.title.match(/\d{1,4}/)).toString()
+		var ep = __.findWhere(episodes,{absolute_number:epNum})
+		if(ep) {
+			var epi = {}
+			e.season = parseInt(ep.SeasonNumber)
+			e.type = "episode"
+			try {
+			if(seasons[parseInt(e.season)]) {
+				seasons[e.season].episode[parseInt(ep.absolute_number)] = e;
+			} else {
+				results.seasonsCount += 1
+				seasons[e.season] = {}
+				seasons[e.season].episode = {}
+				seasons[e.season].episode[parseInt(ep.absolute_number)] = e;
+			}
+		} catch(err){
+			console.log(err)
+		}
+		}
+	})
+	storeSerieToDb(results,cb)
+}
+
 function getOmgDatas(results,cb,page) {
 	$.get('http://www.omgtorrent.com/api?login=smodedibox80&key=rt5f6yh23tygTGR6hu6tyg6&query='+encodeURIComponent(results.query)+'&order=rls&orderby=desc')
 	.done(function(res) {
 		try {
-			results.success = true; 
+			results.success = true;
 			items = res;
 			results.items = res.Resultats;
 			results.total = res.ResultatsTotal;
@@ -241,7 +272,7 @@ function getOmgDatas(results,cb,page) {
 	});
 }
 
-function bytesToSize(bytes, precision) {	
+function bytesToSize(bytes, precision) {
 	var kilobyte = 1024;
 	var megabyte = kilobyte * 1024;
 	var gigabyte = megabyte * 1024;

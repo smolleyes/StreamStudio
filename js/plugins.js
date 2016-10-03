@@ -1,7 +1,7 @@
 var engines = [];
-var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza'];
+var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza','kickass','twitch'];
 var pluginsDir;
-var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','kickass','torrent-project'];
+var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','torrent-project','mp3stream'];
 
 function initPlugins() {
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
@@ -78,7 +78,7 @@ function loadApp() {
 }
 
 function updatePlugins(url) {
-    try { 
+    try {
     $('#loadingApp p').empty().append(_('Downloading plugins...'));
     var req = https.request(url);
     req.on('response', function(resp) {
@@ -100,7 +100,7 @@ function updatePlugins(url) {
             setTimeout(function(){
                 fs.unlinkSync(confDir + "/rev.txt");
                 initPlugins()
-            },2000)  
+            },2000)
         }
         resp.on('data', function(chunk) {
             file.write(chunk);
@@ -128,7 +128,7 @@ function updatePlugins(url) {
                 setTimeout(function(){
                     fs.unlinkSync(confDir + "/rev.txt");
                     initPlugins()
-                },2000)  
+                },2000)
             }
         });
     }).on("error", function(e) {
@@ -142,7 +142,7 @@ function updatePlugins(url) {
       setTimeout(function(){
         fs.unlinkSync(confDir + "/rev.txt");
         initPlugins()
-      },2000)  
+      },2000)
     }
 }
 
@@ -214,5 +214,3 @@ function compareRev(lastRev) {
         }
     });
 }
-
-

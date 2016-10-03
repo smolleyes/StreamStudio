@@ -31,6 +31,7 @@ function parseDatas(data, results,cb) {
 			return getOmgDatas(results,cb,1);
 		}
 		var mlist=$('.ligne0,.ligne1',data).get();
+		console.log(mlist)
 		Iterator.iterate(mlist).forEach(function (item,i) {
 			try {
 				var video = {};

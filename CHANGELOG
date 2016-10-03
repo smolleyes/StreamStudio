@@ -1,3 +1,9 @@
+V 2.9.9.2
+ * fix torrentproject / youtube / piratebay
+ * add mp3stream engine
+ * better api for cpasbien series
+ * others fix
+
 V 2.9.9.1
  * change update system for linux if streamstudio is installed from the ppa
  * fix t411 engine 
