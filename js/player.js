@@ -655,8 +655,7 @@ function launchPlay() {
     }
   } else if(upnpTranscoding) {
     upnpLoading = true;
-    var link = 'http://'+ipaddress+':8887/stream';
-    currentMedia.upnplink = currentMedia.link
+    var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link
     currentMedia.link = link;
   } else {
     console.log(path.extname(currentMedia.title))
@@ -674,8 +673,12 @@ function launchPlay() {
 	}
   console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
 	
-	if(upnpToggleOn) { 
-		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
+	if(upnpToggleOn) {
+    if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && upnpTranscoding) {
+      var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link
+      currentMedia.link = link;
+    }
+    currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
 		if(currentMedia.type === undefined) {
 			try {
 				if (mime.lookup(currentMedia.title).indexOf('audio/') !== -1 || mime.lookup(currentMedia.link).indexOf('audio/') !== -1) {
