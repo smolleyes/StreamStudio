@@ -649,7 +649,7 @@ function launchPlay() {
     }
   } else if(upnpTranscoding) {
     upnpLoading = true;
-    var link = 'http://'+ipaddress+':4745/stream';
+    var link = 'http://'+ipaddress+':8887/stream';
     currentMedia.upnplink = currentMedia.link
     currentMedia.link = link;
   } else {

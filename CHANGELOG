@@ -1,3 +1,7 @@
+V 2.9.9.3
+ * fix transcoder (youtube and many plugins...)
+ * fix chromecat not showing when it s the only device on the network 
+
 V 2.9.9.2
  * fix torrentproject / youtube / piratebay
  * add mp3stream engine

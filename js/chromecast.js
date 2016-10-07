@@ -149,4 +149,5 @@ var Chromecast = function(device) {
 		var name = browser.device.config.name
 		var id = cr._makeID(browser.device.config.name)
 		chromecastDevices.push({name:name,id:id,device:device});
+		loadUpnpRenderers()
 	})

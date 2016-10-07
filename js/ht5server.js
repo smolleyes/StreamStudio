@@ -176,10 +176,11 @@ function startProxyServer() {
 	}).listen(4745);
 }
 
+
 function startStreaming(req, res, width, height) {
-	if(ffmpegLive) {
-		return;
-	}
+    if(ffmpegLive) {
+        return;
+    }
     try {
         var baseLink = url.parse(req.url).href;
         var megaKey;
@@ -188,72 +189,18 @@ function startStreaming(req, res, width, height) {
         //var mediaExt = currentMedia.title.split('.').slice(-1)[0];
         var parsedLink = url.parse(req.url).href.replace(/&amp;/g,'&');
         var device = deviceType(req.headers['user-agent']);
-		$('.mejs-overlay, .mejs-overlay-loading').show();
-		$('.mejs-overlay-play').hide();
-
-        var info = {}
-
-        var reqUrl = url.parse(req.url, true);
-
-        info.path = typeof reqUrl.pathname === "string" ? reqUrl.pathname.substring(1) : undefined;
-
-        if (info.path) {
-            try {
-                info.path = decodeURIComponent(info.path);
-            } catch (exception) {
-                // Can throw URI malformed exception.
-                handler.emit("badRequest", res);
-                return false;
-            }
-        }
-
-        info.file = "truc.mp4"
-
-        var range = typeof req.headers.range === "string" ? req.headers.range : undefined;
-        info.start = 0;
-        console.log('REESSS', res)
-        try {
-            info.end = parseInt(res.headers['content-length']) - 1 || 0;
-            info.size = parseInt(res.headers['content-length']);
-        } catch(err) {
-            info.end = 0;
-            info.size = 0;
-        }
-        info.rangeRequest = false;
-
-        if (range !== undefined && (range = range.match(/bytes=(.+)-(.+)?/)) !== null) {
-            // Check range contains numbers and they fit in the file.
-            // Make sure info.start & info.end are numbers (not strings) or stream.pipe errors out if start > 0.
-            info.start = isNumber(range[1]) && range[1] >= 0 && range[1] < info.end ? range[1] - 0 : info.start;
-            info.end = isNumber(range[2]) && range[2] > info.start && range[2] <= info.end ? range[2] - 0 : info.end;
-            info.rangeRequest = true;
-        } else if (reqUrl.query.start || reqUrl.query.end) {
-            // This is a range request, but doesn't get range headers. So there.
-            info.start = isNumber(reqUrl.query.start) && reqUrl.query.start >= 0 && reqUrl.query.start < info.end ? reqUrl.query.start - 0 : info.start;
-            info.end = isNumber(reqUrl.query.end) && reqUrl.query.end > info.start && reqUrl.query.end <= info.end ? reqUrl.query.end - 0 : info.end;
-        }
-
-        var ocode = 200
-        if(info.rangeRequest) {
-            ocode = 206
-        }
-
-        console.log("REQUEST BEFORE HEADER", req.headers)
-        if (req.headers.origin) res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
-        res.setHeader("accept-ranges","bytes");
-        res.setHeader("content-length",5421445);
-        res.setHeader("content-range","bytes"+ info.start+"-5421444/5421445");//+info.end+"/"+info.size
-        res.setHeader("content-type","video/mpeg");
-        res.setHeader("contentfeatures.dlna.org","DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000")
-        res.setHeader("transfermode.dlna.org","Streaming")
-        //res.setHeader("statusMessage","Partial Content")
-        if (req.method === 'HEAD') return res.end()
-
-        console.log('FFFMPEGGG HEADERSSSSSSSSSSSS', res)
-
-
-		res.setTimeout(10000000)
-		currentRes = res;
+        $('.mejs-overlay, .mejs-overlay-loading').show();
+        $('.mejs-overlay-play').hide();
+        res.writeHead(200, { // NOTE: a partial http response
+            // 'Date':date.toUTCString(),
+            'Connection': 'closed',
+            'Content-Type': 'video/mp4',
+            'Server':'CustomStreamer/0.0.1',
+            'transferMode.dlna.org': 'Streaming',
+            'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000'
+        });
+        res.setTimeout(10000000)
+        currentRes = res;
         var linkParams = parsedLink.split('&');
         var bitrate = 300;
         var time = 0;
@@ -271,10 +218,7 @@ function startStreaming(req, res, width, height) {
             sheight = 480;
         }
         var link = parsedLink.split('?file=')[1];
-        if(upnpTranscoding) {
-            link = currentMedia.upnplink
-        }
-
+        
         if (parsedLink.indexOf('&key') !== -1) {
             megaKey = linkParams[1].replace('key=', '');
         }
@@ -287,7 +231,7 @@ function startStreaming(req, res, width, height) {
                 link = link.replace(/&start=.*/,'')
             }
         }
-
+        
         if (parsedLink.indexOf('&size') !== -1) {
             try {
                 megaSize = parsedLink.match(/&size=(.*?)&/)[1];
@@ -305,9 +249,9 @@ function startStreaming(req, res, width, height) {
         var megaName = $('#song-title').text().replace(_('Playing: '), '');
         var megaType = megaName.split('.').pop().toLowerCase();
         var x = null;
-
+        
         if(os.platform == "win32") {
-        	link = link.replace(/ /g,'\ ');
+            link = link.replace(/ /g,'\ ');
         }
 
         if(engine && engine.engine_name == "Shoutcast") {
@@ -319,76 +263,76 @@ function startStreaming(req, res, width, height) {
             });
             ffmpeg.stdout.pipe(res);
         } else if(playFromDailymotionLive) {
-				console.log('play dailymotion live')
-				var l = parsedLink.replace('/?file=','');
-				var link, quality;
-				if(l.indexOf('&quality') !== -1) {
-					quality = link.split('&quality=')[1];
-					link = link.split('&')[0]
-				} else {
-					quality = "best";
-				}
-				console.log('Starting dailymotion streaming '+ link + " with quality " + quality);
-				ffmpegLive = true;
-				var st = spawn(livestreamerPath, ['-O',link, quality]);
-				var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
+                console.log('play dailymotion live')
+                var l = parsedLink.replace('/?file=','');
+                var link, quality;
+                if(l.indexOf('&quality') !== -1) {
+                    quality = link.split('&quality=')[1];
+                    link = link.split('&')[0]
+                } else {
+                    quality = "best";
+                }
+                console.log('Starting dailymotion streaming '+ link + " with quality " + quality);
+                ffmpegLive = true;
+                var st = spawn(livestreamerPath, ['-O',link, quality]);
+                var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
                             console.log('child process exited with code ' + code);
                             res.end();
                         });
                 st.stdout.pipe(ffmpeg.stdin);
                 stArr.push(st);
-				ffmpeg.stdout.pipe(res);
-				st.stderr.on('data', function(data) {
-					console.log('grep stderr: ' + data);
-					if(data.toString().match(/Failed to open segment/) !== null) {
-						$("#homeToggle").click();
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Bandwith problem please try a lower quality !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-						initPlayer();
-					} else if(data.toString().match(/No streams found on this URL/) !== null || data.toString().match(/requires a subscription/) !== null) {
-						$("#homeToggle").click();
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams available for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-						initPlayer();
-					} else if(data.toString().match(/Unable to open URL/) !== null) {
-						$("#homeToggle").click();
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-						initPlayer();
-					}
-				});
-		} else if(playFromTwitch) {
-				console.log('play twitch stream')
-				var l = parsedLink.replace('/?file=','');
-				var link, quality;
-				if(l.indexOf('&quality') !== -1) {
-					quality = link.split('&quality=')[1];
-					link = link.split('&')[0]
-				} else {
-					quality = "best";
-				}
-				console.log('Starting twitch streaming '+ link + " with quality " + quality);
-				ffmpegLive = true;
-				var st = spawn(livestreamerPath, ['-O',link, quality]);
-				var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
+                ffmpeg.stdout.pipe(res);
+                st.stderr.on('data', function(data) {
+                    console.log('grep stderr: ' + data);
+                    if(data.toString().match(/Failed to open segment/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Bandwith problem please try a lower quality !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                        initPlayer();
+                    } else if(data.toString().match(/No streams found on this URL/) !== null || data.toString().match(/requires a subscription/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams available for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                        initPlayer();
+                    } else if(data.toString().match(/Unable to open URL/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                        initPlayer();
+                    }
+                });
+        } else if(playFromTwitch) {
+                console.log('play twitch stream')
+                var l = parsedLink.replace('/?file=','');
+                var link, quality;
+                if(l.indexOf('&quality') !== -1) {
+                    quality = link.split('&quality=')[1];
+                    link = link.split('&')[0]
+                } else {
+                    quality = "best";
+                }
+                console.log('Starting twitch streaming '+ link + " with quality " + quality);
+                ffmpegLive = true;
+                var st = spawn(livestreamerPath, ['-O',link, quality]);
+                var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
                             console.log('child process exited with code ' + code);
                             res.end();
                         });
                 st.stdout.pipe(ffmpeg.stdin);
                 stArr.push(st);
-				ffmpeg.stdout.pipe(res);
-				st.stderr.on('data', function(data) {
-					console.log('grep stderr: ' + data);
-					if(data.toString().match(/Failed to open segment/) !== null) {
-						$("#homeToggle").click();
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Bandwith problem please try a lower quality !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-						initPlayer();
-					} else if(data.toString().match(/No streams found on this URL/) !== null || data.toString().match(/requires a subscription/) !== null) {
-						$("#homeToggle").click();
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams available for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-					} else if(data.toString().match(/Unable to open URL/) !== null) {
-						$("#homeToggle").click();
-						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-					}
-				});
-		} else if(playFromWat) {
+                ffmpeg.stdout.pipe(res);
+                st.stderr.on('data', function(data) {
+                    console.log('grep stderr: ' + data);
+                    if(data.toString().match(/Failed to open segment/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Bandwith problem please try a lower quality !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                        initPlayer();
+                    } else if(data.toString().match(/No streams found on this URL/) !== null || data.toString().match(/requires a subscription/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("No streams available for this channel !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                    } else if(data.toString().match(/Unable to open URL/) !== null) {
+                        $("#homeToggle").click();
+                        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Can't open this url, please retry !"),btnId:'ok',btnTitle:_('Ok'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
+                    }
+                });
+        } else if(playFromWat) {
                 console.log('play wat.tv stream')
                 var l = parsedLink.replace('/?file=','');
                 var link, quality;
@@ -423,50 +367,50 @@ function startStreaming(req, res, width, height) {
                     }
                 });
         } else if(playFromYoutube && !upnpToggleOn) {
-			console.log('Opening youtube link')
-			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+            console.log('Opening youtube link')
+            var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
                  //res.end();
             });
             ffmpeg.stdout.pipe(res);
-		}
+        }
         //if tv/upnp
         else if(playFromUpnp){
-			console.log('opening upnp link ' + link)
-			if(parsedLink.indexOf('freeboxtv') !== -1) {
-				link = parsedLink.replace('/?file=','');
-				currentMedia.link = link;
-			}
-			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+            console.log('opening upnp link ' + link) 
+            if(parsedLink.indexOf('freeboxtv') !== -1) {
+                link = parsedLink.replace('/?file=','');
+                currentMedia.link = link;
+            }
+            var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
                  //res.end();
             });
             ffmpeg.stdout.pipe(res);
-		}
-		// external link
-		else if(playFromHttp || link.indexOf('&ext') !== -1){
-			if(link.indexOf('&ext') !== -1) {
-				var link = link.split('&ext')[0];
-			}
-			console.log('Opening external link ' + link)
-			if(link.indexOf('grooveshark.com/stream.php') !== -1) {
-				var ffmpeg = spawnFfmpeg(link, device, '', bitrate, 0, function(code) { // exit
+        }
+        // external link
+        else if(playFromHttp || link.indexOf('&ext') !== -1){
+            if(link.indexOf('&ext') !== -1) {
+                var link = link.split('&ext')[0];
+            }
+            console.log('Opening external link ' + link)
+            if(link.indexOf('grooveshark.com/stream.php') !== -1) {
+                var ffmpeg = spawnFfmpeg(link, device, '', bitrate, 0, function(code) { // exit
                     console.log('child process exited with code ' + code);
                     res.end();
                 });
                 ffmpeg.stdout.pipe(res);
-			} else {
-				var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+            } else {
+                var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                      console.log('child process exited with code ' + code);
                      //res.end();
                 });
                 ffmpeg.stdout.pipe(res);
-			}
-		}
+            }
+        }
         // torrent link
         else if (torrentPlaying) {
-			console.log('Opening torrent link')
-			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+            console.log('Opening torrent link')
+            var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
                  //res.end();
             });
@@ -474,8 +418,8 @@ function startStreaming(req, res, width, height) {
         }
         // if local file
         else if (playFromFile) {
-			console.log('Opening file link')
-			var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
+            console.log('Opening file link')
+            var ffmpeg = spawnFfmpeg(link, device, '', bitrate,time, function(code) { // exit
                  console.log('child process exited with code ' + code);
                  //res.end();
             });
@@ -483,7 +427,7 @@ function startStreaming(req, res, width, height) {
         }
         //if mega userstorage link
         else if (link.indexOf('userstorage.mega.co.nz') !== -1) {
-			console.log('Opening userstorage.mega.co.nz link')
+            console.log('Opening userstorage.mega.co.nz link')
             var newVar = currentMedia.title.split('.').slice(-1)[0];
             if ((in_array(newVar, videoArray)) && (parsedLink.indexOf('&download') === -1)) {
                 if (transcoderEnabled) {
@@ -519,7 +463,7 @@ function startStreaming(req, res, width, height) {
         } else if (parsedLink.indexOf('mega.nz') !== -1) {
             console.log("opening mega.co file: " + link);
             var file = mega.file(decodeURIComponent(link)).loadAttributes(function(err, file) {
-				if (err) { console.log(err)}
+                if (err) { console.log(err)}
                 try {
                     megaSize = file.size;
                     megaName = file.name.replace(/ /g, '_');
@@ -554,24 +498,24 @@ function startStreaming(req, res, width, height) {
                             console.log('child process exited with code ' + code);
                             //res.end();
                         });
-
+                            
                         megaDownload = file.download().pipe(ffmpeg.stdin);
-						megaDownload.on('error', function(err) {
-							console.log('ffmpeg stdin error...' + err);
-							if (err.stack.indexOf('codec') === -1) {
-								console.log("Arret demandé !!!!!!!!!!!!!!!!!!!!!!!!!!!!", megaName);
-								//res.end();
-							} else {
-								var f = {};
-								f.link = 'http://' + ipaddress + ':8887' + req.url + '&direct';
-								f.title = megaName;
-								res.end();
-								startPlay(f);
-							}
-						});
-						ffmpeg.stdout.pipe(res);
-						playFromMega = true;
-
+                        megaDownload.on('error', function(err) {
+                            console.log('ffmpeg stdin error...' + err);
+                            if (err.stack.indexOf('codec') === -1) {
+                                console.log("Arret demandé !!!!!!!!!!!!!!!!!!!!!!!!!!!!", megaName);
+                                //res.end();
+                            } else {
+                                var f = {};
+                                f.link = 'http://' + ipaddress + ':8887' + req.url + '&direct';
+                                f.title = megaName;
+                                res.end();
+                                startPlay(f);
+                            }
+                        });
+                        ffmpeg.stdout.pipe(res);
+                        playFromMega = true;
+                        
                     } else {
                         console.log('playing movie without transcoding');
                         file.download().pipe(res);
@@ -586,9 +530,9 @@ function startStreaming(req, res, width, height) {
         console.log(err);
     }
     res.on("close", function() {
-		currentRes= null;
-		console.log('request end!!!!!!!!!!!!!!!!')
-		ffmpegLive = false;
+        currentRes= null;
+        console.log('request end!!!!!!!!!!!!!!!!')
+        ffmpegLive = false;
         cleanffar();
     });
 }

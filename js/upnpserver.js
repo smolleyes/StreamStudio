@@ -267,6 +267,7 @@ function loadUpnpRenderers() {
             upnpDevices.push(name);
             
             if(index+1 === chromecastDevices.length) {
+                console.log('before loasQtip')
                 return loadUpnpQtip();
             }
         }
@@ -276,15 +277,15 @@ function loadUpnpRenderers() {
 
 function loadUpnpQtip() {
   var type = 'upnp';
-  if (upnpDevice !== null) {
-      if(type == 'upnp') {
-        mediaRendererType = "upnp"
-      } else {
-        mediaRendererType = "chromecast"
-      }
+  if (upnpDevice !== null && cli._avTransports.length == 1 && chromecastDevices.length == 0) {
+    mediaRendererType = "upnp"
+  } else if(upnpDevice !== null && cli._avTransports.length == 0 && chromecastDevices.length == 1) {
+    mediaRendererType = "chromecast"
   }
   if (upnpDevices.length === 1) {
-      upnpDevice = 0;
+      upnpDevice = 0
+      $('#upnpRenderersContainer').show();
+      $('#upnpBubble').show();
   } else if (upnpDevices.length === 0){
       var text = '<p>Aucun Freebox player allumé! <br>Allumez votre freebox player et réactivez ce bouton...</p>';
       $("#upnp-toggle").qtip({
@@ -566,7 +567,7 @@ function playOnChromecast(currentMedia,yt) {
         var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.replace('&upnp','');
         currentMedia.link = link;
     }
-    mediaRenderer = upnpDevice;
+    mediaRenderer = upnpDevice == 0 ? chromecastDevices[upnpDevice].device : upnpDevice;
     mediaRenderer.play(currentMedia.link,null,null,win.window);
     ChromecastInterval = setInterval(getChromeCastPos,1000);
     mediaRenderer.on('status',function(status) {
