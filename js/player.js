@@ -77,13 +77,12 @@ $(document).ready(function() {
       updateMiniPlayer()
 		try {
 			upnpMediaPlaying = false;
+      stopUpnp()
 			continueTransition = false;
 			upnpContinuePlay = false;
       upnpStoppedAsked = true;
       fromPlayList = false;
-			mediaRenderer.stop();
 		} catch(err) {}
-        initPlayer();
         if (win.isFullscreen === true) {
             win.toggleFullscreen();
             player.isFullScreen = false;
@@ -92,6 +91,9 @@ $(document).ready(function() {
         $('#playerTopBar').hide();
         $('#closePlayer').click();
         stopTorrent();
+        setTimeout(function(){
+          initPlayer();
+        },1000)
     });
     // pause/stop button
     $('.mejs-playpause-button').click(function(e) {
@@ -176,14 +178,18 @@ $(document).ready(function() {
       torObj.retried = false;
       updateMiniPlayer();
       on_media_finished();
-		$('.mejs-overlay-play').show();
-		$(".mejs-overlay-loading").hide();
+		  $('.mejs-overlay-play').show();
+		  $(".mejs-overlay-loading").hide();
+    });
+
+    player.media.addEventListener('timeupdate', function(e) {
+      console.log("media progress", e)
     });
     
     player.media.addEventListener('pause', function() {
       console.log("pause event")
-		$('#subPlayer-play').show();
-		$('#subPlayer-pause').hide();
+		  $('#subPlayer-play').show();
+		  $('#subPlayer-pause').hide();
 		  updateMiniPlayer();
     });
     player.media.addEventListener('seeking', function() {

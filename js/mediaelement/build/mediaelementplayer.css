@@ -213,6 +213,10 @@
 	background: transparent url(controls.svg) no-repeat;
 }
 
+.mejs-controls {
+	background: linear-gradient(rgba(50, 50, 50, 0.48),rgba(0, 0, 0, 0.06)) !important;
+}
+
 .no-svg .mejs-controls .mejs-button button { 
 	background-image: url(controls.png);
 }

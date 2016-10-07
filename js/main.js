@@ -64,6 +64,7 @@ var htmlStr ='<div id="menu"> \
         </div> \
     </div> \
     <ul id="searchPanel"> \
+        <label id="searchTypesMenu_label">' + _("Plugin:") + '</label> \
         <li id="engines_select" class="dropdown btn-default btn-sm"> \
             <a class="dropdown-toggle" data-toggle="dropdown" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
             Youtube \
@@ -224,7 +225,7 @@ var htmlContent =
                                         <label>'+_("Search serie :")+'</label> \
                                         <input type="text" id="searchSerieByName" placeholder="'+_("search by name...")+'"></input> \
                                         <button href="#" class="btn btn-success" id="searchSerieSend">'+_("Search")+'</button> \
-                                        <button href="#" class="btn btn-info" id="refreshSeries">'+_("Refresh your series")+'</button> \
+                                        <button href="#" class="btn btn-warning" id="refreshSeries">'+_("Refresh your series")+'</button> \
                                     </div> \
                                 </div> \
                                 <div id="seriesContainer"> \
@@ -252,7 +253,7 @@ var htmlContent =
     </div> \
     <div class="tab-pane" id="tabpage_7"> \
         <div class="container" style="width:calc(100% - 5px);"> \
-            <div class="row"> \
+            <div class="row" style="background: rgba(32, 32, 32, 1) !important;"> \
                 <legend> \
                     <h3>' + _("StreamStudio Settings") + '<span style="font-size: 12px;margin-top: 11px;position: relative;top: -2px;left: 10px;"><b>(V' + settings.version + ')</b></span><span id="aboutStreamStudio"><a href="#">'+_("About StreamStudio")+'</a></span></h3><hr style="margin-right:20px;"> \
                     <form style="float-right;margin-left:10px;display:none;" id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank"> \
@@ -427,7 +428,7 @@ var htmlContent =
                                 <select id="shared_dir_select" multiple name="shared_dir" class="well"></select> \
                                 <div id="shared_dir_controls"> \
                                     <div style="width:125px;"> \
-                                        <button class="btn btn-success btn-sm" id="add_shared_dir">' + _("Add") + '</button> \
+                                        <button class="btn btn-default btn-sm" id="add_shared_dir">' + _("Add") + '</button> \
                                     </div> \
                                     <div style="width:125px;margin-top:5px;"> \
                                         <button class="btn btn-danger btn-sm" id="remove_shared_dir" >' + _("Remove") + '</button> \
@@ -437,7 +438,7 @@ var htmlContent =
                         </div> \
                         <hr style="margin-top:30px;margin-right:20px;"> \
                         <div class="form-group"> \
-                            <button id="valid_config" class="btn btn-success">' + _("Save") + '</button> \
+                            <button id="valid_config" class="btn btn-default">' + _("Save") + '</button> \
                         </div> \
                         <input style="display:none;" id="fileDialog" type="file" nwdirectory /> \
                         <input style="display:none;" id="sharedDirDialog" type="file" nwdirectory /> \
@@ -504,6 +505,7 @@ $(document).ready(function() {
     $('#loadingApp p').empty().append(_("Loading StreamStudio..."));
     $('#loadingApp').show();
     // load plugins
+    var nodeip = require('ip')
     ipaddress = nodeip.address();
     initPlugins();
     wipeTmpFolder();
@@ -1466,16 +1468,16 @@ function main() {
             saveTorrent = false;
             torrentSaved = false;
             var html = '<div style="width:100%;height:100%;position:relative;top:0;left:0;"></div><div style="position: absolute;top: 50%;left: 50%;width: 500px;height: 500px;margin-top: -250px;margin-left: -250px;background: rgba(32, 32, 32, 0.63);border-radius: 3px;"><h3>'+file.name.replace('.torrent','')+'</h3><br><img style="width:180;height:240px;" src="images/bittorrent-logo1.jpg" /><br><br> \
-            <button type="button" id="dragTorrent_play" data="'+encodeURIComponent(JSON.stringify(file))+'" class="closePopup dragTorrent_play btn btn-success"> \
+            <button type="button" id="dragTorrent_play" data="'+encodeURIComponent(JSON.stringify(file))+'" class="closePopup dragTorrent_play btn btn-default"> \
                 <span class="glyphicon glyphicon-play-circle"><span class="fbxMsg_glyphText">'+_("Start playing")+'</span></span> \
             </button>  \
-            <button type="button" class="closePopup dragTorrent_download downloadText btn btn-info" href="'+file.path+'" id="downlink" data="'+encodeURIComponent(JSON.stringify(file))+'" title="'+ _("Download")+'">  \
+            <button type="button" class="closePopup dragTorrent_download downloadText btn btn-default" href="'+file.path+'" id="downlink" data="'+encodeURIComponent(JSON.stringify(file))+'" title="'+ _("Download")+'">  \
                 <span class="glyphicon glyphicon-download"><span class="fbxMsg_glyphText">'+_("Download")+'</span>  \
                 </span>  \
             </button>';
 
             //if(freeboxAvailable) {
-                //html += '<button type="button"  href="'+obj.torrent+'" class="closePopup download_t411_torrentFile_fbx downloadText btn btn-info" id="t411_downlinkFbx_'+obj.id+'" data="'+encodeURIComponent(JSON.stringify(obj))+'" title="'+ _("Download")+'"><span class="glyphicon glyphicon-download-alt"><span class="fbxMsg_glyphText">'+_("Télécharger avec freebox")+'</span></span></button>';
+                //html += '<button type="button"  href="'+obj.torrent+'" class="closePopup download_t411_torrentFile_fbx downloadText btn btn-default" id="t411_downlinkFbx_'+obj.id+'" data="'+encodeURIComponent(JSON.stringify(obj))+'" title="'+ _("Download")+'"><span class="glyphicon glyphicon-download-alt"><span class="fbxMsg_glyphText">'+_("Télécharger avec freebox")+'</span></span></button>';
             //}
             html += '<br/><br/><div><label>'+_("Keep torrent file after downloading ?")+'</label><input style="position:relative;left:10px;" type="checkbox" class="saveTorrentCheck" name="saveTorrentCheck"></input></div></div>';
             // show

@@ -496,7 +496,7 @@ video{
 }
 
 .tab-content {
-	background-color: rgba(71, 70, 70, 0.15);
+	  background-color: rgba(32, 32, 32, 0.7);
 }
 
 #search {
@@ -534,6 +534,7 @@ video{
 
 .youtube_item, .youtube_item_playlist, .youtube_item_channel{
     overflow: auto;
+    transition: all .2s ease-in-out;
 	-webkit-animation-name: flipInX;
 	-webkit-animation-duration: 1s;
 	-webkit-animation-fill-mode: both;
@@ -542,6 +543,14 @@ video{
 	float: left;
 	margin: 0 10px 10px 0 !important;
 	font-size:12px;
+  padding: 10px;
+  background: rgba(17, 17, 17, 0.68);
+  /* box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.2); */
+  border-radius: 3px;
+}
+
+.youtube_item :hover, .youtube_item_playlist :hover, .youtube_item_channel :hover {
+  transform: scale(1.1);
 }
 
 .start_video {
@@ -823,14 +832,15 @@ div,form,a,select {
 }
 
 .video_thumbnail {
-    width: 196px;
-    height:130px;
-    margin: 0;
-    border-radius: 4px;
+      width: 177px;
+  height: 125px;
+  margin: 0;
+  border-radius: 4px;
 }
 
 
 #song-title {
+    text-shadow: 2px 2px black;
 	margin-left:5px;
 	color: white;
 	width: 100%;
@@ -1844,8 +1854,8 @@ position: relative;
 
 .list-row,.serieItem {
 	font-size : 12px;
-	width:150px !important;
-	height: 220px;
+	width:170px !important;
+	height: 230px;
 	float:left;
 	-webkit-animation-name: flipInX;
 	-webkit-animation-duration: 1s;
@@ -1853,6 +1863,15 @@ position: relative;
 	margin: 10px 15px 30px 0 !important;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
+  background: rgba(17, 17, 17, 0.68);
+  /* box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.2); */
+  border-radius: 3px;
+  padding:10px;
+
+}
+
+.serieItem:hover {
+    background: rgba(17, 17, 17, 0.68) !important;
 }
 
 .list-row_small {
@@ -1894,17 +1913,18 @@ position: relative;
 	font-weight: bold;
 	position: relative;
 	top: 5px;
-	width:100%;
+	width:calc(100% - 20px);
 	  overflow: hidden;
   max-height: 35px;
   display: flex;
 }
 
 .optionsTop {
+
 	position: absolute;
 	height: 25px;
 	background: black;
-	width: 100%;
+	width:calc(100% - 20px);
 	opacity:0.5;
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
@@ -1913,11 +1933,12 @@ position: relative;
 #optionsTopInfos {
 	position: absolute;
 	height: 25px;
-	width: 100%;
+	width: calc(100% - 20px);
 	color:white;
 	font-size:12px;
 	font-weight: bold;
-	padding: 3px 5px;
+	padding: 3px;
+  top: 8px;
 }
 
 #optionsTopInfos i,#optionsBottomInfos i {
@@ -1929,9 +1950,9 @@ position: relative;
 	height: 25px;
 	background: black;
 	bottom: 30px;
-	width: 100%;
+	width:calc(100% - 20px);
 	opacity:0.5;
-	left:0;
+	left:10px;
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
 }
@@ -1940,12 +1961,12 @@ position: relative;
 	position: absolute;
 	height: 25px;
 	bottom: 30px;
-	width: 100%;
+	width:calc(100% - 20px);
 	color:white;
 	font-size:12px;
 	font-weight: bold;
-	left:0;
-	padding: 3px 5px;
+	left:10px;
+  padding: 3px;
 }
 
 .coverPlayImg {
@@ -2064,15 +2085,15 @@ a#windowControlMinimize{
 
 #tab li.active {
 	color: #ffffff;
-	background: rgba(13, 0, 0, 0.53) !important;
+	background: rgba(68, 68, 68, 1);
 	cursor: default;
-	border-bottom: 2px solid #f04436 !important;
+	border-bottom: 2px solid #3da23d !important;
 	font-weight: bold;
 }
 
 #tab li:hover {
 	color: #ffffff;
-	background: rgba(13, 0, 0, 0.53) !important;
+	background: rgba(68, 68, 68, 1); !important;
 	cursor: default;
 	border-bottom: 2px solid #f9aa37 !important;
 }

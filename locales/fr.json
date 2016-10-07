@@ -290,6 +290,7 @@
 	"error!": "erreur!",
 	"Keep torrent file after downloading ?": "Conserver les fichiers après téléchargement ?",
 	"Updating, please wait...": "Mise à jour en cours, merci de patienter...",
-	"Unable to check the available version on the PPA !" : "Impossible de vérifier la version disponible dans le PPA !",
-	"A new version is available on the PPA !" : "Une nouvelle version est disponible dans le PPA !"
+	"Unable to check the available version on the PPA !": "Impossible de vérifier la version disponible dans le PPA !",
+	"A new version is available on the PPA !": "Une nouvelle version est disponible dans le PPA !",
+	"Plugin:": "Plugin:"
 }

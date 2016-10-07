@@ -2,7 +2,7 @@ var mediaServer;
 playFromUpnp = false;
 var MediaRendererClient = require('upnp-mediarenderer-client');
 var sanitize = require("sanitize-filename");
-
+var upnpInterval;
 function browseUpnpDir(serverId, indexId, parentId) {
     console.log('loading file for server index ' + serverId + " at index " + indexId)
 
@@ -363,6 +363,8 @@ function playUpnpRenderer(obj) {
           rendererState = status;
         });
 
+        mediaRenderer.getTransportInfos(function(res) {console.log("RESSSS INFO", res)})
+
         mediaRenderer.on('error', function(err) {
           console.log("ERREUR UPNP:", err.message);
         });
@@ -411,105 +413,72 @@ function playUpnpRenderer(obj) {
     var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','').replace(/&/g,"&amp;").trim();
     
     mediaRenderer.load(uri.trim(), options, function(err, result) {
+        if(upnpMediaPlaying) {
+            clearInterval(upnpInterval);
+        }
         if(err) throw err;
         upnpContinuePlay = true;
         continueTransition = true;
         transitionCount = 0;
         upnpMediaPlaying = false;
         $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
-        getRendererState('PLAYING');
+        upnpInterval = setInterval(getRendererState,1000);
     });
 }
 
 
 
-function getRendererState(state) {
-    if(rendererState.TransportState !== state && continueTransition) {
-        if(rendererState.TransportState === 'TRANSITIONING') {
-            if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
-                upnpMediaPlaying = false;
-                continueTransition = false;
-                upnpStoppedAsked = true;
-                stopUpnp();
-            } else {
-                transitionCount += 1;
-                $('.mejs-time-current').width(0+'%');
-                $('span.mejs-currenttime').text('--:--');
-                $('span.mejs-duration').text('--:--');
-                $('.mejs-overlay-play').hide();
-                $('.mejs-overlay,.mejs-overlay-loading').show()
-                setTimeout(function(){ 
-                    getRendererState(state);
-                },1000);
-            }
-        } else if (rendererState.TransportState === "NO_MEDIA_PRESENT") {
-            if(transitionCount < 10 ) {
+function getRendererState() {
+    mediaRenderer.getTransportInfos(function(err,res) {
+        rendererState = res;
+        if(!rendererState.TransportState) {
+            rendererState.TransportState = rendererState.CurrentTransportState;
+        }
+        if(rendererState.TransportState == 'TRANSITIONING' && continueTransition) {
+                if (transitionCount === 120 && search_engine !== "twitch" && search_engine !== 'dailymotion') {
+                    upnpMediaPlaying = false;
+                    continueTransition = false;
+                    upnpStoppedAsked = true;
+                    stopUpnp();
+                } else {
+                    transitionCount += 1;
+                    $('.mejs-time-current').width(0+'%');
+                    $('span.mejs-currenttime').text('--:--');
+                    $('span.mejs-duration').text('--:--');
+                    $('.mejs-overlay-play').hide();
+                    $('.mejs-overlay,.mejs-overlay-loading').show()
+                    setTimeout(function(){ 
+                        getRendererState();
+                    },1000);
+                }
+        } else if (rendererState.TransportState === 'PLAYING') {
+                transitionCount = 0;
+                upnpMediaPlaying = true;
+                continueTransition = true;
+                upnpLoading = false;
+                updateMiniPlayer()
+                $('#subPlayer-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
                 setTimeout(function(){
-                    transitionCount +=1;
-                    getRendererState('STOPPED');
+                    $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+                    $('.mejs-overlay-button').hide();
+                    $('.mejs-overlay-loading').hide();
+                    $('.mejs-container p#fbxMsg').remove();
+                    $('#fbxMsg2').remove()
+                    $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
+                    $('.mejs-container').append('<p id="fbxMsg" style="height:300px !important;position: absolute;top: 50%;margin: 0 50%;margin-top:-150px;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
+                    $('.mejs-controls').width('100%');
                 },1000);
-            } else {
-                upnpMediaPlaying = false;
-                continueTransition = false;
-                //initPlayer()
-                setTimeout(function(){
-                    getRendererState('STOPPED');
-                },1000);
-            }
-        } else {
-            updateMiniPlayer()
-            $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-            upnpMediaPlaying = true;
-            if ($('#fbxMsg2').length > 0 && $('#fbxMsg2 img').attr('src') !== currentMedia.cover) {
-                $('#fbxMsg2 img').attr('src',currentMedia.cover);
-                $('#fbxMsg2 h3').text(currentMedia.title);
-            }
-
-            setTimeout(function(){ 
-                getRendererState(state);
-                 getUpnpPosition();
-            },1000);
+            // watch for STOPPED state
+        } else if (rendererState.TransportState === 'STOPPED') {
+                 continueTransition = false;
+                 upnpStoppedAsked = false;
+                 stopUpnp();
         }
-    } else {
-        if (rendererState.TransportState === 'PLAYING') {
-            transitionCount = 0;
-            upnpMediaPlaying = true;
-            continueTransition = true;
-            upnpLoading = false;
-            updateMiniPlayer()
-            $('#subPlayer-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-            setTimeout(function(){
-                $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-                $('.mejs-overlay-button').hide();
-                $('.mejs-overlay-loading').hide();
-                $('.mejs-container p#fbxMsg').remove();
-                $('#fbxMsg2').remove()
-                $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide()
-                $('.mejs-container').append('<p id="fbxMsg" style="height:300px !important;position: absolute;top: 50%;margin: 0 50%;margin-top:-150px;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 450px;right: 50%;left: -225px;">'+_("Playing on your UPNP device !")+'</p>')
-                $('.mejs-controls').width('100%');
-            },1000);
-        // watch for STOPPED state
-        getRendererState('STOPPED');
-        }
-        else if (rendererState.TransportState === 'STOPPED' || state === 'NO_MEDIA_PRESENT') {
-             upnpMediaPlaying = false;
-             continueTransition = false;
-             upnpStoppedAsked = false;
-        //     if(!play_next && !play_prev) {
-        //         setTimeout(function(){
-                     checkStopped()
-        //         },2000);
-        //     } else {
-        //         play_next = false;
-        //         play_prev = false;
-        //     }
-        }
-    }
-    
+    })
+    getUpnpPosition();
 }
 
 function checkStopped() {
-    stopUpnp();
     console.log('upnp state checkStopped '+rendererState.TransportState)
     if(rendererState.TransportState == 'STOPPED' || rendererState.TransportState === 'NO_MEDIA_PRESENT') {
         on_media_finished();
@@ -521,15 +490,15 @@ function checkStopped() {
 }
 
 function stopUpnp() {
+    clearInterval(upnpInterval);
 	// if user asked stop
 	if(upnpMediaPlaying === false) {
         $('#progress-bar').val(0)
         $('.mejs-duration,.mejs-currenttime').text('00:00:00')
 		continueTransition = false;
-        if(upnpStoppedAsked) {
-            //initPlayer()
-            upnpStoppedAsked = false;
-        }
+        mediaRenderer.stop()
+        initPlayer()
+        upnpStoppedAsked = false;
 		// else continue
 	} else {
 		console.log('upnp finished playing...')
@@ -537,7 +506,8 @@ function stopUpnp() {
 		upnpMediaPlaying = false;
 		playFromUpnp = false;
 		upnpStoppedAsked = false;
-        //initPlayer()
+        initPlayer()
+        on_media_finished();
 	}
 }
 
