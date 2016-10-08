@@ -2,7 +2,7 @@ function getUpnpPosition() {
 	 mediaRenderer.getPosition(function(err, position) {
 			if (position) {
 				mediaRenderer.getDuration(function(err, duration) {
-	         if(duration) {
+	         if(duration && duration !== 0) {
             	var pct = (position * 100 / duration).toFixed(2);
 							$('.mejs-time-current').css({width: pct+'%', maxWidth: '100%'})
 							$('span.mejs-currenttime').text(secondstotime(position));

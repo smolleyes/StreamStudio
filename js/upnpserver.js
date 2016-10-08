@@ -384,7 +384,6 @@ function playUpnpRenderer(obj) {
          
         mediaRenderer.on('stopped', function() {
           console.log('UPNP EVENT STOP');
-          checkStopped()
         });
     } catch(err) {
         console.log("UPNP ERREUR CATCH IN playUpnpRenderer:", err)
@@ -452,6 +451,9 @@ function getRendererState() {
                     },1000);
                 }
         } else if (rendererState.TransportState === 'PLAYING') {
+            $('#subPlayer-play').hide();
+            $('#subPlayer-pause').show();
+            $('#playPauseBtn').css('background-position','0 -16px')
                 transitionCount = 0;
                 upnpMediaPlaying = true;
                 continueTransition = true;
@@ -470,6 +472,7 @@ function getRendererState() {
                 },1000);
             // watch for STOPPED state
         } else if (rendererState.TransportState === 'STOPPED') {
+
                  continueTransition = false;
                  upnpStoppedAsked = false;
                  stopUpnp();
@@ -478,20 +481,13 @@ function getRendererState() {
     getUpnpPosition();
 }
 
-function checkStopped() {
-    console.log('upnp state checkStopped '+rendererState.TransportState)
-    if(rendererState.TransportState == 'STOPPED' || rendererState.TransportState === 'NO_MEDIA_PRESENT') {
-        on_media_finished();
-    } else {
-        setTimeout(function(){
-            checkStopped()
-        },1000);
-    }
-}
 
 function stopUpnp() {
     clearInterval(upnpInterval);
 	// if user asked stop
+    $('#subPlayer-play').show();
+    $('#subPlayer-pause').hide();
+    $('#playPauseBtn').css('background-position','0 0')
 	if(upnpMediaPlaying === false) {
         $('#progress-bar').val(0)
         $('.mejs-duration,.mejs-currenttime').text('00:00:00')
