@@ -499,6 +499,7 @@ function stopUpnp() {
         mediaRenderer.stop()
         initPlayer()
         upnpStoppedAsked = false;
+        $('#playPauseBtn').css('background-position','0 0')
 		// else continue
 	} else {
 		console.log('upnp finished playing...')
@@ -506,6 +507,7 @@ function stopUpnp() {
 		upnpMediaPlaying = false;
 		playFromUpnp = false;
 		upnpStoppedAsked = false;
+        $('#playPauseBtn').css('background-position','0 0')
         initPlayer()
         on_media_finished();
 	}
@@ -553,6 +555,10 @@ function playOnChromecast(currentMedia,yt) {
             chromeCastplaying = true;
             upnpContinuePlay = true;
             updateProgressBar();
+            updateMiniPlayer();
+            $('#subPlayer-play').hide();
+            $('#subPlayer-pause').show();
+            $('#playPauseBtn').css('background-position','0 -16px')
             if(currentMedia.cover) {
                 $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;width:200px;max-height:200px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
                 $('.mejs-container').append('<p id="fbxMsg" style="height:45px !important;position: absolute;top: 50%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;top: calc(50% - 200px);">'+_("Playing on your Chromecast device !")+'</p>')
@@ -571,10 +577,16 @@ function playOnChromecast(currentMedia,yt) {
 function getChromeCastPos() {
     mediaRenderer.getStatus(function(data){
         try {
-            mediaDuration = data.media.duration;
-            player.media.duration = mediaDuration;
-            player.media.currentTime = data.currentTime;
-            updateProgressBar();
+            if(!upnpTranscoding) {
+                mediaDuration = data.media.duration;
+                player.media.duration = mediaDuration;
+                player.media.currentTime = data.currentTime;
+                updateProgressBar();
+            } else {
+                player.media.duration = mediaDuration;
+                player.media.currentTime = data.currentTime;
+                updateProgressBar();
+            }
         } catch(err) {
 
         }

@@ -950,6 +950,9 @@ function updateProgressBar() {
 			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (player.media.currentTime) / mediaDuration)+'px');
 			$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(player.media.currentTime))
 			$('#subPlayer-img').attr('src',currentMedia.cover);
+      if(upnpTranscoding && percentage == 0) {
+        $('.mejs-currenttime').text('Live')
+      }
 		} catch(err) { console.log(err)}
 	} else {
 		var duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
