@@ -1,3 +1,7 @@
+V 2.9.9.5
+  * fix youtube seeking when transcoder enabled
+  * fix player play-pause buttons 
+
 V 2.9.9.4
  * fix transcoding with chromecast 
 

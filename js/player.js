@@ -180,31 +180,36 @@ $(document).ready(function() {
       on_media_finished();
 		  $('.mejs-overlay-play').show();
 		  $(".mejs-overlay-loading").hide();
+      $('#playPauseBtn').css('background-position','0 0')
     });
 
     player.media.addEventListener('timeupdate', function(e) {
-      console.log("media progress", e)
+      
     });
     
     player.media.addEventListener('pause', function() {
       console.log("pause event")
 		  $('#subPlayer-play').show();
 		  $('#subPlayer-pause').hide();
+      $('#playPauseBtn').css('background-position','0 -16px')
 		  updateMiniPlayer();
     });
     player.media.addEventListener('seeking', function() {
 		$(".mejs-overlay-loading").show();
 		$('.mejs-overlay-play').hide();
+    $('#playPauseBtn').css('background-position','0 -16px')
     });
     
     player.media.addEventListener('stalled', function() {
 		$(".mejs-overlay-loading").show();
 		$('.mejs-overlay-play').hide();
+    $('#playPauseBtn').css('background-position','0 -16px')
     });
     
     player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
+    $('#playPauseBtn').css('background-position','0 -16px')
 		try { $('#fbxMsg2').remove(); } catch(err) {}
 		$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
 		updateMiniPlayer();
@@ -297,10 +302,12 @@ $(document).ready(function() {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
 			} else if (playFromYoutube) {
 				doNotSwitch = true;
-				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+        currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+				m.link = l.split('?file=')[1].trim()+'&start='+mejs.Utility.secondsToTimeCode(newTime).trim();
 			}
 			m.title = currentMedia.title;
 			m.cover = currentMedia.cover;
+      console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
 			initPlay(m);
       //player.media.setCurrentTime(newTime);
 		} else {
@@ -351,6 +358,7 @@ $(document).ready(function() {
 function initPlayer(stopTorrent) {
 	// clean subtitles
   $('.soloTorrent').remove();
+  $('#playPauseBtn').css('background-position','0 0')
 	clearInterval(ChromecastInterval);
   stopIceTimer()
   cleanffar()
@@ -527,7 +535,7 @@ function initPlay(media) {
     playFromWat = false;
     try {
         next_vid = media.next;
-        var link = media.link;
+        var link = media.link.trim();
         if(link.indexOf('http://'+ipaddress+':8887/?file') !== -1) {
 			link = link.split('?file=')[1].replace('&tv','');
 		} else {
