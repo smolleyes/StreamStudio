@@ -37,7 +37,7 @@ var iceCastTimer = null;
 var https = require('https')
 
 $(document).ready(function() {
-	
+
 	player = MediaElementPlayer('#videoPlayer', {
         playlist: true,
         playlistposition: 'top',
@@ -61,7 +61,7 @@ $(document).ready(function() {
     player.playlistToggle.removeClass('mejs-hide-playlist').addClass('mejs-show-playlist');
     player.options.playlist = false;
   });
-    
+
     // next signal and callback
     $(document).on('click', '.mejs-next-btn', function(e) {
   		e.preventDefault();
@@ -136,7 +136,7 @@ $(document).ready(function() {
 			transcoderEnabled = true;
 		}
 	 });
-    
+
     //playlist buttons
     $(document).on('click','#playModeBtn,#playlistBtnSub',function(e) {
 		e.preventDefault();
@@ -160,7 +160,7 @@ $(document).ready(function() {
 			playlistMode = 'continue';
 		}
 	});
-	
+
     // previous signal and callback
     $(document).on('click', '.mejs-back-btn', function(e) {
         e.preventDefault();
@@ -171,7 +171,7 @@ $(document).ready(function() {
           getPrev();
         }
     });
-    
+
     // player signals
     player.media.addEventListener('ended', function() {
     	console.log('media finished')
@@ -184,9 +184,9 @@ $(document).ready(function() {
     });
 
     player.media.addEventListener('timeupdate', function(e) {
-      
+
     });
-    
+
     player.media.addEventListener('pause', function() {
       console.log("pause event")
 		  $('#subPlayer-play').show();
@@ -199,13 +199,13 @@ $(document).ready(function() {
 		$('.mejs-overlay-play').hide();
     $('#playPauseBtn').css('background-position','0 -16px')
     });
-    
+
     player.media.addEventListener('stalled', function() {
 		$(".mejs-overlay-loading").show();
 		$('.mejs-overlay-play').hide();
     $('#playPauseBtn').css('background-position','0 -16px')
     });
-    
+
     player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
@@ -222,7 +222,7 @@ $(document).ready(function() {
       fromPlayList = true;
     })
     player.playlistToggleClick()
-    
+
 	//SubPlayer controls
 	$('#subPlayer-next').click(function() {
 		play_next = true;
@@ -232,7 +232,7 @@ $(document).ready(function() {
       getNext();
     }
 	});
-	
+
 	$('#subPlayer-play, #subPlayer-pause').click(function() {
 		if(upnpMediaPlaying) {
       if(mediaRendererPaused) {
@@ -258,7 +258,7 @@ $(document).ready(function() {
       }
     }
 	});
-	
+
 	$('#subPlayer-prev').click(function() {
 		play_prev = true;
     if(fromPlayList) {
@@ -267,7 +267,7 @@ $(document).ready(function() {
       getNext();
     }
 	});
-	
+
 	// subPlayer progress bar
 	mediaPlayer = document.getElementById('videoPlayer');
 	mediaPlayer.addEventListener('timeupdate', updateProgressBar, false);
@@ -323,7 +323,7 @@ $(document).ready(function() {
 			}
 		}
 	})
-	
+
 	// close player
 	$('#closePlayer').click(function() {
 		if (win.isFullscreen === true) {
@@ -520,7 +520,7 @@ function initPlay(media) {
 			});
 		} catch(err){};
 	}
-    
+
     playFromFile = false;
     playFromHttp = false;
     torrentPlaying = false;
@@ -535,7 +535,7 @@ function initPlay(media) {
     playFromWat = false;
     try {
         next_vid = media.next;
-        var link = media.link.trim();
+        var link = media.link;
         if(link.indexOf('http://'+ipaddress+':8887/?file') !== -1) {
 			link = link.split('?file=')[1].replace('&tv','');
 		} else {
@@ -545,7 +545,7 @@ function initPlay(media) {
         var title = media.title;
         currentMedia = media;
         currentMedia.link = link.trim();
-        
+
         // set title
         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(title));
 		$('.mejs-overlay, .mejs-overlay-loading').show();
@@ -645,7 +645,7 @@ function launchPlay() {
 	} catch(err) {}
 	$('#subPlayer-play').hide();
 	$('#subPlayer-pause').show();
-	
+
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
   var carray = ['.mp3','.mp4','.opus','.wav','.flac','.mkv','.ts','.mpeg','.mpg','.ogg','.webm','.ogv'];
@@ -673,14 +673,14 @@ function launchPlay() {
       transcoderEnabled = false;
     }
   }
-  
+
 	// add link for transcoding
 	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && !upnpTranscoding|| playFromWat || engine && engine.engine_name == "Shoutcast" && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
 		currentMedia.link = link;
 	}
   console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
-	
+
 	if(upnpToggleOn) {
     if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && upnpTranscoding) {
       var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link
@@ -776,7 +776,7 @@ function startVideo(vid_id, title) {
                 videoResolution = res;
                 found = true;
                 child.click();
-            } 
+            }
         });
         if (!found) {
           videoResolution = $(childs[0]).attr('alt');
@@ -838,7 +838,7 @@ function getNext() {
 			}
 		} else {
 			try {
-				// have next node ? 
+				// have next node ?
 				if($('.jstree-clicked').closest('li').next('li').length > 0) {
 					// we have another node, check if we have a folder or media
 					if($('.jstree-clicked').closest('li').next('li').attr('id').indexOf('SubNode') == -1) {
@@ -855,8 +855,8 @@ function getNext() {
 					//check if we are in a sub node
 					while($('.jstree-clicked').closest('ul').parent().attr('id').indexOf('SubNode') !== -1){
 						if($('.jstree-clicked').closest('ul').parent().closest('li').next('li').length > 0) {
-							$('.jstree-clicked').closest('ul').parent().closest('li').next('li').find('a').first().click(); 
-							setTimeout(function(){ 
+							$('.jstree-clicked').closest('ul').parent().closest('li').next('li').find('a').first().click();
+							setTimeout(function(){
 								getNext();
 							},2000);
 							break;
@@ -883,7 +883,7 @@ function getPrev() {
 		}
 	} else {
 		try {
-			// have next node ? 
+			// have next node ?
 			if($('.jstree-clicked').closest('li').prev('li').length > 0) {
 				// we have another node, check if we have a folder or media
 				if($('.jstree-clicked').closest('li').prev('li').attr('id').indexOf('SubNode') == -1) {
@@ -900,8 +900,8 @@ function getPrev() {
 				//check if we are in a sub node
 				while($('.jstree-clicked').closest('ul').parent().attr('id').indexOf('SubNode') !== -1){
 					if($('.jstree-clicked').closest('ul').parent().closest('li').prev('li').length > 0) {
-						$('.jstree-clicked').closest('ul').parent().closest('li').prev('li').find('a').first().click(); 
-						setTimeout(function(){ 
+						$('.jstree-clicked').closest('ul').parent().closest('li').prev('li').find('a').first().click();
+						setTimeout(function(){
 							getprev();
 						},2000);
 						break;
@@ -912,7 +912,7 @@ function getPrev() {
 					}
 				}
 			}
-		} catch(err) {} 
+		} catch(err) {}
 	}
 }
 
@@ -930,7 +930,7 @@ function on_media_finished(){
 			initPlay(currentMedia);
 		}
 	} else if (playlistMode === 'shuffle') {
-		
+
 	} else if (playlistMode === 'continue') {
 		if(upnpToggleOn) {
 			if(upnpContinuePlay){
@@ -1008,10 +1008,10 @@ function getIcecastTitle() {
           currentMedia.title = _("Unknown station")
           iceCastStation = _("Unknown station")
         }
-        currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title; 
+        currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title;
         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
       }
-  });  
+  });
 }
 
 
