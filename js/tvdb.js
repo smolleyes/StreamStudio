@@ -266,6 +266,7 @@ function storeSerieToDb(serie,cb) {
 }
 
 function updateSeriesDb(serie,cb) {
+  console.log(serie)
 	bongo.db('seriesDb').collection('series').save({
 		_id: serie._id,
 		id: serie.id,

@@ -70,7 +70,12 @@ $(document).on('click', '.removeSerie', function(e) {
 })
 
 $(document).on('click', '.openTorrent', function(e) {
+    playFromSeries = true;
     var obj = JSON.parse(decodeURIComponent($(this).attr('data')));
+    currentEpisode = obj;
+    if(currentEpisode.newItem) {
+        updateEpisode()
+    }
     if (obj.engine == "eztv") {
         var query = {
             imdbid: obj.imdbId,
@@ -121,6 +126,7 @@ $(document).on('click', '.openTorrent', function(e) {
         });
     } else {
         getAuthTorrent(obj.torrentLink, true, false, obj.cover);
+        currentMedia.torrentLink = obj.torrentLink;
     }
     itemTitle = obj.torrentTitle;
     try {
@@ -451,6 +457,27 @@ function loadSeasonTable(id, num) {
             console.log(err)
         }
     });
+}
+
+function updateEpisode() {
+    var id = $('.btn-infos.active').attr('data-id')
+    $('.active');bongo.db('seriesDb').collection('series').find({
+        'id': id
+    }).toArray(function(error, list) {
+        if(list.length !== 0) {
+            var serie = list[0]
+            __.each(serie.seasons[currentEpisode.season].serie,function(ep,index) {
+                if(ep.torrentTitle == currentEpisode.torrentTitle) {
+                    ep.newItem=false;
+                    serie.seasons[currentEpisode.season].episode[index] = ep;
+                    serie.newItems-=1
+                }
+            })
+            updateSeriesDb(serie,function(res) {
+                console.log(res)
+            })
+        }
+    })
 }
 
 function reloadSeries() {

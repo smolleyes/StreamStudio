@@ -803,7 +803,6 @@ div,form,a,select {
 }
 
 .progress {
-	border: 1px solid black !important;
 	padding: 10px;
 	height: 125px !important;
 	width: calc(100% - 25px);

@@ -1,3 +1,9 @@
+V 2.9.9.6
+  * fix youtube always auto playing next song
+  * fix us-gb youtube most populars videos
+  * fix series counter 
+  * add us language 
+
 V 2.9.9.5
   * fix youtube seeking when transcoder enabled
   * fix player play-pause buttons 

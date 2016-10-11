@@ -268,7 +268,8 @@ var htmlContent =
                         <div class="form-group"> \
                             <label>' + _("Language:") + '</label> \
                             <select name="countries" id="countries" style="width:300px;"> \
-                                <option value="en" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gb" data-title="England">English</option> \
+                                <option value="gb" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gb" data-title="England">English</option> \
+                                <option value="us" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag us" data-title="United states">United states</option> \
                                 <option value="fr" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag fr" data-title="France">Français</option> \
                                 <option value="es" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag es" data-title="Spain">Spanish</option> \
                                 <option value="gr" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag gr" data-title="Greek">Greek</option> \
@@ -1741,7 +1742,7 @@ function startSearch(query) {
                     getChannelsInfos(datas, 'youtube');
                 });
             } else if (searchTypes_select === 'topRated') {
-                youtube.standard(current_page, localeCode, function(datas) {
+                youtube.standard(current_page, settings.locale, function(datas) {
                     current_page = datas.nextPageToken;
                     ytSearchType = 'toprated'
                     getVideosDetails(datas, 'youtube', false);

@@ -288,7 +288,6 @@ $(document).ready(function() {
     mediaCurrentPct = pct;
     mediaCurrentTime = newTime;
 		seekAsked = true;
-		console.log(transcoderEnabled, playYoutubeDash)
 		if(transcoderEnabled || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
@@ -369,6 +368,7 @@ function initPlayer(stopTorrent) {
 	seekAsked = false;
   mediaCurrentPct = 0;
   mediaCurrentTime = 0;
+  playFromSeries = false;
   fromPlayList = false;
 	try {
 		$('.mejs-captions-button').remove();
@@ -816,7 +816,7 @@ function getNext() {
 		try {
 			engine.play_next();
 		} catch(err) {
-			if(search_engine == 'youtube' || search_engine == 'dailymotion') {
+			if(playlistMode == "continue" && search_engine == 'youtube' || search_engine == 'dailymotion') {
 				try {
 					$('.highlight').closest('.youtube_item').next().find('.coverPlayImg').click()
 				} catch (err) {

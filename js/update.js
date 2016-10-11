@@ -37,7 +37,7 @@ function checkUpdates() {
 					}
 					if (online_version === undefined) {
 						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Website ubukey.fr is unreachable !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})
-					} else if (online_version === settings.version) {
+					} else if (online_version == settings.version) {
 						$.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Your software is up to date !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
 					} else if (online_version !== settings.version && online_version !== undefined) {
 						$.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("A new version is available !"),btnId:'updateBtn',btnTitle:_('Update'),btnColor:'black',btnDisplay: 'block',updateDisplay:'none'})

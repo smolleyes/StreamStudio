@@ -1,4 +1,4 @@
-var VERSION = "2.9.9.5";
+var VERSION = "2.9.9.6";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -114,6 +114,8 @@ var playerBarsLocked = false;
 var mediaRendererType = 'upnp';
 var ytSearchType = 'search';
 //storedb
+var playFromSeries = false;
+var currentEpisode = {}
 var sdb = storedb('std');
 var seriesDb = storedb('seriesDb');
 var moviesDb = storedb('moviesDb');
