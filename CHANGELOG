@@ -1,6 +1,6 @@
 V 2.9.9.7
  * fix upnpserver
- * update ffmpeg osx
+ * update ffmpeg linux/osx
  * fix play pause button
  * more
 

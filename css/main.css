@@ -354,10 +354,10 @@ font-weight:bold;
 #playerTopBar a{
 	position: absolute;
 	text-decoration: none;
-	top: 5px;
+	top: 45px;
 	right: 25px;
 	font-weight: bold;
-	font-size: 24px;
+	font-size: 30px;
 	color: white;
 }
 

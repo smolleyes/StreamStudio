@@ -327,7 +327,7 @@ var htmlContent =
                                     <input class="pluginCheckBox" type="checkbox" id="mp3stream" name="mp3stream"> \
                                 </div> \
                                 <div class="ItemCheckbox left"> \
-                                    <label for="torrent-project">Torrent-project</label> \
+                                    <label for="torrent-project">Torrent-project (exp)</label> \
                                     <input class="pluginCheckBox" type="checkbox" id="torrent-project" name="torrent-project"> \
                                 </div> \
                                 <div id="t411Login" style="display:none;"> \

@@ -320,7 +320,7 @@ $(document).ready(function() {
 	})
 
 	// close player
-	$('#closePlayer').click(function() {
+	$(document).on('click', '#closePlayer',function() {
 		if (win.isFullscreen === true) {
             win.toggleFullscreen();
             player.isFullScreen = false;
