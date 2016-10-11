@@ -22,6 +22,7 @@ onload = function() {
             } catch(err) {}
             try {
                 UPNPserver.stop();
+                clearInterval(UPNPInterval);
             } catch (err) {}
             // close opened pages in engines
             $.each(engines, function(key, value) {
@@ -35,7 +36,7 @@ onload = function() {
                 }
             });
             try {
-                gui.App.closeAllWindows()
+                gui.App.closeAllWindows(true)
                 process.exit()
                 gui.App.quit();
             } catch(err) {
@@ -54,7 +55,7 @@ onload = function() {
         } catch(err) {}
         // clean torrent dir
         try {
-            gui.App.closeAllWindows()
+            gui.App.closeAllWindows(true)
             process.exit()
             gui.App.quit();
         } catch(err) {

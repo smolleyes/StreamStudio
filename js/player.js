@@ -180,7 +180,6 @@ $(document).ready(function() {
       on_media_finished();
 		  $('.mejs-overlay-play').show();
 		  $(".mejs-overlay-loading").hide();
-      $('#playPauseBtn').css('background-position','0 0')
     });
 
     player.media.addEventListener('timeupdate', function(e) {
@@ -191,25 +190,21 @@ $(document).ready(function() {
       console.log("pause event")
 		  $('#subPlayer-play').show();
 		  $('#subPlayer-pause').hide();
-      $('#playPauseBtn').css('background-position','0 -16px')
 		  updateMiniPlayer();
     });
     player.media.addEventListener('seeking', function() {
 		$(".mejs-overlay-loading").show();
 		$('.mejs-overlay-play').hide();
-    $('#playPauseBtn').css('background-position','0 -16px')
     });
 
     player.media.addEventListener('stalled', function() {
 		$(".mejs-overlay-loading").show();
 		$('.mejs-overlay-play').hide();
-    $('#playPauseBtn').css('background-position','0 -16px')
     });
 
     player.media.addEventListener('playing', function() {
 		$('#subPlayer-play').hide();
 		$('#subPlayer-pause').show();
-    $('#playPauseBtn').css('background-position','0 -16px')
 		try { $('#fbxMsg2').remove(); } catch(err) {}
 		$('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
 		updateMiniPlayer();
@@ -357,8 +352,7 @@ $(document).ready(function() {
 function initPlayer(stopTorrent) {
 	// clean subtitles
   $('.soloTorrent').remove();
-  $('#playPauseBtn').css('background-position','0 0')
-	clearInterval(ChromecastInterval);
+  	clearInterval(ChromecastInterval);
   stopIceTimer()
   cleanffar()
 	chromeCastplaying = false;
@@ -535,7 +529,7 @@ function initPlay(media) {
     playFromWat = false;
     try {
         next_vid = media.next;
-        var link = media.link;
+        var link = media.link
         if(link.indexOf('http://'+ipaddress+':8887/?file') !== -1) {
 			link = link.split('?file=')[1].replace('&tv','');
 		} else {
@@ -663,8 +657,10 @@ function launchPlay() {
     }
   } else if(upnpTranscoding) {
     upnpLoading = true;
-    var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link
+    if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+      var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
     currentMedia.link = link;
+    }
   } else {
     console.log(path.extname(currentMedia.title))
     if(settings.transcoding || upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.indexOf(path.extname(currentMedia.title)) == -1 && engine && engine_name !== "Mp3stream" || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1 || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
@@ -676,14 +672,14 @@ function launchPlay() {
 
 	// add link for transcoding
 	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && !upnpTranscoding|| playFromWat || engine && engine.engine_name == "Shoutcast" && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
-		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link;
+		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim();
 		currentMedia.link = link;
 	}
   console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
 
 	if(upnpToggleOn) {
     if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && upnpTranscoding) {
-      var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link
+      var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
       currentMedia.link = link;
     }
     currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});

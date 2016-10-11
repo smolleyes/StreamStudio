@@ -38,6 +38,8 @@
 
   var UPnPContentDirectory = function( serviceObj, opts ) {
 
+    console.log("SERVERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",serviceObj,opts)
+
     Plug.UPnP.apply( this, [ serviceObj, opts ] );
 
     this.upnpType = serviceObj.type;

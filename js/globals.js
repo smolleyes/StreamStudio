@@ -1,4 +1,4 @@
-var VERSION = "2.9.9.6";
+var VERSION = "2.9.9.7";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -124,7 +124,8 @@ var chromecastPlaying = false;
 var videoResolution = false;
 var upnpPlayer;
 var mediaRendererPaused = false;
-
+var UPNPserverInit = false;
+var UPNPInterval = null
 //checks
 temp.mkdir(function(err,path){
 	if(err) {

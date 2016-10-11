@@ -172,50 +172,52 @@ function loadUpnpItems(items) {
     });
 }
 
-
 function updateUpnpList() {
     var list = cli._servers;
-    $('#upnp_upnpRootNode ul').remove()
-    if ($('#UpnpContainer li').length === 0) {
-        $(function() {
-            $("#UpnpContainer").jstree({
-                "plugins": ["themes", "json_data", "ui", "types", "crrm"],
-                "json_data": {
-                    "data": {
-                        "attr": {
-                            id: '' + _("upnp") + '_upnpRootNode'
-                        },
-                        "data": _("Upnp"),
-                        "children": []
+    if(!UPNPserverInit) {
+        UPNPserverInit = true;
+        $('#UpnpContainer ul').empty()
+        if ($('#UpnpContainer li').length === 0) {
+            $(function() {
+                $("#UpnpContainer").jstree({
+                    "plugins": ["themes", "json_data", "ui", "types", "crrm"],
+                    "json_data": {
+                        "data": {
+                            "attr": {
+                                id: '' + _("upnp") + '_upnpRootNode'
+                            },
+                            "data": _("Upnp"),
+                            "children": []
+                        }
+                    },
+                    "themes": {
+                        "theme": "default"
+                    },
+                }).bind("select_node.jstree", function(e, data) {
+                    onSelectedItem(data);
+                }).bind('before.jstree', function(event, data) {
+                    if (data.plugin == 'contextmenu') {
+                        var settings = data.inst._get_settings();
+                        if ((data.inst._get_parent(data.args[0]) == -1) || (data.args[0].id === '')) {
+                            settings.contextmenu.items.remove._disabled = true;
+                            settings.contextmenu.items.rename._disabled = true;
+                            settings.contextmenu.items.create._disabled = false;
+                        } else {
+                            settings.contextmenu.items.remove._disabled = false;
+                            settings.contextmenu.items.rename._disabled = false;
+                            settings.contextmenu.items.create._disabled = true;
+                        }
                     }
-                },
-                "themes": {
-                    "theme": "default"
-                },
-            }).bind("select_node.jstree", function(e, data) {
-                onSelectedItem(data);
-            }).bind('before.jstree', function(event, data) {
-                if (data.plugin == 'contextmenu') {
-                    var settings = data.inst._get_settings();
-                    if ((data.inst._get_parent(data.args[0]) == -1) || (data.args[0].id === '')) {
-                        settings.contextmenu.items.remove._disabled = true;
-                        settings.contextmenu.items.rename._disabled = true;
-                        settings.contextmenu.items.create._disabled = false;
-                    } else {
-                        settings.contextmenu.items.remove._disabled = false;
-                        settings.contextmenu.items.rename._disabled = false;
-                        settings.contextmenu.items.create._disabled = true;
-                    }
-                }
-            }).bind("loaded.jstree", function(event, data) {
-                console.log('upnp tree loaded...')
+                }).bind("loaded.jstree", function(event, data) {
+                    console.log('upnp tree loaded...')
+                });
             });
-        });
+        }
     }
     $.each(list, function(index, server) {
 		// load upnpFolder if not already loaded
         if ($('#' + server._index + '_upnpRootNode').length === 0) {
-            var obj = {
+            obj = {
                 "attr": {
                     id: '' + server._index + '_upnpRootNode'
                 },
@@ -226,13 +228,13 @@ function updateUpnpList() {
             $("#UpnpContainer").jstree("create", $("#" + _("upnp") + "_upnpRootNode"), "inside", obj, function() {}, true);
         }
     })
-    if(cli._avTransports.length > 0) {
-		$('#upnpRenderersContainer').show();
-        $('#upnpBubble').show();
-	} else {
-        $('#upnpRenderersContainer').hide();
-        $('#upnpBubble').hide();
-    }
+ //    if(cli._avTransports.length > 0 || chromecastDevices.length > 0) {
+	// 	$('#upnpRenderersContainer').show();
+ //        $('#upnpBubble').show();
+	// } else {
+ //        $('#upnpRenderersContainer').hide();
+ //        $('#upnpBubble').hide();
+ //    }
 }
 
 function loadUpnpRenderers() {
@@ -256,6 +258,10 @@ function loadUpnpRenderers() {
 
     $.each(chromecastDevices,function(index,item) {
         var name = item.name;
+        if(name.toLowerCase()=="chromecast_") {
+            return;
+        }
+        var name = item.name;
         var id = item.id;
         if(name !== "") {
             if (upnpDevices.length === 0) {
@@ -265,13 +271,17 @@ function loadUpnpRenderers() {
             }
             
             upnpDevices.push(name);
-            
-            if(index+1 === chromecastDevices.length) {
-                console.log('before loasQtip')
-                return loadUpnpQtip();
-            }
         }
     });
+    console.log(upnpDevices.length)
+    if(upnpDevices.length > 0 ) {
+        $('#upnpRenderersContainer').show();
+        $('#upnpBubble').show();
+        loadUpnpQtip();
+    } else {
+        $('#upnpRenderersContainer').hide();
+        $('#upnpBubble').hide();
+    }
 }
 
 
@@ -284,8 +294,6 @@ function loadUpnpQtip() {
   }
   if (upnpDevices.length === 1) {
       upnpDevice = 0
-      $('#upnpRenderersContainer').show();
-      $('#upnpBubble').show();
   } else if (upnpDevices.length === 0){
       var text = '<p>Aucun Freebox player allumé! <br>Allumez votre freebox player et réactivez ce bouton...</p>';
       $("#upnp-toggle").qtip({
@@ -376,6 +384,7 @@ function playUpnpRenderer(obj) {
         mediaRenderer.on('playing', function() {
             upnpMediaPlaying = true;
             console.log('UPNP PLAYING EVENT');
+            player.play()
         });
          
         mediaRenderer.on('paused', function() {
@@ -450,10 +459,13 @@ function getRendererState() {
                         getRendererState();
                     },1000);
                 }
+
+        } else if (rendererState.TransportState === 'PAUSED' || rendererState.TransportState === 'BUFFERING') { 
+            $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play')
         } else if (rendererState.TransportState === 'PLAYING') {
             $('#subPlayer-play').hide();
             $('#subPlayer-pause').show();
-            $('#playPauseBtn').css('background-position','0 -16px')
+            $('.mejs-playpause-button').removeClass('mejs-play').addClass('mejs-pause')
                 transitionCount = 0;
                 upnpMediaPlaying = true;
                 continueTransition = true;
@@ -487,7 +499,6 @@ function stopUpnp() {
 	// if user asked stop
     $('#subPlayer-play').show();
     $('#subPlayer-pause').hide();
-    $('#playPauseBtn').css('background-position','0 0')
 	if(upnpMediaPlaying === false) {
         $('#progress-bar').val(0)
         $('.mejs-duration,.mejs-currenttime').text('00:00:00')
@@ -495,7 +506,7 @@ function stopUpnp() {
         mediaRenderer.stop()
         initPlayer()
         upnpStoppedAsked = false;
-        $('#playPauseBtn').css('background-position','0 0')
+        $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play')
 		// else continue
 	} else {
 		console.log('upnp finished playing...')
@@ -503,7 +514,6 @@ function stopUpnp() {
 		upnpMediaPlaying = false;
 		playFromUpnp = false;
 		upnpStoppedAsked = false;
-        $('#playPauseBtn').css('background-position','0 0')
         initPlayer()
         on_media_finished();
 	}
@@ -518,16 +528,21 @@ function startUPNPserver() {
         share.mountPoint = path.basename(dir).replace(' ', '_');
         upnpDirs.push(share);
         if (index + 1 == settings.shared_dirs.length) {
+            console.log(upnpDirs)
             UPNPserver = new upnpServer({
-                name: 'StreamStudio_' + os.hostname(),
-                uuid: uuid.v4()
+                name: 'StreamStudio_' + os.hostname()
             }, upnpDirs);
             UPNPserver.start();
+            UPNPInterval = setInterval(updateDevices,10000);
         }
     });
 } catch(err) {
     console.log(err)
 }
+}
+
+function updateDevices() {
+    cli.searchDevices()
 }
 
 function playOnChromecast(currentMedia,yt) {
@@ -540,6 +555,7 @@ function playOnChromecast(currentMedia,yt) {
     ChromecastInterval = setInterval(getChromeCastPos,1000);
     mediaRenderer.on('status',function(status) {
         if(status.playerState == 'IDLE') {
+            $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play')
             on_media_finished();
             if(chromeCastplaying) {
                 clearInterval(ChromecastInterval);
@@ -554,7 +570,7 @@ function playOnChromecast(currentMedia,yt) {
             updateMiniPlayer();
             $('#subPlayer-play').hide();
             $('#subPlayer-pause').show();
-            $('#playPauseBtn').css('background-position','0 -16px')
+            $('.mejs-playpause-button').removeClass('mejs-play').addClass('mejs-pause')
             if(currentMedia.cover) {
                 $('.mejs-container').append('<div id="fbxMsg2" style="height:calc(100% - 60px);"><div style="top:50%;position: relative;"><img style="margin-left: 50%;left: -100px;position: relative;top: 50%;margin-top: -100px;width:200px;max-height:200px;" src="'+currentMedia.cover+'" /><h3 style="font-weight:bold;text-align: center;">'+currentMedia.title+'</h3></div></div>');
                 $('.mejs-container').append('<p id="fbxMsg" style="height:45px !important;position: absolute;top: 50%;margin: 0 50%;color: white;font-size: 30px;text-align: center;z-index: 10000;width: 100%;right: 50%;left: -50%;top: calc(50% - 200px);">'+_("Playing on your Chromecast device !")+'</p>')

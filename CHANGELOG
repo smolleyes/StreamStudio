@@ -1,3 +1,9 @@
+V 2.9.9.7
+ * fix upnpserver
+ * update ffmpeg osx
+ * fix play pause button
+ * more
+
 V 2.9.9.6
   * fix youtube always auto playing next song
   * fix us-gb youtube most populars videos

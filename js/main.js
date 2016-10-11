@@ -159,7 +159,7 @@ var htmlStr ='<div id="menu"> \
 <div id="upnpBubble" class="panel panel-default" style="display:none;"> \
     <div class="panel-body"> \
         <span>' + _("Play thru Upnp") + '</span> \
-        <div id="upnpRenderersContainer" style="display:none;"> \
+        <div id="upnpRenderersContainer"> \
             <a id="upnp-toggle" class="upnp tiptip upnp-disabled"></a> \
             <form id="upnpPopup" style="display:none;"></form> \
         </div>\

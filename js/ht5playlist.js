@@ -60,9 +60,11 @@ function onSelectedItem(data) {
 	$(".mejs-overlay-loading").show();
 	$('.highlight').removeClass('highlight well');
 	var id = data.rslt.obj[0].id;
-	if(id.indexOf('upnpRootNode') !== -1 && $('#'+id).hasClass('loaded') === false) {
+  console.log(id)
+	if(id.indexOf('upnpRootNode') !== -1 && !$('#'+id).hasClass('loaded')) {
 		var serverId = parseInt(id.split('_')[0]);
 		$('#'+id).addClass('loaded');
+    console.log(serverId,'0',id)
 		return browseUpnpDir(serverId,'0',id);
 	} else if (id.indexOf('upnpSubNode') !== -1 && $('#'+id).hasClass('loaded') === false) {
 		var serverId = parseInt(id.split('_')[0]);
@@ -172,6 +174,7 @@ function removeDir(name) {
 }
 
 function onCreateItem(item) {
+  console.log("item created !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", item)
 	if (item.args.length === 1) {
 		var name = item.rslt.name;
 		if (name.match(' ') !== null) {
