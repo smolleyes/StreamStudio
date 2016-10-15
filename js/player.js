@@ -492,7 +492,7 @@ function initPlay(media) {
 			}
 		}
 	}
-    if(extPlayerRunning) {
+  if(extPlayerRunning) {
 		try {
 			var playerPath = path.basename(JSON.parse(settings.ht5Player).path);
 			var pid = 0;
@@ -531,93 +531,93 @@ function initPlay(media) {
         next_vid = media.next;
         var link = media.link
         if(link.indexOf('http://'+ipaddress+':8887/?file') !== -1) {
-			link = link.split('?file=')[1].replace('&tv','');
-		} else {
-			link = link.replace('&tv','');
-		}
-		console.log(link)
+    			link = link.split('?file=')[1].replace('&tv','');
+    		} else {
+    			link = link.replace('&tv','');
+    		}
+    		console.log(link)
         var title = media.title;
         currentMedia = media;
         currentMedia.link = link.trim();
 
         // set title
         $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(title));
-		$('.mejs-overlay, .mejs-overlay-loading').show();
-		$('.mejs-overlay-play').hide();
-        // check type of link to play
-		var linkType = link.split('&').pop();
-		if(engine && engine.engine_name == "Shoutcast") {
-      stopIceTimer()
-      iceCastLink = link;
-      playFromIcecast = true;
-      $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
-      launchPlay()
-      iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
-    }
-    if (linkType === 'twitch' || link.indexOf('twitch.tv') !== -1) {
-			playFromTwitch = true;
-			currentMedia.link = link.replace('&twitch','').replace('&external','');
-			launchPlay();
-    } else if (link.indexOf('wat.tv') !== -1) {
-      playFromWat = true;
-      currentMedia.link = link;
-      launchPlay();
-		// youtube dash
-		} else if (link.indexOf('dailymotion.com') !== -1 && link.indexOf('&quality=') !== -1) {
-			playFromDailymotionLive = true;
-			currentMedia.link = link;
-			launchPlay();
-		} else if (link.indexOf('videoplayback?') !== -1 && !upnpToggleOn) {
-			playFromYoutube = true;
-			currentMedia.link = link;
-			currentMedia.ytId = ytId;
-			launchPlay();
-		} else if (linkType === 'torrent') {
-			torrentPlaying = true;
-			currentMedia.link = link.replace('&torrent','');
-			scanSubTitles(execDir+'/subtitles');
-			//launchPlay();
-		// http(s) links
-		} else if (linkType === 'external') {
-			playFromHttp = true;
-			currentMedia.link = link.replace('&external','');
-			launchPlay();
-		// local files links
-		} else if (link.indexOf('file://') !== -1) {
-			playFromFile = true;
-			currentMedia.link = link.replace('file://','');
-			scanSubTitles(link);
-		// play from upnp server
-		} else if (linkType === 'upnp' || upnpToggleOn) {
-			playFromUpnp = true;
-			currentMedia.link = link.replace('&upnp','');
-			launchPlay();
-		// else look for link already downloaded, if yes play it from hdd
-		} else if (playFromFile == false) {
-			if(currentMedia.link.match('http://|https://') !== null) {
-				playFromHttp = true;
-				launchPlay();
-				return;
-			}
-			fs.readdir(download_dir, function(err, filenames) {
-				var i;
-				if (!filenames || filenames.length == 0 || err) {
-					launchPlay();
-				} else {
-					for (i = 0; i < filenames.length; i++) {
-						ftitle = filenames[i];
-						if ((title + '.mp4' === ftitle) || (title + '.webm' === ftitle) || (title + '.mp3' === ftitle)) {
-							currentMedia.link = 'file://' + encodeURI(download_dir + '/' + ftitle);
-						}
-						if (i+1 === filenames.length) {
-							launchPlay();
-						}
-					}
-				}
-			});
-		} else {
-			launchPlay();
-		}
+  		$('.mejs-overlay, .mejs-overlay-loading').show();
+  		$('.mejs-overlay-play').hide();
+          // check type of link to play
+  		var linkType = link.split('&').pop();
+  		if(engine && engine.engine_name == "Shoutcast") {
+        stopIceTimer()
+        iceCastLink = link;
+        playFromIcecast = true;
+        $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+        launchPlay()
+        iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
+      }
+      if (linkType === 'twitch' || link.indexOf('twitch.tv') !== -1) {
+  			playFromTwitch = true;
+  			currentMedia.link = link.replace('&twitch','').replace('&external','');
+  			launchPlay();
+      } else if (link.indexOf('wat.tv') !== -1) {
+        playFromWat = true;
+        currentMedia.link = link;
+        launchPlay();
+  		// youtube dash
+  		} else if (link.indexOf('dailymotion.com') !== -1 && link.indexOf('&quality=') !== -1) {
+  			playFromDailymotionLive = true;
+  			currentMedia.link = link;
+  			launchPlay();
+  		} else if (link.indexOf('videoplayback?') !== -1 && !upnpToggleOn) {
+  			playFromYoutube = true;
+  			currentMedia.link = link;
+  			currentMedia.ytId = ytId;
+  			launchPlay();
+  		} else if (linkType === 'torrent') {
+  			torrentPlaying = true;
+  			currentMedia.link = link.replace('&torrent','');
+  			scanSubTitles(execDir+'/subtitles');
+  			//launchPlay();
+  		// http(s) links
+  		} else if (linkType === 'external') {
+  			playFromHttp = true;
+  			currentMedia.link = link.replace('&external','');
+  			launchPlay();
+  		// local files links
+  		} else if (link.indexOf('file://') !== -1) {
+  			playFromFile = true;
+  			currentMedia.link = link.replace('file://','');
+  			scanSubTitles(link);
+  		// play from upnp server
+  		} else if (linkType === 'upnp' || upnpToggleOn) {
+  			playFromUpnp = true;
+  			currentMedia.link = link.replace('&upnp','');
+  			launchPlay();
+  		// else look for link already downloaded, if yes play it from hdd
+  		} else if (playFromFile == false) {
+  			if(currentMedia.link.match('http://|https://') !== null) {
+  				playFromHttp = true;
+  				launchPlay();
+  				return;
+  			}
+  			fs.readdir(download_dir, function(err, filenames) {
+  				var i;
+  				if (!filenames || filenames.length == 0 || err) {
+  					launchPlay();
+  				} else {
+  					for (i = 0; i < filenames.length; i++) {
+  						ftitle = filenames[i];
+  						if ((title + '.mp4' === ftitle) || (title + '.webm' === ftitle) || (title + '.mp3' === ftitle)) {
+  							currentMedia.link = 'file://' + encodeURI(download_dir + '/' + ftitle);
+  						}
+  						if (i+1 === filenames.length) {
+  							launchPlay();
+  						}
+  					}
+  				}
+  			});
+  		} else {
+  			launchPlay();
+  		}
     } catch (err) {
         console.log("error startPlay: " + err);
     }
@@ -659,7 +659,7 @@ function launchPlay() {
     upnpLoading = true;
     if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
       var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
-    currentMedia.link = link;
+      currentMedia.link = link;
     }
   } else {
     console.log(path.extname(currentMedia.title))

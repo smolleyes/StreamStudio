@@ -461,7 +461,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         link = decodeURIComponent(link);
         audio = 'libmp3lame';
     } else {
-        audio = 'libopus';
+        audio = 'aac';
     } 
     if (host === undefined || link !== '') {
         //local file...

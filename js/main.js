@@ -1560,6 +1560,9 @@ function main() {
     });
 
     cli.searchDevices();
+    setTimeout(function() {
+        cli.searchDevices()
+    },5000)
 }
 
 $(document).bind("scrollend", ".nano",function(e){

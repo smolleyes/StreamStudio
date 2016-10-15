@@ -22,7 +22,6 @@ onload = function() {
             } catch(err) {}
             try {
                 UPNPserver.stop();
-                clearInterval(UPNPInterval);
             } catch (err) {}
             // close opened pages in engines
             $.each(engines, function(key, value) {

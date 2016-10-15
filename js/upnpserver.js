@@ -533,7 +533,7 @@ function startUPNPserver() {
                 name: 'StreamStudio_' + os.hostname()
             }, upnpDirs);
             UPNPserver.start();
-            UPNPInterval = setInterval(updateDevices,10000);
+            //UPNPInterval = setInterval(updateDevices,10000);
         }
     });
 } catch(err) {
