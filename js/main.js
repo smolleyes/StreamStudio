@@ -1416,13 +1416,15 @@ function main() {
         __.some(state.devices.dlna.getDevices(), function(el, index) {
           if (el.name === selected) {
             upnpDevice = el.name
+            mediaRenderer = el;
+            mediaRendererType = 'upnp';
           }
-          mediaRendererType = 'upnp';
         });
       } else {
         __.some(state.devices.chromecast.getDevices(), function(el, index) {
           if (el.name === selected) {
             upnpDevice= el.device
+            mediaRenderer = el;
             mediaRendererType = "chromecast"
           }
         });
