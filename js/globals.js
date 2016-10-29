@@ -51,6 +51,7 @@ var state = {}
 state.player={}
 state.devices={}
 state.playing={}
+state.devices.castMenu={}
 state.playing.location="local"
 
 var Jq = $;

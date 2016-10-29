@@ -523,6 +523,7 @@ $(document).ready(function() {
     console.log('LOADDDD CCASSTTTTTTTTT')
     Cast = require('casts')
     Cast.init(state, updateUpnpList)
+    cli.searchDevices()
 });
 
 function main() {
@@ -1527,12 +1528,9 @@ function main() {
     saveSettings();
   });
   // load upnp devices
-  //cli.on('updateUpnpDevice', function() {
-    //updateUpnpList()
-  //});
-  // try {
-  //     UPNPserver.stop()
-  // } catch(err) {}
+  cli.on('updateUpnpDevice', function() {
+    updateUpnpList()
+  });
 
   var observer = new MutationObserver(function(mutations) {
     if (spinnerPlay === false) {
