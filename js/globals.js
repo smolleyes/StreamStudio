@@ -40,6 +40,7 @@ var iceCastStation = null;
 var rendererState;
 var upnpLoading = false;
 var tseWin = false; // hidden window for cloudflare
+var Cast = null;
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {

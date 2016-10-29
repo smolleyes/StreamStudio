@@ -49,7 +49,6 @@ var playlistMode = 'normal';
 var engines = {};
 // active engine
 var engine;
-var Cast = require('casts')
 // array of possibles menus
 var selectTypes = ["searchTypes", "orderBy", "dateTypes", "searchFilters", "categories"];
 // object to store search options passed to engines
@@ -520,6 +519,10 @@ $(document).ready(function() {
     // Else call parent method
     $.magnificPopup.proto._onFocusIn.call(this,e);
   };
+  // load cast
+    console.log('LOADDDD CCASSTTTTTTTTT')
+    Cast = require('casts')
+    Cast.init(state, updateUpnpList)
 });
 
 function main() {
@@ -1524,9 +1527,9 @@ function main() {
     saveSettings();
   });
   // load upnp devices
-  cli.on('updateUpnpDevice', function() {
-    updateUpnpList()
-  });
+  //cli.on('updateUpnpDevice', function() {
+    //updateUpnpList()
+  //});
   // try {
   //     UPNPserver.stop()
   // } catch(err) {}
@@ -1561,9 +1564,6 @@ function main() {
   $('.tab-content').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
     updateScroller();
   });
-
-  // load cast
-  Cast.init(state, updateUpnpList)
 }
 
 $(document).bind("scrollend", ".nano",function(e){

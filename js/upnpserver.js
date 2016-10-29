@@ -235,55 +235,62 @@ function updateUpnpList() {
  //        $('#upnpRenderersContainer').hide();
  //        $('#upnpBubble').hide();
  //    }
+ loadUpnpRenderers()
 }
 
 function loadUpnpRenderers() {
-	var list = state.devices.dlna.getDevices();
-	upnpDevices = [];
-	$('#upnpPopup').empty();
-	$.each(list,function(index,item) {
-		var name = item.name;
-        if(name !== "") {
-		if (upnpDevices.length === 0) {
-    			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" checked="true" value="'+name+'"> <br />');
-    		} else {
-    			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" value="'+name+'"> <br />');
-    		}
-            upnpDevices.push(name);
-    		if(index+1 === list.length) {
-    			return loadUpnpQtip();
-    		}
-        }
-	});
-
-    if(state.devices.chromecast) {
-      $.each(state.devices.chromecast.getDevices(),function(index,item) {
-          var name = item.name;
-          if(name.toLowerCase()=="chromecast_") {
-              return;
-          }
-          var name = item.name;
-          var id = item.id;
+  try {
+  	var list = state.devices.dlna.getDevices();
+  	upnpDevices = [];
+  	$('#upnpPopup').empty();
+  	$.each(list,function(index,item) {
+  		var name = item.name;
           if(name !== "") {
-              if (upnpDevices.length === 0) {
-                  $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
-              } else {
-                  $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
-              }
-
+  		if (upnpDevices.length === 0) {
+      			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" checked="true" value="'+name+'"> <br />');
+            upnpDevices.push(name);
+          } else {
+            if(upnpDevices.indexOf(name) == -1) {
+      			  $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" value="'+name+'"> <br />');
               upnpDevices.push(name);
+            }
           }
-      });
-    }
-    console.log(upnpDevices.length)
-    if(state.devices ) {
-        $('#upnpRenderersContainer').show();
-        $('#upnpBubble').show();
-        loadUpnpQtip();
-    } else {
-        $('#upnpRenderersContainer').hide();
-        $('#upnpBubble').hide();
-    }
+      		if(index+1 === list.length) {
+      			return loadUpnpQtip();
+      		}
+          }
+  	});
+
+      if(state.devices.chromecast) {
+        $.each(state.devices.chromecast.getDevices(),function(index,item) {
+            var name = item.name;
+            if(name.toLowerCase()=="chromecast_") {
+                return;
+            }
+            var name = item.name;
+            var id = item.id;
+            if(name !== "") {
+                if (upnpDevices.length === 0) {
+                    $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
+                    upnpDevices.push(name);
+                } else {
+                  if(upnpDevices.indexOf(name) == -1) {
+                    $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
+                    upnpDevices.push(name);
+                  }
+                }
+            }
+        });
+      }
+      if(upnpDevices.length !== 0 ) {
+          $('#upnpRenderersContainer').show();
+          $('#upnpBubble').show();
+          loadUpnpQtip();
+      } else {
+          $('#upnpRenderersContainer').hide();
+          $('#upnpBubble').hide();
+      }
+    } catch(err) {}
 }
 
 
@@ -364,7 +371,6 @@ function playUpnpRenderer(obj) {
         return playOnChromecast(obj);
     }
     try {
-        mediaRenderer = new MediaRendererClient(cli._avTransports[upnpDevice].location);
         mediaRenderer.on('status', function(status) {
           // Reports the full state of the AVTransport service the first time it fires,
           // then reports diffs. Can be used to maintain a reliable copy of the
