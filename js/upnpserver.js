@@ -282,6 +282,27 @@ function loadUpnpRenderers() {
             }
         });
       }
+      if(state.devices.airplay) {
+        $.each(state.devices.airplay.getDevices(),function(index,item) {
+            var name = item.name;
+            if(name.toLowerCase()=="chromecast_") {
+                return;
+            }
+            var name = item.name;
+            var id = item.id;
+            if(name !== "") {
+                if (upnpDevices.length === 0) {
+                    $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
+                    upnpDevices.push(name);
+                } else {
+                  if(upnpDevices.indexOf(name) == -1) {
+                    $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
+                    upnpDevices.push(name);
+                  }
+                }
+            }
+        });
+      }
       if(upnpDevices.length !== 0 ) {
           $('#upnpRenderersContainer').show();
           $('#upnpBubble').show();
