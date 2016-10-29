@@ -98,5 +98,9 @@
 	"Please restart StreamStudio to apply your settings !": "Please restart StreamStudio to apply your settings !",
 	"Engine %s ready...!": "Engine %s ready...!",
 	"Published": "Published",
-	"Lives": "Lives"
+	"Lives": "Lives",
+	"Downloading plugins...": "Downloading plugins...",
+	"done at": "done at",
+	"Installing update...": "Installing update...",
+	"Please add local folders to scan in the settings": "Please add local folders to scan in the settings"
 }

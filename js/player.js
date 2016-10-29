@@ -35,6 +35,7 @@ var playFromWat = false;
 var playFromIcecast = false;
 var iceCastTimer = null;
 var https = require('https')
+var Cast = require('casts')
 
 $(document).ready(function() {
 

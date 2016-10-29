@@ -46,6 +46,12 @@ updateTimer.on("timeupdate", function () {
     updateProgressBar()
 });
 
+var state = {}
+state.player={}
+state.devices={}
+state.playing={}
+state.playing.location="local"
+
 var Jq = $;
 //engines
 var dailymotion = require('dailymotion');

@@ -238,11 +238,11 @@ function updateUpnpList() {
 }
 
 function loadUpnpRenderers() {
-	var list = cli._avTransports;
+	var list = state.devices.dlna.getDevices();
 	upnpDevices = [];
 	$('#upnpPopup').empty();
 	$.each(list,function(index,item) {
-		var name = item.friendlyName;
+		var name = item.name;
         if(name !== "") {
 		if (upnpDevices.length === 0) {
     			$('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" checked="true" value="'+name+'"> <br />');
@@ -256,25 +256,27 @@ function loadUpnpRenderers() {
         }
 	});
 
-    $.each(chromecastDevices,function(index,item) {
-        var name = item.name;
-        if(name.toLowerCase()=="chromecast_") {
-            return;
-        }
-        var name = item.name;
-        var id = item.id;
-        if(name !== "") {
-            if (upnpDevices.length === 0) {
-                $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
-            } else {
-                $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
-            }
-            
-            upnpDevices.push(name);
-        }
-    });
+    if(state.devices.chromecast) {
+      $.each(state.devices.chromecast.getDevices(),function(index,item) {
+          var name = item.name;
+          if(name.toLowerCase()=="chromecast_") {
+              return;
+          }
+          var name = item.name;
+          var id = item.id;
+          if(name !== "") {
+              if (upnpDevices.length === 0) {
+                  $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
+              } else {
+                  $('#upnpPopup').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
+              }
+
+              upnpDevices.push(name);
+          }
+      });
+    }
     console.log(upnpDevices.length)
-    if(upnpDevices.length > 0 ) {
+    if(state.devices ) {
         $('#upnpRenderersContainer').show();
         $('#upnpBubble').show();
         loadUpnpQtip();
@@ -364,8 +366,8 @@ function playUpnpRenderer(obj) {
     try {
         mediaRenderer = new MediaRendererClient(cli._avTransports[upnpDevice].location);
         mediaRenderer.on('status', function(status) {
-          // Reports the full state of the AVTransport service the first time it fires, 
-          // then reports diffs. Can be used to maintain a reliable copy of the 
+          // Reports the full state of the AVTransport service the first time it fires,
+          // then reports diffs. Can be used to maintain a reliable copy of the
           // service internal state.
           //console.log("UPNP STATUS EVENT: ", status)
           rendererState = status;
@@ -376,21 +378,21 @@ function playUpnpRenderer(obj) {
         mediaRenderer.on('error', function(err) {
           console.log("ERREUR UPNP:", err.message);
         });
-         
+
         mediaRenderer.on('loading', function() {
           console.log('UPNP LOADING EVENT');
         });
-         
+
         mediaRenderer.on('playing', function() {
             upnpMediaPlaying = true;
             console.log('UPNP PLAYING EVENT');
             player.play()
         });
-         
+
         mediaRenderer.on('paused', function() {
             console.log('UPNP PAUSE EVENT');
         });
-         
+
         mediaRenderer.on('stopped', function() {
           console.log('UPNP EVENT STOP');
         });
@@ -398,7 +400,7 @@ function playUpnpRenderer(obj) {
         console.log("UPNP ERREUR CATCH IN playUpnpRenderer:", err)
         return;
     }
- 
+
     // Load a stream with subtitles and play it immediately
     if(obj.title.indexOf('opus') !== -1) {
         currentMedia.mime = 'audio/opus'
@@ -406,12 +408,12 @@ function playUpnpRenderer(obj) {
     }
     obj.title = sanitize(XMLEscape.xmlEscape(decodeURIComponent(obj.title.replace(/[^\x00-\x7F]/g, ""))))
 
-    var options = { 
+    var options = {
       autoplay: true,
       contentType: "video/mpeg",
       metadata: {
         title: obj.title,
-        type: currentMedia.type || "video", // can be 'video', 'audio' or 'image' 
+        type: currentMedia.type || "video", // can be 'video', 'audio' or 'image'
         subtitlesUrl: ''
       }
     };
@@ -419,7 +421,7 @@ function playUpnpRenderer(obj) {
     mediaRendererPaused = false;
 
     var uri = obj.link.replace('&upnp','').replace('&torrent','').replace('&direct','').replace(/&/g,"&amp;").trim();
-    
+
     mediaRenderer.load(uri.trim(), options, function(err, result) {
         if(upnpMediaPlaying) {
             clearInterval(upnpInterval);
@@ -455,12 +457,12 @@ function getRendererState() {
                     $('span.mejs-duration').text('--:--');
                     $('.mejs-overlay-play').hide();
                     $('.mejs-overlay,.mejs-overlay-loading').show()
-                    setTimeout(function(){ 
+                    setTimeout(function(){
                         getRendererState();
                     },1000);
                 }
 
-        } else if (rendererState.TransportState === 'PAUSED' || rendererState.TransportState === 'BUFFERING') { 
+        } else if (rendererState.TransportState === 'PAUSED' || rendererState.TransportState === 'BUFFERING') {
             $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play')
         } else if (rendererState.TransportState === 'PLAYING') {
             $('#subPlayer-play').hide();
@@ -606,5 +608,5 @@ function getChromeCastPos() {
     })
 }
 
-// start 
+// start
 startUPNPserver();
