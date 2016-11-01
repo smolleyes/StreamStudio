@@ -71,8 +71,8 @@ $(document).on('ready', function() {
             <li><a class="open_in_browser" href="http://ffmpeg.org/">FFMpeg</a></li> \
         </ul><br/> \
         <p><u>'+_("Links and informations:")+'</u></p>  \
-        '+_('You can find informations on how to use StreamStudio in the <a class="open_in_browser" href="http://wiki.streamstudio.me">wiki</a><br/> \
-        Since we don\'t have a specific forum yet, please report any bug <a class="open_in_browser" href="http://forum.streamstudio.me">here</a> or by mail <a class="open_in_browser" href="mailto:staff@streamstudio.me">here</a><br/> \
+        '+_('You can find informations on how to use StreamStudio in the <a class="open_in_browser" href="http://wiki.streamstudio.cm">wiki</a><br/> \
+        Since we don\'t have a specific forum yet, please report any bug <a class="open_in_browser" href="http://forum.streamstudio.cm">here</a> or by mail <a class="open_in_browser" href="mailto:staff@streamstudio.cm">here</a><br/> \
         (use the "d" key to open the debug console (informations about this console <a class="open_in_browser" href="https://developer.chrome.com/devtools">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !')+'</div>';
         showPopup(html,'body')
     });
