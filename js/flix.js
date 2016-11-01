@@ -75,6 +75,18 @@ $(document).on('click', '#closeMfp', function(evt) {
 
 var torObj = {}
 
+function waitLoading(stream) {
+    console.log('waiting torrent port')
+    if(videoStreamer && videoStreamer.server && videoStreamer.server.address()) {
+    stream.link = 'http://' + ipaddress + ':' + videoStreamer.server.address().port + '/&torrent';
+    initPlay(stream)
+    } else {
+        setTimeout(function() {
+            waitLoading(stream)
+        },1000)
+    }
+}
+
 function getTorrent(link, cover, fallback,retried,id) {
     console.log(torObj,link, cover, fallback,retried,id)
     torObj.link = link;
@@ -84,7 +96,7 @@ function getTorrent(link, cover, fallback,retried,id) {
     torObj.id = id;
     if(!torObj.retried) {
      player.cleanTracks();
-    } 
+    }
     if (link.toString().indexOf('magnet:?') !== -1) {
         if (cover) {
             mediaCover = cover;
@@ -345,7 +357,12 @@ app.updateStats = function(streamInfo) {
                 $('#fbxMsg2').remove();
             } catch (err) {}
             $('.mejs-container').append('<div id="fbxMsg2" class="preloadingMsg" style="height:calc(100% - 60px);"><div style="top:62%;position: relative;"><p style="font-weight:bold;text-align: center;">' + _("Please wait while loading your video... (Can take a few seconds)") + '</p></div></div>');
-            initPlay(stream)
+            if(!torrentsArr[0] || !torrentsArr[0].link) {
+               console.log('PAS DE LIEN DANS INITPLAY FLIX ! attends !')
+               waitLoading(stream)
+           } else {
+              initPlay(stream)
+            }
         } else {
             torrentSrc = videoStreamer.path;
             torrentName = videoStreamer.server.index.name;
@@ -358,7 +375,7 @@ app.updateStats = function(streamInfo) {
                 var t = _('(%s%% downloaded)', 100);
                 $('.mejs-time-loaded').width('100%')
                 $('#preloadTorrent').remove();
-                $("#song-title").empty().text(_('Playing: ') + torrentName + " " + t);
+                $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
                 if (saveTorrent && !torrentSaved) {
                     saveToDisk(torrentSrc, torrentName);
                     torrentSaved = true;
@@ -378,7 +395,7 @@ app.updateStats = function(streamInfo) {
                     totalBytes = 0;
                 }
                 $('.mejs-time-loaded').width(downloadedPct + '%')
-                $("#song-title").empty().text(_('Playing: ') + torrentName + " " + t);
+                $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
             }
         }
     }

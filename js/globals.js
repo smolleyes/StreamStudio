@@ -1,4 +1,4 @@
-var VERSION = "2.9.9.8";
+var VERSION = "2.9.9.9";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -41,6 +41,7 @@ var rendererState;
 var upnpLoading = false;
 var tseWin = false; // hidden window for cloudflare
 var Cast = null;
+var castStatusInterval = null;
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
@@ -53,6 +54,10 @@ state.devices={}
 state.playing={}
 state.devices.castMenu={}
 state.playing.location="local"
+
+var aiplayPlayers = []
+var chromecastPlayers = []
+var dlnaPlayers = []
 
 var Jq = $;
 //engines

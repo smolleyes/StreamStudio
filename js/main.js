@@ -465,7 +465,7 @@ var htmlContent =
 <div id="playlistBtnSub"></div>  \
 <div id="transcodingBtnSub"></div> \
 <div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
-<div id="subPlayer-title-container">' + _("Playing:") + '<span id="subPlayer-title"><p> ' + _('Waiting...') + '</p></span></div> \
+<div id="subPlayer-title-container"></div> \
 </div> \
 </div> \
 <div id="showPlayer"></div> \
@@ -518,11 +518,7 @@ $(document).ready(function() {
     }
     // Else call parent method
     $.magnificPopup.proto._onFocusIn.call(this,e);
-  };
-  // load cast
-    console.log('LOADDDD CCASSTTTTTTTTT')
-    Cast = require('casts')
-    Cast.init(state, updateUpnpList)
+  }
 });
 
 function main() {
@@ -570,8 +566,6 @@ function main() {
     })
   });
 
-  //show gui
-  createLocalRootNodes();
   $('#loadingApp').remove();
   $('#menuContainer').show();
   $('#content').show();
@@ -762,9 +756,6 @@ function main() {
       $('#subPlayer-Timer').empty().append($('div.mejs-time').html());
     }
     var img = null;
-    if ($('#subPlayer-title').text() !== currentMedia.title) {
-      $('#subPlayer-title').empty().append('<p>' + currentMedia.title + '</p>');
-    }
   });
 
   $("#playlistBtn").bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
@@ -949,7 +940,7 @@ function main() {
     video.dir = $(this).attr('dir');
     video.title = $(this).attr('title');
     video.next = $(this).parent().next();
-    $('#song-title').empty().append(_('Playing: ') + video.title);
+    $('.song-title').empty().append(_('Playing: ') + video.title);
     if (playAirMedia === true || upnpToggleOn) {
       upnpMediaPlaying = false;
       continueTransition = false;
@@ -1396,7 +1387,6 @@ function main() {
     if (upnpToggleOn === false) {
       playUpnpMedia = true;
       upnpToggleOn = true;
-      loadUpnpRenderers();
       $('#upnp-toggle').removeClass('upnp-disabled').addClass('upnp-enabled');
       $('#upnpTranscoding').show();
     } else {
@@ -1423,12 +1413,20 @@ function main() {
             mediaRendererType = 'upnp';
           }
         });
-      } else {
+      } else if (type== 'chromecast'){
         __.some(state.devices.chromecast.getDevices(), function(el, index) {
           if (el.name === selected) {
             upnpDevice= el.device
             mediaRenderer = el;
             mediaRendererType = "chromecast"
+          }
+        });
+      } else {
+        __.some(state.devices.airplay.getDevices(), function(el, index) {
+          if (el.name === selected) {
+            upnpDevice= el.device
+            mediaRenderer = el;
+            mediaRendererType = "airplay"
           }
         });
       }
@@ -1456,7 +1454,7 @@ function main() {
   $('#dateTypes_label').hide();
   $('#dateTypes_select').hide();
   $('#items_container').hide();
-  $('#song-title').empty().append(_('Stopped...'));
+  $('.song-title').empty().append(_('Stopped...'));
   window.ondragover = function(e) {
     e.preventDefault();
     return false
@@ -1527,9 +1525,9 @@ function main() {
     saveSettings();
   });
   // load upnp devices
-  //cli.on('updateUpnpDevice', function() {
-    //updateUpnpList()
-  //});
+  cli.on('updateUpnpDevice', function() {
+    updateUpnpList()
+  });
   // try {
   //     UPNPserver.stop()
   // } catch(err) {}
@@ -1564,6 +1562,8 @@ function main() {
   $('.tab-content').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
     updateScroller();
   });
+  $('.mejs-playmode-button').clone().appendTo('#playlistBtnSub')
+  $('.song-title').clone().appendTo('#subPlayer-title-container')
 }
 
 $(document).bind("scrollend", ".nano",function(e){

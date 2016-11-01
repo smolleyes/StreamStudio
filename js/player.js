@@ -78,7 +78,6 @@ $(document).ready(function() {
       updateMiniPlayer()
 		try {
 			upnpMediaPlaying = false;
-      stopUpnp()
 			continueTransition = false;
 			upnpContinuePlay = false;
       upnpStoppedAsked = true;
@@ -230,18 +229,18 @@ $(document).ready(function() {
 	});
 
 	$('#subPlayer-play, #subPlayer-pause').click(function() {
-		if(upnpMediaPlaying) {
-      if(mediaRendererPaused) {
+		if(upnpToggleOn) {
+			if(state.playing.state == 'PAUSED' || state.playing.state == "PAUSED_PLAYBACK") {
         mediaRenderer.play()
-        mediaRendererPaused = false;
+				player.playing.state = "PLAYING"
         $('#subPlayer-play').hide();
         $('#subPlayer-pause').show();
       } else {
         mediaRenderer.pause()
-        mediaRendererPaused = true;
+				state.playing.state = 'PAUSED'
         $('#subPlayer-play').show();
         $('#subPlayer-pause').hide();
-      }
+			}
     } else {
       if(player.media.paused) {
         if(player.media.src.indexOf('index.html') !== -1) {
@@ -275,7 +274,7 @@ $(document).ready(function() {
 		var pct = (( pos * 100) / $('#progress-bar').outerWidth(true)).toFixed(2);
     console.log(pct)
 		var duree;
-		if(chromeCastplaying){
+		if(upnpTranscoding){
 			duree = mediaDuration;
 		} else {
 			duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
@@ -306,14 +305,14 @@ $(document).ready(function() {
 			initPlay(m);
       //player.media.setCurrentTime(newTime);
 		} else {
-			if(chromeCastplaying){
-				mediaRenderer.player.seek(newTime,function(){
-					console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
-				})
-			}else if (upnpMediaPlaying) {
-          mediaRenderer.seek(newTime,function(){
-            console.log('upnp seek to '+ mejs.Utility.secondsToTimeCode(newTime));
-          })
+			if(upnpToggleOn){
+				newTime = pct * state.playing.duration / 100
+				console.log('SEEKING UPNP TO ', newTime)
+				if(state.playing.location == "airplay") {
+					mediaRenderer.scrub(newTime)
+				} else {
+					mediaRenderer.seek(newTime)
+				}
       } else {
 				player.media.setCurrentTime(newTime);
 			}
@@ -353,9 +352,10 @@ $(document).ready(function() {
 function initPlayer(stopTorrent) {
 	// clean subtitles
   $('.soloTorrent').remove();
-  	clearInterval(ChromecastInterval);
   stopIceTimer()
   cleanffar()
+	state.playing.currentTime = 0
+	state.playing.duration = 0
 	chromeCastplaying = false;
 	mediaCurrentTime = 0;
 	mediaDuration = 0;
@@ -414,12 +414,19 @@ function initPlayer(stopTorrent) {
     player.loaded.width(0);
     player.current.width(0);
     $('#infosPage').remove();
-	$('#song-title').empty().append(_('Waiting...'));
+	$('.song-title').empty().append(_('Waiting...'));
 	$(".mejs-overlay-loading").hide();
 	$(".mejs-overlay-button").show();
 	$(".mejs-overlay-play").show();
 	// reinit mini Player
 	clearInterval(timeUpdater);
+	// clear cast player
+	if(upnpToggleOn) {
+		try {
+			mediaRenderer.stop()
+			clearInterval(castStatusInterval)
+		} catch(err) {}
+	}
 	timeUpdater = null;
 	$("#subPlayer-title").text(' '+_('Waiting...'));
 	$('#subPlayer-play').show();
@@ -450,7 +457,7 @@ function updateMiniPlayer() {
       currentMedia.cover = 'images/play-overlay.png'
   	}
   }
-  if (!player.media.paused || upnpToggleOn && upnpMediaPlaying || upnpToggleOn && chromeCastplaying) {
+  if (!player.media.paused && upnpToggleOn) {
     $('#subPlayer-img').attr('src',currentMedia.cover );
   } else {
     $('#subPlayer-img').attr('src','images/play-overlay.png');
@@ -467,7 +474,6 @@ function initPlay(media) {
   $('.mejs-playlist  > ul').hide();
   $('.mejs-playlist').css('opacity',0);
 	try {
-		clearInterval(ChromecastInterval);
     clearInterval(iceCastTimer);
 	} catch(err) {}
   stopIceTimer()
@@ -476,7 +482,7 @@ function initPlay(media) {
 	if(upnpMediaPlaying || playFromUpnp) {
 		play_next = true;
 	}
-	if(currentMedia.link && playFromUpnp == false && upnpMediaPlaying == false) {
+	if(currentMedia.link && !upnpToggleOn) {
 		if (media.link && media.link.indexOf('videoplayback?id') !== -1 && !upnpToggleOn) {
 			if(!currentMedia.ytId || currentMedia.ytId !== ytId) {
 				initPlayer();
@@ -536,13 +542,14 @@ function initPlay(media) {
     		} else {
     			link = link.replace('&tv','');
     		}
-    		console.log(link)
+				console.log("media avant currentMedia", media)
         var title = media.title;
         currentMedia = media;
+				state.media=currentMedia
         currentMedia.link = link.trim();
 
         // set title
-        $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(title));
+        $('.song-title').empty().append(_('Playing: ') + decodeURIComponent(title));
   		$('.mejs-overlay, .mejs-overlay-loading').show();
   		$('.mejs-overlay-play').hide();
           // check type of link to play
@@ -551,7 +558,7 @@ function initPlay(media) {
         stopIceTimer()
         iceCastLink = link;
         playFromIcecast = true;
-        $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+        $('.song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
         launchPlay()
         iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
       }
@@ -698,14 +705,10 @@ function launchPlay() {
         currentMedia.mime = "video/mp4"
 			}
 		}
-		if(mediaRendererType == 'upnp') {
-			playUpnpRenderer(currentMedia);
-		} else {
-			if(currentMedia.link.indexOf('videoplayback?') !== -1) {
-				playOnChromecast(currentMedia, true);
-			} else {
-				playOnChromecast(currentMedia, false);
-			}
+		if(upnpToggleOn) {
+			mediaRenderer.play(currentMedia.link,currentMedia)
+			state.playing.location=mediaRendererType
+			startStatusInterval()
 		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
@@ -946,14 +949,14 @@ function on_media_finished(){
 
 function updateProgressBar() {
     var progressBar = document.getElementById('progress-bar');
-    if(chromeCastplaying){
-		duree = mediaDuration;
+    if(upnpToggleOn){
+		duree = state.playing.duration;
 		try {
-			var percentage = ((100 / duree) * (player.media.currentTime));
+			var percentage = ((100 / duree) * (state.playing.currentTime));
 			progressBar.value = percentage;
 			$('.mejs-duration').text(mejs.Utility.secondsToTimeCode(duree))
-			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (player.media.currentTime) / mediaDuration)+'px');
-			$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(player.media.currentTime))
+			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
+			$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
 			$('#subPlayer-img').attr('src',currentMedia.cover);
       if(upnpTranscoding && percentage == 0) {
         $('.mejs-currenttime').text('Live')
@@ -1006,7 +1009,7 @@ function getIcecastTitle() {
           iceCastStation = _("Unknown station")
         }
         currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title;
-        $('#song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+        $('.song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
       }
   });
 }

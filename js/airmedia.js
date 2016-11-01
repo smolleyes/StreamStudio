@@ -20,12 +20,91 @@ var API = {};
 var BASE_URL = '';
 var session_token = '';
 
+function updateState(state) {
+  console.log(state)
+}
+
+function startStatusInterval () {
+  clearInterval(castStatusInterval)
+  castStatusInterval = null;
+
+  castStatusInterval = setInterval(function () {
+    var mediaPlayer = mediaRenderer
+    if (mediaPlayer) {
+      if(state.playing.location == "airplay") {
+        mediaPlayer.playbackInfo(function(err,body,res) {
+          if (err) return;
+          if(res.readyToPlay) {
+            state.playing.state = "PLAYING"
+            player.play()
+            state.playing.currentTime = res.position
+            state.playing.duration = res.duration
+            updateMiniPlayer()
+            updateProgressBar()
+          } else {
+            state.playing.state = "STOPPED"
+            clearInterval(castStatusInterval)
+            castStatusInterval = null;
+            initPlayer()
+          }
+        })
+      } else {
+        mediaPlayer.status(function(err,res) {
+          console.log(err,res)
+          if (err) return;
+          if(state.playing.location == 'chromecast' && !res) {
+            state.playing.state = "STOPPED";
+            mediaPlayer.stop()
+            initPlayer()
+          }
+          state.playing.state = res.playerState
+          if(res.playerState == 'PLAYING' || res.PlayerState == 'BUFFERING') {
+            player.play()
+            if(state.playing.location == 'upnp'){
+              state.playing.currentTime = res.position.currentTime
+              state.playing.duration = res.position.duration
+            } else { // chromecast
+              state.playing.currentTime = res.currentTime
+              state.playing.duration = res.media.duration
+            }
+            updateMiniPlayer()
+            updateProgressBar()
+          } else if (res.playerState == "PAUSED" || res.playerState == "TRANSITIONING"){
+            player.pause()
+            updateMiniPlayer()
+            updateProgressBar()
+          } else if(res.playerState == "STOPPED") {
+            clearInterval(castStatusInterval)
+            castStatusInterval = null;
+            initPlayer()
+          }
+        })
+      }
+    }
+  }, 1000)
+}
+
 function checkFreebox() {
     try {
-        http.get('http://mafreebox.freebox.fr');
-        console.log('freebox available, airplay enabled');
-        //$('#airplayContainer').show();
-        freeboxAvailable = true;
+        $.get('http://mafreebox.freebox.fr').done(function(res) {
+          console.log('freebox available, airplay enabled');
+          //$('#airplayContainer').show();
+          freeboxAvailable = true;
+          //show gui
+          createLocalRootNodes();
+          console.log('LOADDDD CCASSTTTTTTTTT')
+          Cast = require('casts')
+          Cast.init(state, updateUpnpList,updateState)
+          cli.searchDevices()
+        }).fail(function(err){
+          //show gui
+          console.log('no freebox available, airplay disabled');
+          createLocalRootNodes();
+          console.log('LOADDDD CCASSTTTTTTTTT')
+          Cast = require('casts')
+          Cast.init(state, updateUpnpList)
+          cli.searchDevices()
+        });
     } catch(err) {
         console.log('no freebox available, airplay disabled');
     }
@@ -56,12 +135,12 @@ function checkFreebox() {
 function ask_authorization() {
     var param = {"app_id": APP_ID, "app_name": APP_NAME, "app_version": APP_VERSION, "device_name": 'pc'};
     var paramString = JSON.stringify(param);
-    
+
     var headers = {
         'Content-Type': 'application/json',
         'Content-Length': paramString.length
     };
-    
+
     var options = {
         host: 'mafreebox.freebox.fr',
         port: 80,
@@ -69,7 +148,7 @@ function ask_authorization() {
         method: 'POST',
         headers: headers
     };
-    
+
     // Setup the request.  The options parameter is
     // the object we defined above.
     var req = http.request(options, function(res) {
@@ -156,12 +235,12 @@ function login(cb,params) {
 function getSession(passwd,cb,params) {
     var param = {"app_id": APP_ID, "password": passwd};
     var paramString = JSON.stringify(param);
-    
+
     var headers = {
         'Content-Type': 'application/json',
         'Content-Length': paramString.length
     };
-    
+
     var options = {
         host: 'mafreebox.freebox.fr',
         port: 80,
@@ -186,7 +265,7 @@ function getSession(passwd,cb,params) {
                 console.log('session ok!, token : '+session_token);
                 if (cb) {
                 	cb(params);
-                } 
+                }
             } else {
                 console.log('can t get session token! : '+resultObject);
                 return;
@@ -203,7 +282,7 @@ function getAirMediaReceivers() {
     var headers = {
         'X-Fbx-App-Auth': session_token
     };
-    
+
     var options = {
         host: 'mafreebox.freebox.fr',
         port: 80,
@@ -211,7 +290,7 @@ function getAirMediaReceivers() {
         method: 'GET',
         headers: headers
     };
-    
+
     var req = http.request(options, function(res) {
         res.setEncoding('utf-8');
         var responseString = '';
@@ -244,7 +323,7 @@ function getAirMediaReceivers() {
                         return loadQtip();
                     }
                   });
-                
+
             } else {
                 console.log('can t get airmedia receivers : '+responseString);
                 return;
@@ -327,13 +406,13 @@ function play_on_fbx(url) {
     }
     var params = {"action": "start","media_type": "video","media": url,"password": ""}
     var paramString = JSON.stringify(params);
-    
+
     var headers = {
         'X-Fbx-App-Auth': session_token,
         'Content-Type': 'application/json',
         'Content-Length': paramString.length
     };
-    
+
     var options = {
         host: 'mafreebox.freebox.fr',
         port: 80,
@@ -371,13 +450,13 @@ function play_on_fbx(url) {
 function stop_on_fbx() {
     var params = {"action": "stop","media_type": "video"}
     var paramString = JSON.stringify(params);
-    
+
     var headers = {
         'X-Fbx-App-Auth': session_token,
         'Content-Type': 'application/json',
         'Content-Length': paramString.length
     };
-    
+
     var options = {
         host: 'mafreebox.freebox.fr',
         port: 80,
@@ -422,13 +501,13 @@ function addFreeboxDownload(link) {
   var l = encodeURIComponent(link);
   var param = {"download_url": link};
   var paramString = JSON.stringify(param);
-  
+
   var headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-Requested-With':'XMLHttpRequest',
         'X-Fbx-App-Auth': session_token
 	};
-  
+
   $.ajax({
     type       : "POST",
     url        : 'http://mafreebox.freebox.fr/api/v1/downloads/add',
@@ -447,7 +526,7 @@ function addFreeboxDownload(link) {
     error: function(response) {
       $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Impossible d'ajouter le téléchargement... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: '',updateDisplay:'none'});
     }
-	});     
+	});
 }
 
 function upToFreebox(form) {
@@ -458,7 +537,7 @@ function upToFreebox(form) {
         'X-Requested-With':'XMLHttpRequest',
         'X-Fbx-App-Auth': session_token
 	};
-  
+
   $.ajax({
     type       : "POST",
     url        : 'http://mafreebox.freebox.fr/api/v3/downloads/add',
@@ -481,5 +560,5 @@ function upToFreebox(form) {
 		console.log(response)
       $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Impossible d'ajouter le téléchargement... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: '',updateDisplay:'none'});
     }
-	});     
+	});
 }

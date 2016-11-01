@@ -47,7 +47,7 @@ function loadItem(item, count) {
         var ext = item.ext || 'mp4';
         var views = item.view_count || ''
         if(item.formats) {
-           var formats = item.formats; 
+           var formats = item.formats;
         }
 
         $('#items_container').append('<div class="youtube_item" style="height:180px;" id="'+pid+'"> \
@@ -78,7 +78,7 @@ function loadItem(item, count) {
             for (var i = 0; i < formats.length; i++) {
                 try {
                     var resolution = formats[i].format_id.toLowerCase().match(/\d{3,4}p/) !== null ? formats[i].format_id.toLowerCase().match(/\d{3,4}p/) !== null: formats[i].format_id.toLowerCase() ;
-                    
+
                     if (resolution.toLowerCase().indexOf('hd') !== -1) {
                         resolution = '1080p';
                     } else if (formats[i].format.indexOf('1280x720') !== -1 || resolution.toLowerCase().indexOf('mp4_sq') !== -1) {
@@ -89,7 +89,7 @@ function loadItem(item, count) {
                         resolution = '360p';
                     } else if (resolution.toLowerCase().indexOf('mobile') !== -1 || resolution.toLowerCase().indexOf('hls_lq') !== -1 || resolution.toLowerCase().indexOf('mp4_lq') !== -1) {
                         resolution = '240p';
-                    }   
+                    }
                     var vlink = formats[i].url;
                     if (vlink === 'null' || vlink.toLowerCase().indexOf('rtmp') !== -1 || formats[i].ext !== 'flv' && formats[i].ext !== 'mp4' && formats[i].ext !== 'hls' && formats[i].ext !== 'webm' && formats[i].ext !== 'm3u8' && formats[i].ext !== 'mp3' && formats[i].ext !== 'aac') {
                         continue;
@@ -113,7 +113,7 @@ function loadItem(item, count) {
                         resolution = '360p';
                     } else if (resolution.toLowerCase().indexOf('mobile') !== -1 || resolution.toLowerCase().indexOf('hls_lq') !== -1 || resolution.toLowerCase().indexOf('mp4_lq') !== -1) {
                         resolution = '240p';
-                    }   
+                    }
                     var vlink = item.url;
                     if (vlink === 'null' || vlink.toLowerCase().indexOf('rtmp') !== -1 || item.ext !== 'mp4' && item.ext !== 'hls' && item.ext !== 'webm' && item.ext !== 'm3u8' && item.ext !== 'mp3' && item.ext !== 'aac') {
                         return;
@@ -409,7 +409,7 @@ function downloadFile(link, title, vid, toTorrent) {
             // detect this and add the host to the path.
             $('#progress_' + vid).remove();
             return downloadFile(response.headers.location, title, vid, toTorrent);
-            // Otherwise no redirect; capture the response as normal            
+            // Otherwise no redirect; capture the response as normal
         } else {
             pbar.show();
             $('#progress_' + vid + ' a.cancel').show();

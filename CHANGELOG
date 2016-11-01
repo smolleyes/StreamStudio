@@ -1,3 +1,9 @@
+V 2.9.9.9
+ * fix app loading without internet
+ * add airplay support
+ * upnp rewrite
+ * more...
+
 V 2.9.9.8
  * fix upnp/chromecast update
  * fix mp3stream columns sizes when resizing the software

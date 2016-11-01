@@ -106,7 +106,7 @@ function startStreaming(req, res, width, height) {
                 bitrate = parsedLink.match(/&bitrate=(.*)/)[1];
             }
         }
-        var megaName = $('#song-title').text().replace(_('Playing: '), '');
+        var megaName = $('.song-title').text().replace(_('Playing: '), '');
         var megaType = megaName.split('.').pop().toLowerCase();
         var x = null;
         
@@ -351,7 +351,7 @@ function startStreaming(req, res, width, height) {
                     return;
                 }
                 if ((in_array(megaType, videoArray)) && (parsedLink.indexOf('&download') === -1)) {
-                    $('#song-title').empty().html(_('Playing: ') + megaName);
+                    $('.song-title').empty().html(_('Playing: ') + megaName);
                     if (transcoderEnabled) {
                         console.log('playing movie with transcoding');
                         var ffmpeg = spawnFfmpeg('', device, '', bitrate, function(code) { // exit

@@ -23,7 +23,7 @@ function initPlugins() {
 
 function checkRev() {
     chdir(confDir, function() {
-        $.get('https://github.com/smolleyes/streamstudio-plugins/commits/master.atom', function(res) {
+        $.get('https://github.com/smolleyes/streamstudio-plugins/commits/master.atom').done(function(res) {
             var lastRev;
             try {
                 lastRev = $($.find('link', res)[2]).attr('href').split('/').pop();
@@ -43,6 +43,9 @@ function checkRev() {
                     main();
                 }
             }
+        }).fail(function(err) {
+          console.log(err)
+          main()
         });
     });
 }
