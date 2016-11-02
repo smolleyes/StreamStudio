@@ -1,4 +1,5 @@
 
+var https = require('follow-redirects').https;
 function checkUpdates() {
 	if(VERSION.indexOf('testing') !== -1) {
 		return;
@@ -19,7 +20,7 @@ function checkUpdates() {
 			  }
 			});
 		} else {
-			http.get('http://download.streamstudio.cm/update.html',function(res,err){
+			https.get('https://download.streamstudio.cm/update.html',function(res,err){
 				var datas = [];
 				res.on('data',function(chunk){
 					datas.push(chunk);
@@ -28,7 +29,7 @@ function checkUpdates() {
 					console.log("Checking for updates....");
 					var data = datas.join('');
 					var txt = $('p',data).prevObject[1].innerHTML;
-					online_version = txt;
+					online_version = txt
 					try {
 						console.log("online version : "+online_version+', current version : '+ settings.version);
 					} catch(err){
