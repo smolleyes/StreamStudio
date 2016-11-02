@@ -62,11 +62,11 @@ $(document).on('click','#updateBtn',function(e) {
 	var link = '';
 	if (process.platform === 'win32') {
 		file = 'streamstudio-setup.exe';
-		link = 'http://download.streamstudio.cm/windows/'+file;
+		link = 'https://download.streamstudio.cm/windows/'+file;
 		return downloadUpdate(link,file);
 	} else if (process.platform === 'darwin') {
 		 file = 'streamstudio-osx.zip';
-		 link = 'http://download.streamstudio.cm/osx/'+file;
+		 link = 'https://download.streamstudio.cm/osx/'+file;
 		 return downloadUpdate(link,file);
 	} else {
 		if(execDir.indexOf('/opt') !== -1) {
@@ -99,7 +99,7 @@ $(document).on('click','#updateBtn',function(e) {
 				console.log('linux 64 bits detected...');
 				file = 'streamstudio-64.zip';
 			}
-			link = 'http://download.streamstudio.cm/'+file;
+			link = 'https://download.streamstudio.cm/'+file;
 			return downloadUpdate(link,file);
 		}
 	}
@@ -121,7 +121,7 @@ function downloadUpdate(link,filename) {
     var val = $('#updateProgress progress').attr('value');
     var currentTime;
     var startTime = (new Date()).getTime();
-    current_download = http.request(link,
+    current_download = https.request(link,
     function (response) {
 	var contentLength = response.headers["content-length"];
     if (parseInt(contentLength) === 0) {
