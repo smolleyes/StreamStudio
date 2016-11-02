@@ -149,7 +149,7 @@
 	"Current Media:": "Media actuel:",
 	"Disabled": "Désactivé",
 	"Play thru Upnp": "Lecture par Upnp",
-	"Website ubukey.fr is unreachable !": "Le site ubukey.fr n'est pas joignable !",
+	"Website streamstudio.cm is unreachable !": "Le site streamstudio.cm n'est pas joignable !",
 	"Start playing": "Démarrer la lecture",
 	"Playing:": "Lecture:",
 	"Home": "Accueil",
@@ -294,5 +294,11 @@
 	"A new version is available on the PPA !": "Une nouvelle version est disponible dans le PPA !",
 	"Plugin:": "Plugin:",
 	"ubukey is unreachable !": "ubukey is unreachable !",
-	"You can find informations on how to use StreamStudio in the <a class=\"open_in_browser\" href=\"http://wiki.streamstudio.cm\">wiki</a><br/>         Since we don't have a specific forum yet, please report any bug <a class=\"open_in_browser\" href=\"http://forum.streamstudio.cm\">here</a> or by mail <a class=\"open_in_browser\" href=\"mailto:staff@streamstudio.cm\">here</a><br/>         (use the \"d\" key to open the debug console (informations about this console <a class=\"open_in_browser\" href=\"https://developer.chrome.com/devtools\">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !": "You can find informations on how to use StreamStudio in the <a class=\"open_in_browser\" href=\"http://wiki.streamstudio.cm\">wiki</a><br/>         Since we don't have a specific forum yet, please report any bug <a class=\"open_in_browser\" href=\"http://forum.streamstudio.cm\">here</a> or by mail <a class=\"open_in_browser\" href=\"mailto:staff@streamstudio.cm\">here</a><br/>         (use the \"d\" key to open the debug console (informations about this console <a class=\"open_in_browser\" href=\"https://developer.chrome.com/devtools\">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !"
+	"You can find informations on how to use StreamStudio in the <a class=\"open_in_browser\" href=\"http://wiki.streamstudio.cm\">wiki</a><br/>         Since we don't have a specific forum yet, please report any bug <a class=\"open_in_browser\" href=\"http://forum.streamstudio.cm\">here</a> or by mail <a class=\"open_in_browser\" href=\"mailto:staff@streamstudio.cm\">here</a><br/>         (use the \"d\" key to open the debug console (informations about this console <a class=\"open_in_browser\" href=\"https://developer.chrome.com/devtools\">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !": "You can find informations on how to use StreamStudio in the <a class=\"open_in_browser\" href=\"http://wiki.streamstudio.cm\">wiki</a><br/>         Since we don't have a specific forum yet, please report any bug <a class=\"open_in_browser\" href=\"http://forum.streamstudio.cm\">here</a> or by mail <a class=\"open_in_browser\" href=\"mailto:staff@streamstudio.cm\">here</a><br/>         (use the \"d\" key to open the debug console (informations about this console <a class=\"open_in_browser\" href=\"https://developer.chrome.com/devtools\">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !",
+	"Cast": "Caster",
+	"Disable": "Désactivé",
+	"Transcoding": "Transcodage",
+	"Playing on your airplay device !": "Lecture en cours sur votre péripérique airplay !",
+	"Playing on your upnp device !": "Lecture en cours sur votre péripérique upnp !",
+	"Playing on your chromecast device !": "Lecture en cours sur votre péripérique chromecast !"
 }

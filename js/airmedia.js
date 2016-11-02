@@ -34,7 +34,7 @@ function startStatusInterval () {
       if(state.playing.location == "airplay") {
         mediaPlayer.playbackInfo(function(err,body,res) {
           if (err) return;
-          if(res.readyToPlay) {
+          if(res.readyToPlay && state.playing.state !== "PAUSED") {
             state.playing.state = "PLAYING"
             player.play()
             state.playing.currentTime = res.position
@@ -42,15 +42,17 @@ function startStatusInterval () {
             updateMiniPlayer()
             updateProgressBar()
           } else {
-            state.playing.state = "STOPPED"
-            clearInterval(castStatusInterval)
-            castStatusInterval = null;
-            initPlayer()
+            if(state.playing.state !== "PAUSED") {
+              state.playing.state = "STOPPED"
+              mediaPlayer.stop()
+              clearInterval(castStatusInterval)
+              castStatusInterval = null;
+              initPlayer()
+            }
           }
         })
       } else {
         mediaPlayer.status(function(err,res) {
-          console.log(err,res)
           if (err) return;
           if(state.playing.location == 'chromecast' && !res) {
             state.playing.state = "STOPPED";
@@ -76,6 +78,7 @@ function startStatusInterval () {
           } else if(res.playerState == "STOPPED") {
             clearInterval(castStatusInterval)
             castStatusInterval = null;
+            mediaPlayer.stop()
             initPlayer()
           }
         })
@@ -92,17 +95,13 @@ function checkFreebox() {
           freeboxAvailable = true;
           //show gui
           createLocalRootNodes();
-          console.log('LOADDDD CCASSTTTTTTTTT')
           Cast = require('casts')
-          Cast.init(state, updateUpnpList,updateState)
           cli.searchDevices()
         }).fail(function(err){
           //show gui
           console.log('no freebox available, airplay disabled');
           createLocalRootNodes();
-          console.log('LOADDDD CCASSTTTTTTTTT')
           Cast = require('casts')
-          Cast.init(state, updateUpnpList)
           cli.searchDevices()
         });
     } catch(err) {

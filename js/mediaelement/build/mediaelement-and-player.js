@@ -99,6 +99,7 @@ mejs.Utility = {
 		return codePath;
 	},
 	secondsToTimeCode: function(time, forceHours, showFrameCount, fps) {
+		forceHours = true
 		//add framecount
 		if (typeof showFrameCount == 'undefined') {
 		    showFrameCount=false;
@@ -2306,7 +2307,7 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		hideControls: function(doAnimation) {
-			if(playerBarsLocked || $('#box').is(':focus')) {
+			if(playerBarsLocked || $('#box').is(':focus') || $('#castPopup').is(":hover") || $('#castPopup').is(":visible")) {
 				return;
 			}
 			var t = this;
@@ -2316,12 +2317,13 @@ if (typeof jQuery != 'undefined') {
 			}
 			doAnimation = typeof doAnimation == 'undefined' || doAnimation;
 
-			if (!t.controlsAreVisible)
+			if (!t.controlsAreVisible || $('#castPopup').is(":hover"))
 				return;
 			$('#playerTopBar').hide();
 			if($('.mejs-hide-playlist').length > 0) {
 				$('.mejs-playlist').hide();
 			}
+			$('#castPopup').hide()
 
 			if (doAnimation) {
 				// fade out main controls
@@ -3188,6 +3190,10 @@ if (typeof jQuery != 'undefined') {
 					'<button type="button" aria-controls="playModeBtnImg" title="'+_("play and stop")+'" aria-label="playmode"></button>' +
 				'</div>')
 				.appendTo(controls);
+				$('<div class="mejs-button mejs-cast-button cast-off" id="castBtn">' +
+					'<button type="button" title="'+_("Cast")+'" aria-label="cast"></button>' +
+				'</div>')
+				.appendTo(controls);
 		}
 	});
 	// playlist BUTTONs
@@ -3285,14 +3291,10 @@ if (typeof jQuery != 'undefined') {
 							mediaCurrentTime = newTime;
 							seekAsked = true;
 							mouseIsDown = false;
-							if(chromeCastplaying){
-								mediaRenderer.player.seek(newTime,function(){
-									console.log('Chromecast seek to '+ mejs.Utility.secondsToTimeCode(newTime));
-								})
-							} else if (upnpMediaPlaying) {
-								mediaRenderer.seek(newTime,function(){
-									console.log('upnp seek to '+ mejs.Utility.secondsToTimeCode(newTime));
-								})
+							if(upnpToggleOn && state.playing.location == "airplay"){
+								mediaRenderer.scrub(newTime)
+							} else if (upnpToggleOn && state.playing.location == "chromecast" || state.playing.location == "upnp") {
+								mediaRenderer.seek(newTime)
 							} else {
 								//player.setCurrentTime(newTime)
 								var m = {};
@@ -3382,6 +3384,7 @@ if (typeof jQuery != 'undefined') {
 			t.handle = handle;
 		},
 		setProgressRail: function(e) {
+			console.log(t,this)
 			var
 				t = this;
 				if(t.media.duration && t.media.duration !== Infinity) {
@@ -3410,6 +3413,7 @@ if (typeof jQuery != 'undefined') {
 				if (percent !== null && t.media && !t.media.paused) {
 					percent = Math.min(1, Math.max(0, percent));
 					// update loaded bar
+					console.log(t.loaded,t.total)
 					if (t.loaded && t.total) {
 						if((t.total.width() * percent) >= 100) {
 							return;
@@ -3429,6 +3433,7 @@ if (typeof jQuery != 'undefined') {
 					if (percent !== null && t.media && !t.media.paused) {
 						percent = Math.min(1, Math.max(0, percent));
 						// update loaded bar
+						console.log(t.loaded,t.total)
 						if (t.loaded && t.total && percent !== null) {
 							t.loaded.width(t.total.width() * (percent+mediaCurrentPct));
 						}
@@ -3454,16 +3459,17 @@ if (typeof jQuery != 'undefined') {
 			}
 		},
 		setCurrentRail: function() {
-
 			var t = this;
+			console.log(t)
 		    if(t.media.duration == Infinity) {
-				if (t.media.currentTime != undefined && mediaDuration || chromecastPlaying) {
+				if (t.media.currentTime != undefined && mediaDuration || upnpToggleOn) {
 					// update bar and handle
 					if (t.total && t.handle) {
 						var
 							newWidth = Math.round(t.total.width() * (mediaCurrentTime+t.media.currentTime) / mediaDuration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
-						if(t.total.width() < newWidth) {
+							console.log(t.total.width(),newWidth,handlePos)
+						if(t.total.width() < newWidth || t.total.width() < handlePos) {
 							return;
 						}
 						t.current.width(newWidth);
@@ -3477,6 +3483,10 @@ if (typeof jQuery != 'undefined') {
 						var
 							newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
+							console.log(t.total.width(),newWidth,handlePos)
+							if(t.total.width() < newWidth || t.total.width() < handlePos) {
+								return;
+							}
 						t.current.width(newWidth);
 						t.handle.css('left', handlePos);
 					}

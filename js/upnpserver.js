@@ -175,7 +175,6 @@ function loadUpnpItems(items) {
 function updateUpnpList() {
   try {
     var list = cli._servers;
-    console.log('UPNP SERVER LIST', list)
     if(!UPNPserverInit) {
       UPNPserverInit = true;
       $('#UpnpContainer ul').empty()
@@ -237,36 +236,35 @@ function updateUpnpList() {
   loadUpnpRenderers()
 }
 
+var aiplayPlayersArr = []
+var chromecastPlayers = []
+var dlnaPlayers = []
+
 function loadUpnpRenderers() {
-  if($('#upnpPopup').children().length == 0) {
-    $('#upnpPopup').append(`
-      <h5><img style="height:24px;width:24px;margin-right:5px;" src="images/dlna.png" />Upnp-dlna</h5>
+  if($('#castPopup').children().length == 0) {
+    $('#castPopup').append(`
+      <span style="position:relative;top:-3px;">${_("Disable")}: </span><input id="upnpToggle" data-name="disable" class="upnp" type="radio" data-type="activate" name="cast" checked><br>
+      <div id="upnpTranscoding" style="display:none;"><span style="position:relative;top:-3px;">${_("Transcoding")}: </span><input id="transcodingInput" class="upnp" type="checkbox" data-type="transcoding" name="transcoding"></div>
+      <h5 id="dlnaLabel"><img style="height:24px;width:24px;margin-right:5px;" src="images/dlna.png" />Upnp-dlna</h5>
       <div id="dlnaPlayers">
       </div>
-      <h5><img style="height:24px;width:24px;margin-right:5px;" src="images/chromecast.png" />Chromecast</h5>
+      <h5 id="chromecastLabel"><img style="height:24px;width:24px;margin-right:5px;" src="images/chromecast.png" />Chromecast</h5>
       <div id="chromecastPlayers">
       </div>
-      <h5><img style="height:24px;width:24px;margin-right:5px;" src="images/airplay-icon.png" />Airplay</h5>
+      <h5 id="airplayLabel"><img style="height:24px;width:24px;margin-right:5px;" src="images/airplay-icon.png" />Airplay</h5>
       <div id="airplayPlayers">
       </div>
       `)
     }
     try {
-        var list = state.devices.dlna.getDevices();
-        $.each(list,function(index,item) {
+        $.each(state.devices.dlna.getDevices(),function(index,item) {
           var name = item.name;
           if(name !== "") {
-            if (upnpDevices.length === 0) {
-              $('#dlnaPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" checked="true" value="'+name+'"> <br />');
-              upnpDevices.push(name);
-              dlnaPlayers.push(name)
-            } else {
               if(dlnaPlayers.indexOf(name) == -1) {
-                $('#dlnaPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="upnp" name="'+name+'" value="'+name+'"> <br />');
+                $('#dlnaPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="upnp" name="cast" value="'+name+'"> <br />');
                 upnpDevices.push(name);
                 dlnaPlayers.push(name)
               }
-            }
           }
         });
         $.each(state.devices.chromecast.getDevices(),function(index,item) {
@@ -274,68 +272,122 @@ function loadUpnpRenderers() {
           if(name.toLowerCase()=="chromecast_") {
             return;
           }
-          var name = item.name;
           var id = item.id;
           if(name !== "") {
-            if (upnpDevices.length === 0) {
-              $('#chromecastPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" checked="true" value="'+id+'"> <br />');
-              upnpDevices.push(name);
-              chromecastPlayers.push(name)
-            } else {
               if(chromecastPlayers.indexOf(name) == -1) {
-                $('#chromecastPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="chromecast" name="'+name+'" value="'+id+'"> <br />');
+                $('#chromecastPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="chromecast" name="cast" value="'+id+'"> <br />');
                 upnpDevices.push(name);
                 chromecastPlayers.push(name)
               }
-            }
           }
         });
         $.each(state.devices.airplay.getDevices(),function(index,item) {
           var name = item.name;
           var id = item.id;
           if(name !== "") {
-            if (upnpDevices.length === 0) {
-              $('#airplayPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="airplay" name="'+name+'" checked="true" value="'+id+'"> <br />');
-              upnpDevices.push(name);
-              airplayPlayers.push(name)
-            } else {
-              if(airplayPlayers.indexOf(name) == -1) {
-                $('#airplayPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" type="radio" data-type="airplay" name="'+name+'" value="'+id+'"> <br />');
+              if(aiplayPlayersArr.indexOf(name) == -1) {
+                $('#airplayPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="airplay" name="cast" value="'+id+'"> <br />');
                 upnpDevices.push(name);
-                airplayPlayers.push(name);
+                aiplayPlayersArr.push(name);
               }
-            }
           }
         });
-    } catch(err) {}
-    if(upnpDevices.length !== 0 ) {
+        var pos = $($('button[aria-label="cast"]')[0]).offset().left == 0 ?  $($('button[aria-label="cast"]')[1]).offset() : $($('button[aria-label="cast"]')[0]).offset();
+        var height = $('#castPopup').height() + 20;
+        var left = pos.left-150;
+        $('#castPopup').css({left:left+'px'})
+    } catch(err) {
+      console.log(err)
+    }
       if(airplayPlayers.length == 0) {
         $('#airplayPlayers').hide()
+        $('#airplayLabel').hide()
       } else {
         $('#airplayPlayers').show()
+        $('#airplayLabel').show()
       }
       if (chromecastPlayers.length == 0) {
         $('#chromecastPlayers').hide()
+        $('#chromecastLabel').hide()
       } else {
         $('#chromecastPlayers').show()
+        $('#chromecastLabel').show()
       }
       if (dlnaPlayers.length == 0) {
         $('#dlnaPlayers').hide()
+        $('#dlnaLabel').hide()
       } else {
         $('#dlnaPlayers').show()
+        $('#dlnaLabel').show()
       }
-      $('#upnpRenderersContainer').show();
-      $('#upnpBubble').show();
-      loadUpnpQtip()
-    } else {
-      $('#upnpRenderersContainer').hide();
-      $('#upnpBubble').hide();
-    }
   }
+
+  $(document).on('click','.mejs-cast-button',function() {
+    var pos = $('button[aria-label="cast"]').offset()
+    if(!$('#castPopup').is(':visible')) {
+      Cast.init(state,updateUpnpList)
+      var height = $('#castPopup').height() + 20;
+      var left = pos.left-150;
+      $('#castPopup').css({left:left+'px'})
+      $('#castPopup').show().focus()
+    } else {
+      $('#castPopup').hide()
+    }
+  })
+
+  $(document).on('click','input[name="cast"]',function() {
+    var inputClass = $(this).attr('class');
+    var selected = $(this).attr('data-name');
+    var type = $(this).attr('data-type');
+    console.log('input clicked', selected)
+    if(selected == "disable") {
+      $('#upnpTranscoding').hide()
+      upnpToggleOn = false
+      $('.mejs-cast-button').removeClass('cast-on').addClass('cast-off')
+    } else {
+      upnpToggleOn = true
+      $('.mejs-cast-button').removeClass('cast-off').addClass('cast-on')
+      $('#upnpTranscoding').show()
+    }
+    if(type == "upnp") {
+      __.some(state.devices.dlna.getDevices(), function(el, index) {
+        if (el.name === selected) {
+          upnpDevice = el.name
+          mediaRenderer = el;
+          mediaRendererType = 'upnp';
+        }
+      });
+    } else if (type== 'chromecast'){
+      __.some(state.devices.chromecast.getDevices(), function(el, index) {
+        if (el.name === selected) {
+          upnpDevice= el.device
+          mediaRenderer = el;
+          mediaRendererType = "chromecast"
+        }
+      });
+    } else {
+      __.some(state.devices.airplay.getDevices(), function(el, index) {
+        if (el.name === selected) {
+          upnpDevice= el.device
+          mediaRenderer = el;
+          mediaRendererType = "airplay"
+        }
+      });
+    }
+    $('#castPopup').hide()
+})
+
+$(document).on('click',"#transcodingInput", function(e) {
+  if ($(this).is(':checked')) {
+    upnpTranscoding = true;
+  } else {
+    upnpTranscoding = false;
+  }
+});
 
 
   function loadUpnpQtip() {
-      var text = $('#upnpPopup').html();
+      var text = $('#castPopup').html();
       $("#upnp-toggle").qtip({
         content : {text: text},
         position: {

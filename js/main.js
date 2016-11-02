@@ -163,9 +163,6 @@ Youtube \
 <a id="upnp-toggle" class="upnp tiptip upnp-disabled"></a> \
 <form id="upnpPopup" style="display:none;"></form> \
 </div>\
-<div id="upnpTranscoding" style="margin-top:10px;display:none;"> \
-<span>' + _("Enable transcoding") + '</span> \
-<input type="checkbox" id="transcodingInput" name="enableTranscoding"></input> \
 </div>\
 </div>\
 </div>\
@@ -463,6 +460,7 @@ var htmlContent =
 <progress id="progress-bar" min=\'0\' max=\'100\' value=\'0\'></progress> \
 </div> \
 <div id="playlistBtnSub"></div>  \
+<div id="castBtnSub"></div>  \
 <div id="transcodingBtnSub"></div> \
 <div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
 <div id="subPlayer-title-container"></div> \
@@ -605,6 +603,7 @@ function main() {
 
   // navigation setup
   $(document).on("click", "li a.tab-pane", function(e) {
+    $('#castPopup').hide()
     updateLazy = false;
     try {
       engine.pageLoading = false;
@@ -631,6 +630,7 @@ function main() {
     }, 100);
   });
   $(document).on("click", "#sectionsContainer a", function(e) {
+    $('#castPopup').hide()
     var id;
     try {
       engine.pageLoading = false;
@@ -769,17 +769,6 @@ function main() {
     $("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
   });
   $("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
-  $("#transcodingInput").on('click', function(e) {
-    if ($('#transcodingInput').is(':checked')) {
-      upnpTranscoding = true;
-      $('button[aria-controls="transcodeBtn"]').removeClass('transcoder-disabled').addClass('transcoder-enabled');
-      $('button[aria-controls="transcodeBtn"]').attr('title', _('transcoding enabled'));
-    } else {
-      upnpTranscoding = false;
-      $('button[aria-controls="transcodeBtn"]').removeClass('transcoder-enabled').addClass('transcoder-disabled');
-      $('button[aria-controls="transcodeBtn"]').attr('title', _('transcoding disabled'));
-    }
-  });
 
   // fullscreen signal and callback
   var left;
@@ -1366,78 +1355,6 @@ function main() {
     $('#playerTopBar').show();
   });
 
-  // airplay
-  $('#airplay-toggle').click(function(e) {
-    e.preventDefault();
-    if (airplayToggleOn === false) {
-      playAirMedia = true;
-      airplayToggleOn = true;
-      login(getAirMediaReceivers);
-      $('#airplay-toggle').removeClass('airplay-disabled').addClass('airplay-enabled');
-    } else {
-      $('#airplay-toggle').qtip('destroy', true);
-      $('#airplay-toggle').removeClass('airplay-enabled').addClass('airplay-disabled');
-      airplayToggleOn = false;
-      playAirMedia = false;
-    }
-  });
-
-  $('#upnp-toggle').click(function(e) {
-    e.preventDefault();
-    if (upnpToggleOn === false) {
-      playUpnpMedia = true;
-      upnpToggleOn = true;
-      $('#upnp-toggle').removeClass('upnp-disabled').addClass('upnp-enabled');
-      $('#upnpTranscoding').show();
-    } else {
-      $('#upnp-toggle').qtip('destroy', true);
-      $('#upnp-toggle').removeClass('upnp-enabled').addClass('upnp-disabled');
-      $('#upnpTranscoding').hide();
-      upnpToggleOn = false;
-      playUpnpMedia = false;
-    }
-  });
-  $(document).on('change', '.qtip-content input', function() {
-    var inputClass = $(this).attr('class');
-    var selected = $(this).prop('name');
-    var type = $(this).attr('data-type');
-    console.log(type)
-    if (inputClass === "freebox") {
-      airMediaDevice = selected;
-    } else {
-      if(type == "upnp") {
-        __.some(state.devices.dlna.getDevices(), function(el, index) {
-          if (el.name === selected) {
-            upnpDevice = el.name
-            mediaRenderer = el;
-            mediaRendererType = 'upnp';
-          }
-        });
-      } else if (type== 'chromecast'){
-        __.some(state.devices.chromecast.getDevices(), function(el, index) {
-          if (el.name === selected) {
-            upnpDevice= el.device
-            mediaRenderer = el;
-            mediaRendererType = "chromecast"
-          }
-        });
-      } else {
-        __.some(state.devices.airplay.getDevices(), function(el, index) {
-          if (el.name === selected) {
-            upnpDevice= el.device
-            mediaRenderer = el;
-            mediaRendererType = "airplay"
-          }
-        });
-      }
-    }
-    $(".qtip-content input").each(function() {
-      var name = $(this).prop('name');
-      if (name !== selected) {
-        $(this).prop('checked', '');
-      }
-    });
-  });
   // rotate image
   $('#file_update').click(function(e) {
     e.preventDefault();
@@ -1563,6 +1480,7 @@ function main() {
     updateScroller();
   });
   $('.mejs-playmode-button').clone().appendTo('#playlistBtnSub')
+  $('.mejs-cast-button').clone().appendTo('#castBtnSub')
   $('.song-title').clone().appendTo('#subPlayer-title-container')
 }
 

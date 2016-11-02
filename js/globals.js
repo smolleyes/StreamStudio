@@ -55,10 +55,6 @@ state.playing={}
 state.devices.castMenu={}
 state.playing.location="local"
 
-var aiplayPlayers = []
-var chromecastPlayers = []
-var dlnaPlayers = []
-
 var Jq = $;
 //engines
 var dailymotion = require('dailymotion');

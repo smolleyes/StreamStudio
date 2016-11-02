@@ -62,6 +62,72 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     border-radius: 3px;
 }
 
+.cast-off {
+  background: url('../images/chromecast.png') no-repeat !important;
+	background-size : 24px 24px !important;
+	position : relative;
+	left:82px;
+	top:2px
+}
+
+.cast-on {
+  background: url('../images/chromecast-on.png') no-repeat !important;
+	background-size : 24px 24px !important;
+	position : relative;
+	left:82px;
+	top:2px
+}
+
+.mejs-cast-button-on {
+  background: url('../images/chromecast.png') no-repeat !important;
+}
+
+.mejs-cast-button button, #castBtnSub button {
+  background: none !important;
+	width: 31px;
+	height: 31px;
+	border:none;
+}
+
+#castBtnSub {
+	border: none;
+	position: relative;
+	left: 160px;
+	top: 20px;
+	width:31px !important;
+}
+
+#castPopup input {
+	position: relative !important;
+  margin-left: calc(100% - 12px)  !important;
+  top: -19px  !important;
+}
+
+#castPopup h5 {
+	  margin: 20px 0;
+}
+
+#castPopup {
+	position: absolute;
+	height: auto;
+	font-family: Arial, Helvetica, sans-serif;
+	background: rgba(50, 50, 50, 0.8);
+	z-index: 100003;
+	display:none;
+	-webkit-transition: opacity 400ms ease-in;
+	-moz-transition: opacity 400ms ease-in;
+	transition: opacity 400ms ease-in;
+	width:auto;
+	border-radius: 4px;
+	padding: 5px;
+	bottom:65px;
+}
+
+#dlnaPlayers, #airplayPlayers, #chromecastPlayers {
+	width:auto;
+	height:auto;
+}
+
 a {
 	text-decoration: none !important;
 }
