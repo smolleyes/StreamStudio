@@ -72,16 +72,14 @@ function storeCpbDatas(lang,list,results,cb) {
 			try {
 				item.season = parseInt(item.title.toUpperCase().match(/S(\d{1,3})/)[1])
 				item.type = 'episode'
-				item.needRebuild = false
 			} catch(err) {
 				try {
 					item.season = parseInt(item.title.toUpperCase().replace(/\s+/g,'').match(/SAISON(\d{1,3})/).pop())
-					item.needRebuild = false
 					item.type = 'complete'
 				} catch(err) {
 					try {
-						item.season = parseInt(item.title.toUpperCase().match(/(\d{1,3}\s)/)[1])
-						item.needRebuild = true
+						item.season = parseInt(item.title.toUpperCase().match(/(\s\d{1,3}\s)/)[1])
+						results.needRebuild = true
 						item.type = 'episode'
 					} catch(err) {
 						return true;
@@ -117,8 +115,6 @@ function storeCpbDatas(lang,list,results,cb) {
 				if(!item.needRebuild && !results.seasons[lang][item.season]['episode'].hasOwnProperty('complete')) {
 					item.type = 'complete';
 					results.seasons[lang][item.season]['episode']['complete'] = item;
-				} else {
-					results.needRebuild = true
 				}
 			}
 		} catch(err) {}

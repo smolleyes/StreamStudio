@@ -32,6 +32,7 @@ $(document).on('click', '#reloadSeries', function(e) {
     reloadSeries();
 });
 
+$(document).off('click', '.seasonItem');
 $(document).on('click', '.seasonItem', function(e) {
     $('#seasonsList').find('.active').removeClass('active');
     var id = $(this).attr('data-id');
@@ -44,6 +45,7 @@ $(document).on('click', '.changeLang', function(e) {
     $('#seasonsList').find('.active').removeClass('active');
     var id = $(this).attr('data-id');
     var lang = $(this).attr('data-lang');
+    console.log('dans changelang', id,lang)
     loadSerie(id, lang);
 })
 
@@ -283,6 +285,7 @@ function printSeriesList(list) {
 }
 
 function loadSerie(id,lang) {
+  console.log('dans load serie', lang, id)
     $("#searchSeriesContainer").hide();
     bongo.db('seriesDb').collection('series').find({
         'id': id
@@ -320,7 +323,7 @@ function loadSerie(id,lang) {
             $('#seriesContainer').empty().append(html);
             console.log("AVANT CHARGEMENT SERIE:", lang,serie.seasonsCount['fr'],serie.seasonsCount['vostfr'])
             if(!lang && serie.seasonsCount['fr'] !== 0 && serie.seasonsCount['vostfr'] !== 0) {
-              var lang = serie.seasonsCount['fr'] > serie.seasonsCount['vostfr'] ? 'fr' : 'vostfr';
+              lang = serie.seasonsCount['fr'] >= serie.seasonsCount['vostfr'] ? 'fr' : 'vostfr';
               loadAllSeasons(serie,lang)
             } else {
               if(lang && serie.seasonsCount[lang] !== 0) {
