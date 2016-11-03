@@ -325,6 +325,7 @@ function loadUpnpRenderers() {
   $(document).on('click','.mejs-cast-button',function() {
     var pos = $('button[aria-label="cast"]').offset()
     if(!$('#castPopup').is(':visible')) {
+      $('#upnpTranscoding').show()
       Cast.init(state,updateUpnpList)
       var height = $('#castPopup').height() + 20;
       $('#castPopup').css({left:left+'px'}).show().focus()
@@ -339,13 +340,11 @@ function loadUpnpRenderers() {
     var type = $(this).attr('data-type');
     console.log('input clicked', selected)
     if(selected == "disable") {
-      $('#upnpTranscoding').hide()
       upnpToggleOn = false
       $('.mejs-cast-button').removeClass('cast-on').addClass('cast-off')
     } else {
       upnpToggleOn = true
       $('.mejs-cast-button').removeClass('cast-off').addClass('cast-on')
-      $('#upnpTranscoding').show()
     }
     if(type == "upnp") {
       __.some(state.devices.dlna.getDevices(), function(el, index) {

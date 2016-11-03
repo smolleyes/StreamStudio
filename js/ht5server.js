@@ -393,6 +393,7 @@ function startStreaming(req, res, width, height) {
         currentRes= null;
         console.log('request end!!!!!!!!!!!!!!!!')
         ffmpegLive = false;
+        state.playing.state = "STOPPED"
         cleanffar();
     });
 }
@@ -526,14 +527,22 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
             console.log('grep stderr: ' + data);
 
             if (data.toString().substr(0,5) == 'frame') {
-                var time = data.toString().match(/time=(\d\d:\d\d:\d\d\.\d\d)/)[1];
+                var time = data.toString().match(/time=(\d\d:\d\d:\d\d)/)[1];
                 var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
                 var pct = (seconds / total_time) * 100;
                 var total = pct+mediaCurrentPct;
                 if (parseInt(total) >= 100) {
                     return;
-                } else if (playFromYoutube) {
+                } else if (playFromYoutube || upnpToggleOn && state.playing.location == "chromecast") {
                    $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
+                   if(upnpToggleOn && state.playing.location == "chromecast") {
+                     $('.mejs-time-current').css('width', pct+'%');
+                     state.playing.currentTime = seconds
+                     state.playing.duration = mediaDuration
+                     updateMiniPlayer()
+                     updateProgressBar()
+                     state.playing.state = "PLAYING"
+                   }
                 }
             }
 
@@ -544,6 +553,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 }
 
 function cleanffar() {
+    state.playing.state = "STOPPED"
     player.options.duration = 0;
     $.each(ffar, function(index, ff) {
         try {

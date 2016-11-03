@@ -737,6 +737,13 @@ function launchPlay() {
 			}
 		}
 		if(upnpToggleOn) {
+			if(upnpTranscoding) {
+					if(mediaRendererType == "chromecast") {
+						currentMedia.type = currentMedia.mime || 'video/mp4'
+					}
+					state.media = currentMedia;
+			}
+			console.log('avant lecture upnp', currentMedia)
 			mediaRenderer.play(currentMedia.link,currentMedia)
 			state.playing.location=mediaRendererType
 			startStatusInterval()
@@ -983,7 +990,7 @@ function updateProgressBar() {
 	if(upnpToggleOn){
 		duree = state.playing.duration;
 		player.media.duration = state.playing.duration
-		mediaDuration = state.playing.duration
+		mediaDuration = mediaDuration == 0 ? state.playing.duration : mediaDuration
 		try {
 			var percentage = ((100 / duree) * (state.playing.currentTime));
 			progressBar.value = percentage;
