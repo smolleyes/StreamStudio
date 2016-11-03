@@ -52,16 +52,16 @@ function analyseCpbDatas(results,cb) {
 				} else {
 					verifySerie(datas,cb)
 				}
-		});
-	} else {
-		if(vost.length !== 0) {
-			console.log('load vostfr',vost)
-			storeCpbDatas('vostfr',vost,results,function(datas){
-				verifySerie(datas,cb)
 			});
+		} else {
+			if(vost.length !== 0) {
+				console.log('load vostfr',vost)
+				storeCpbDatas('vostfr',vost,results,function(datas){
+					verifySerie(datas,cb)
+				});
+			}
 		}
 	}
-}
 }
 
 function storeCpbDatas(lang,list,results,cb) {
@@ -80,7 +80,7 @@ function storeCpbDatas(lang,list,results,cb) {
 					item.type = 'complete'
 				} catch(err) {
 					try {
-						item.season = parseInt(item.title.toUpperCase().match(/(\d{1,3})/)[1])
+						item.season = parseInt(item.title.toUpperCase().match(/(\d{1,3}\s)/)[1])
 						item.needRebuild = true
 						item.type = 'episode'
 					} catch(err) {
@@ -142,7 +142,7 @@ function verifySerie(results,cb) {
 		if(Object.keys(results.seasons[lang]).length !== 0) {
 			results.seasonsCount[lang]=Object.keys(results.seasons[lang]).length
 		}
-  });
+	});
 	if(results.needRebuild) {
 		buildSeasons(results,cb)
 	} else {
@@ -165,17 +165,17 @@ function buildSeasons(results,cb) {
 			e.type = "episode"
 			var lang = e.title.toUpperCase().indexOf('VOSTFR') !== -1 ? 'vostfr' : 'fr';
 			try {
-			if(seasons[lang][parseInt(e.season)]) {
-				seasons[lang][e.season].episode[parseInt(ep.absolute_number)] = e;
-			} else {
-				results.seasonsCount[lang] += 1
-				seasons[lang][e.season] = {}
-				seasons[lang][e.season].episode = {}
-				seasons[lang][e.season].episode[parseInt(ep.absolute_number)] = e;
+				if(seasons[lang][parseInt(e.season)]) {
+					seasons[lang][e.season].episode[parseInt(ep.absolute_number)] = e;
+				} else {
+					results.seasonsCount[lang] += 1
+					seasons[lang][e.season] = {}
+					seasons[lang][e.season].episode = {}
+					seasons[lang][e.season].episode[parseInt(ep.absolute_number)] = e;
+				}
+			} catch(err){
+				console.log(err)
 			}
-		} catch(err){
-			console.log(err)
-		}
 		}
 	})
 	storeSerieToDb(results,cb)

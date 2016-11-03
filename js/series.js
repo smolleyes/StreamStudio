@@ -289,7 +289,6 @@ function loadSerie(id,lang) {
     }).toArray(function(error, list) {
         if (!error) {
             var serie = list[0];
-            console.log(serie)
             var genre = serie.infos.Genre !== null ? serie.infos.Genre : _("Unknown");
             var network = serie.infos.Network !== null ? serie.infos.Network : _("Unknown");
             var status = serie.infos.Status == 'Continuing' ? _("Continuing") : _("Ended");
@@ -319,13 +318,19 @@ function loadSerie(id,lang) {
 					</div> \
 				</div>';
             $('#seriesContainer').empty().append(html);
-            if(lang && serie.seasonsCount[lang] !== 0) {
+            console.log("AVANT CHARGEMENT SERIE:", lang,serie.seasonsCount['fr'],serie.seasonsCount['vostfr'])
+            if(!lang && serie.seasonsCount['fr'] !== 0 && serie.seasonsCount['vostfr'] !== 0) {
+              var lang = serie.seasonsCount['fr'] > serie.seasonsCount['vostfr'] ? 'fr' : 'vostfr';
               loadAllSeasons(serie,lang)
             } else {
-              if(serie.seasonsCount['fr'] !== 0) {
-                loadAllSeasons(serie,'fr')
+              if(lang && serie.seasonsCount[lang] !== 0) {
+                loadAllSeasons(serie,lang)
               } else {
-                loadAllSeasons(serie,'vostfr')
+                if(serie.seasonsCount['fr'] !== 0) {
+                  loadAllSeasons(serie,'fr')
+                } else {
+                  loadAllSeasons(serie,'vostfr')
+                }
               }
             }
         } else {
