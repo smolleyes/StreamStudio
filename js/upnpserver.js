@@ -327,9 +327,7 @@ function loadUpnpRenderers() {
     if(!$('#castPopup').is(':visible')) {
       Cast.init(state,updateUpnpList)
       var height = $('#castPopup').height() + 20;
-      var left = pos.left-150;
-      $('#castPopup').css({left:left+'px'})
-      $('#castPopup').show().focus()
+      $('#castPopup').css({left:left+'px'}).show().focus()
     } else {
       $('#castPopup').hide()
     }

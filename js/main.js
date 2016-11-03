@@ -308,10 +308,6 @@ var htmlContent =
 <input class="pluginCheckBox" type="checkbox" id="vimeo" name="vimeo"> \
 </div>--> \
 <div class="ItemCheckbox left"> \
-<label for="thepiratebay">ThePiratebay</label> \
-<input class="pluginCheckBox" type="checkbox" id="thepiratebay" name="thepiratebay"> \
-</div> \
-<div class="ItemCheckbox left"> \
 <label for="omgtorrent">Cpasbien</label> \
 <input class="pluginCheckBox" type="checkbox" id="cpasbien" name="cpasbien"> \
 </div> \
