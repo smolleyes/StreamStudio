@@ -394,7 +394,7 @@ app.updateStats = function(streamInfo) {
                     totalBuffered = 0;
                     totalBytes = 0;
                 }
-                $('.mejs-time-loaded').width(downloadedPct + '%')
+                //$('.mejs-time-loaded').width(downloadedPct + '%')
                 $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
             }
         }

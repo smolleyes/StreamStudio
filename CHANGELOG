@@ -1,3 +1,7 @@
+V 3.0
+ * rewrite series section, separate fr and vostfr
+ * small bugs fix
+
 V 2.9.9.9
  * fix app loading without internet
  * add airplay support

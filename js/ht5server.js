@@ -78,7 +78,7 @@ function startStreaming(req, res, width, height) {
             sheight = 480;
         }
         var link = parsedLink.split('?file=')[1];
-        
+
         if (parsedLink.indexOf('&key') !== -1) {
             megaKey = linkParams[1].replace('key=', '');
         }
@@ -91,7 +91,7 @@ function startStreaming(req, res, width, height) {
                 link = link.replace(/&start=.*/,'')
             }
         }
-        
+
         if (parsedLink.indexOf('&size') !== -1) {
             try {
                 megaSize = parsedLink.match(/&size=(.*?)&/)[1];
@@ -109,7 +109,7 @@ function startStreaming(req, res, width, height) {
         var megaName = $('.song-title').text().replace(_('Playing: '), '');
         var megaType = megaName.split('.').pop().toLowerCase();
         var x = null;
-        
+
         if(os.platform == "win32") {
             link = link.replace(/ /g,'\ ');
         }
@@ -236,7 +236,7 @@ function startStreaming(req, res, width, height) {
         }
         //if tv/upnp
         else if(playFromUpnp){
-            console.log('opening upnp link ' + link) 
+            console.log('opening upnp link ' + link)
             if(parsedLink.indexOf('freeboxtv') !== -1) {
                 link = parsedLink.replace('/?file=','');
                 currentMedia.link = link;
@@ -358,7 +358,7 @@ function startStreaming(req, res, width, height) {
                             console.log('child process exited with code ' + code);
                             //res.end();
                         });
-                            
+
                         megaDownload = file.download().pipe(ffmpeg.stdin);
                         megaDownload.on('error', function(err) {
                             console.log('ffmpeg stdin error...' + err);
@@ -375,7 +375,7 @@ function startStreaming(req, res, width, height) {
                         });
                         ffmpeg.stdout.pipe(res);
                         playFromMega = true;
-                        
+
                     } else {
                         console.log('playing movie without transcoding');
                         file.download().pipe(res);
@@ -401,16 +401,16 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
     if(!upnpToggleOn) {
         link = decodeURIComponent(link);
     }
-    
+
     var olink = '';
     if(playFromYoutube) {
         olink = link;
         var link = link.split('::')[0];
     }
-    
+
     var p;
     if (process.platform === 'win32') {
-        p = spawn(execDir+'/ffprobe.exe',[''+decodeURIComponent(link)+'', '-show_format','-v', 'quiet']); 
+        p = spawn(execDir+'/ffprobe.exe',[''+decodeURIComponent(link)+'', '-show_format','-v', 'quiet']);
     } else {
         p = spawn(execDir+'/ffprobe',[''+decodeURIComponent(link)+'', '-show_format','-v', 'quiet']);
     }
@@ -423,7 +423,7 @@ function checkDuration(link, device, host, bitrate,res,seekTo) {
                 mediaDuration = parseFloat(rep);
             }
         }
-    }); 
+    });
     p.on('exit',function(code){
         if(code === 0 && mediaDuration !== 0) {
             if(playFromYoutube) {
@@ -462,7 +462,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         audio = 'libmp3lame';
     } else {
         audio = 'aac';
-    } 
+    }
     if (host === undefined || link !== '') {
         //local file...
         var h = window.innerHeight
@@ -472,7 +472,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
             var carray = ['mp3','opus','wav','flac','m4a','wma','ape'];
             if(obj.name == 'StreamStudio' && carray.indexOf(currentMedia.title.split('.').pop()) !== -1 || playFromIcecast) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
-                // "ebur128=video=1:meter=18" 
+                // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
                 args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
@@ -492,7 +492,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 args = ['-ss' , start,'-re','-i', vlink, '-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
             } else {
                 args = ['-ss' , start,'-re','-i', vlink, '-c:v', 'copy','-c:a', 'libopus','-threads', '0','-f','matroska', 'pipe:1'];
-            }          
+            }
         }
     } else {
         if(playFromWat) {
@@ -506,10 +506,10 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     console.log("spawn : " + args)
     ffmpeg = spawn(ffmpegPath, args);
     ffar.push(ffmpeg);
-    
+
     var total_time = 0,
         total_data = '';
-        
+
     ffmpeg.stderr.on('data', function(data) {
         if(data) {
             total_data += data.toString();
@@ -524,7 +524,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 initPlayer();
             }
             console.log('grep stderr: ' + data);
-            
+
             if (data.toString().substr(0,5) == 'frame') {
                 var time = data.toString().match(/time=(\d\d:\d\d:\d\d\.\d\d)/)[1];
                 var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
@@ -533,10 +533,10 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 if (parseInt(total) >= 100) {
                     return;
                 } else if (playFromYoutube) {
-                   $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show(); 
+                   $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
                 }
             }
-            
+
         }
     });
 
@@ -567,7 +567,7 @@ function startWebServer() {
     ht5Server = http.createServer(function(req, res) {
         if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
             if(req.url.indexOf("getAirMediaDevices") !== -1) {
-                var list = $(cli._renderers).map(function(i){ 
+                var list = $(cli._renderers).map(function(i){
                     return {
                         "ip":$(this)[0].baseUrl,
                         "id":$(this)[0]._index,

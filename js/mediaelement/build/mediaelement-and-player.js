@@ -3384,7 +3384,6 @@ if (typeof jQuery != 'undefined') {
 			t.handle = handle;
 		},
 		setProgressRail: function(e) {
-			console.log(t,this)
 			var
 				t = this;
 				if(t.media.duration && t.media.duration !== Infinity) {
@@ -3413,7 +3412,6 @@ if (typeof jQuery != 'undefined') {
 				if (percent !== null && t.media && !t.media.paused) {
 					percent = Math.min(1, Math.max(0, percent));
 					// update loaded bar
-					console.log(t.loaded,t.total)
 					if (t.loaded && t.total) {
 						if((t.total.width() * percent) >= 100) {
 							return;
@@ -3433,7 +3431,6 @@ if (typeof jQuery != 'undefined') {
 					if (percent !== null && t.media && !t.media.paused) {
 						percent = Math.min(1, Math.max(0, percent));
 						// update loaded bar
-						console.log(t.loaded,t.total)
 						if (t.loaded && t.total && percent !== null) {
 							t.loaded.width(t.total.width() * (percent+mediaCurrentPct));
 						}
@@ -3460,7 +3457,6 @@ if (typeof jQuery != 'undefined') {
 		},
 		setCurrentRail: function() {
 			var t = this;
-			console.log(t)
 		    if(t.media.duration == Infinity) {
 				if (t.media.currentTime != undefined && mediaDuration || upnpToggleOn) {
 					// update bar and handle
@@ -3468,7 +3464,6 @@ if (typeof jQuery != 'undefined') {
 						var
 							newWidth = Math.round(t.total.width() * (mediaCurrentTime+t.media.currentTime) / mediaDuration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
-							console.log(t.total.width(),newWidth,handlePos)
 						if(t.total.width() < newWidth || t.total.width() < handlePos) {
 							return;
 						}
@@ -3483,7 +3478,6 @@ if (typeof jQuery != 'undefined') {
 						var
 							newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
 							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
-							console.log(t.total.width(),newWidth,handlePos)
 							if(t.total.width() < newWidth || t.total.width() < handlePos) {
 								return;
 							}

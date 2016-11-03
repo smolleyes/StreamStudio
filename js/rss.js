@@ -1,5 +1,5 @@
 var Iterator = require('iterator').Iterator;
-
+var shortid = require('shortid')
 bongo.db({
 	name: 'seriesDb',
 	collections: ["series"]
@@ -9,12 +9,16 @@ bongo.db({
 
 function analyseCpbDatas(results,cb) {
 	var seasons = {};
+	seasons.fr = {}
+	seasons.vostfr = {}
 	var fr = [];
 	var vost = [];
 	results.success = true;
 	Iterator.iterate(results.list).forEach(function (src,index) {
 		try {
 			var item = {};
+			item.id = shortid.generate()
+			item.percent = 0
 			item.title = src.title;
 			item.torrentLink = src.torrentLink;
 			item.size = src.size;
@@ -33,70 +37,88 @@ function analyseCpbDatas(results,cb) {
 		}
 	});
 	// if french list is 0 parse vostfr
-	if(fr.length == 0) {
-		storeCpbDatas(vost,results,function(datas){
-			verifySerie(datas,cb)
+	console.log(fr,vost)
+	if(fr.length == 0 && vost.length == 0) {
+		verifySerie(datas,cb)
+	} else {
+		if(fr.length !== 0) {
+			console.log('load fr',fr)
+			storeCpbDatas('fr',fr,results,function(datas){
+				if(vost.length !== 0) {
+					console.log('load vostfr',vost)
+					storeCpbDatas('vostfr',vost,datas,function(datas){
+						verifySerie(datas,cb)
+					});
+				} else {
+					verifySerie(datas,cb)
+				}
 		});
 	} else {
-		// else parse it then try vost after callback
-		storeCpbDatas(fr,results,function(datas){
-			// if vost list is 0 call omgtorrent
-			if(vost.length == 0) {
+		if(vost.length !== 0) {
+			console.log('load vostfr',vost)
+			storeCpbDatas('vostfr',vost,results,function(datas){
 				verifySerie(datas,cb)
-			} else {
-				// else parse vost then call omgtorrent in callback
-				storeCpbDatas(vost,datas,function(datas){
-					verifySerie(datas,cb)
-				});
-			}
-		})
+			});
+		}
 	}
 }
+}
 
-function storeCpbDatas(list,results,cb) {
+function storeCpbDatas(lang,list,results,cb) {
+	results.needRebuild = false;
 	Iterator.iterate(list).forEach(function (item,index) {
 		try {
 			//detect season
 			try {
 				item.season = parseInt(item.title.toUpperCase().match(/S(\d{1,3})/)[1])
 				item.type = 'episode'
+				item.needRebuild = false
 			} catch(err) {
 				try {
-					item.season = parseInt(item.title.toUpperCase().match(/SAISON (\d{1,3})/)[1])
+					item.season = parseInt(item.title.toUpperCase().replace(/\s+/g,'').match(/SAISON(\d{1,3})/).pop())
+					item.needRebuild = false
 					item.type = 'complete'
 				} catch(err) {
-					return true;
+					try {
+						item.season = parseInt(item.title.toUpperCase().match(/(\d{1,3})/)[1])
+						item.needRebuild = true
+						item.type = 'episode'
+					} catch(err) {
+						return true;
+					}
 				}
 			}
 			// parse episodes to extract seasons number
-			if(!results.seasons.hasOwnProperty(item.season)){
-				results.seasons[item.season] = {}
-				results.seasons[item.season]['episode'] = {}
+			if(!results.seasons[lang].hasOwnProperty(item.season)){
+				results.seasons[lang][item.season] = {}
+				results.seasons[lang][item.season]['episode'] = {}
 			}
 			// check if we have an episode number, set is a episode type first
 			try {
 				item.ep = parseInt(item.title.toUpperCase().match(/S(\d{1,3})E(\d{1,3})/)[2]);
 				Iterator.iterate(results.infos['Episodes']).forEach(function(e) {
-					if(!results.seasons[item.season]['episode'].hasOwnProperty(item.ep)) {
+					if(!results.seasons[lang][item.season]['episode'].hasOwnProperty(item.ep)) {
 						if(results.infos['Episodes'].hasOwnProperty(item.ep)) {
 							if(e['EpisodeNumber'] && parseInt(e['EpisodeNumber']) == item.ep && e['SeasonNumber'] && parseInt(e['SeasonNumber']) == item.season) {
 								if(e['EpisodeName'] !== null) {
 									item.title = e['EpisodeName'];
-									results.seasons[item.season]['episode'][item.ep] = item;
+									results.seasons[lang][item.season]['episode'][item.ep] = item;
 								} else {
-									results.seasons[item.season]['episode'][item.ep] = item;
+									results.seasons[lang][item.season]['episode'][item.ep] = item;
 								}
 							}
 						} else {
-							results.seasons[item.season]['episode'][item.ep] = item;
+							results.seasons[lang][item.season]['episode'][item.ep] = item;
 						}
 					}
 				});
 			} catch(err) {
 				// if not if we have a season number, add it as complete season torrent...
-				if(!results.seasons[item.season]['episode'].hasOwnProperty('complete')) {
+				if(!item.needRebuild && !results.seasons[lang][item.season]['episode'].hasOwnProperty('complete')) {
 					item.type = 'complete';
-					results.seasons[item.season]['episode']['complete'] = item;
+					results.seasons[lang][item.season]['episode']['complete'] = item;
+				} else {
+					results.needRebuild = true
 				}
 			}
 		} catch(err) {}
@@ -106,47 +128,50 @@ function storeCpbDatas(list,results,cb) {
 
 function verifySerie(results,cb) {
 	// count valid seasons
-	results.seasonsCount = 0;
-	//console.log(results)
-	if(Object.keys(results.seasons).length == 0) {
-		if(Object.keys(results.list).length !== 0) {
-			return buildSeasons(results,cb)
-		}
+	results.seasonsCount ={}
+	results.seasonsCount['fr'] = 0;
+	results.seasonsCount['vostfr'] = 0;
+	var langs = ['fr','vostfr']
+	console.log(results,Object.keys(results.seasons['fr']).length  && Object.keys(results.seasons['vostfr']).length)
+	if(Object.keys(results.seasons['fr']).length == 0 && Object.keys(results.seasons['vostfr']).length == 0 ) {
 		swal(_("Error!"), _("No torrents found for %s, sorry !",results.name), "error");
 		return loadMySeries();
 	}
-	var num = 1;
-	$.each(results.seasons,function(key,val) {
-		if(Object.keys(val.episode).length > 0) {
-			results.seasonsCount+=1;
+	//console.log(results)
+	Iterator.iterate(langs).forEach(function(lang) {
+		if(Object.keys(results.seasons[lang]).length !== 0) {
+			results.seasonsCount[lang]=Object.keys(results.seasons[lang]).length
 		}
-		if(num == Object.keys(results.seasons).length) {
-			storeSerieToDb(results,cb)
-			//return cb(results);
-		}
-		num += 1;
-	});
+  });
+	if(results.needRebuild) {
+		buildSeasons(results,cb)
+	} else {
+		storeSerieToDb(results,cb)
+	}
 }
 
 function buildSeasons(results,cb) {
-	var seasons = results.seasons
-	var list = results.list
-	var episodes = results.infos['Episodes']
-	Iterator.iterate(list).forEach(function(e) {
-		var epNum = parseInt(e.title.match(/\d{1,4}/)).toString()
+	results.seasons['fr'] = {}
+	results.seasons['vostfr'] = {}
+	results.seasonsCount['fr'] = 0
+	results.seasonsCount['vostfr'] = 0
+	var episodes = results.infos["Episodes"];
+	var seasons = results.seasons;
+	Iterator.iterate(results.list).forEach(function(e) {
+		var epNum = parseInt(e.title.match(/\d{2,4}/)).toString()
 		var ep = __.findWhere(episodes,{absolute_number:epNum})
 		if(ep) {
-			var epi = {}
 			e.season = parseInt(ep.SeasonNumber)
 			e.type = "episode"
+			var lang = e.title.toUpperCase().indexOf('VOSTFR') !== -1 ? 'vostfr' : 'fr';
 			try {
-			if(seasons[parseInt(e.season)]) {
-				seasons[e.season].episode[parseInt(ep.absolute_number)] = e;
+			if(seasons[lang][parseInt(e.season)]) {
+				seasons[lang][e.season].episode[parseInt(ep.absolute_number)] = e;
 			} else {
-				results.seasonsCount += 1
-				seasons[e.season] = {}
-				seasons[e.season].episode = {}
-				seasons[e.season].episode[parseInt(ep.absolute_number)] = e;
+				results.seasonsCount[lang] += 1
+				seasons[lang][e.season] = {}
+				seasons[lang][e.season].episode = {}
+				seasons[lang][e.season].episode[parseInt(ep.absolute_number)] = e;
 			}
 		} catch(err){
 			console.log(err)

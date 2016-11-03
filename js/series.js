@@ -36,8 +36,17 @@ $(document).on('click', '.seasonItem', function(e) {
     $('#seasonsList').find('.active').removeClass('active');
     var id = $(this).attr('data-id');
     var num = $(this).attr('data-num');
-    loadSeasonTable(id, num);
+    var lang = $(this).attr('data-lang');
+    loadSeasonTable(lang,id, num);
 })
+
+$(document).on('click', '.changeLang', function(e) {
+    $('#seasonsList').find('.active').removeClass('active');
+    var id = $(this).attr('data-id');
+    var lang = $(this).attr('data-lang');
+    loadSerie(id, lang);
+})
+
 
 $(document).on('click', '.removeSerie', function(e) {
     var id = $(this).attr('data-id');
@@ -244,12 +253,15 @@ function printSeriesList(list) {
     $("#seriesContainer p").empty().append('<p>' + _("%s series in your favorites", list.length) + '</p>');
     $('#mySeries').empty();
     Iterator.iterate(list).forEach(function(e) {
-        var seasonString = parseInt(e.seasonsCount) > 1 ? _("seasons") : _("season");
+        var fr = e.seasonsCount['fr']
+        var vostfr = e.seasonsCount['vostfr']
+        var count = fr > vostfr ? fr : vostfr
+        var seasonString = count > 1 ? _("seasons") : _("season");
         var newItems = parseInt(e.newItems) > 0 ? '<span class="notifCircle" title="' + _("%s new episode(s)", e.newItems) + '">' + e.newItems + '</span>' : '';
         var html = '<li id="' + e.id + '" class="serieItem" style="border:none !important;"> \
 		<span class="optionsTop" style="display:none;"></span> \
 		<div id="optionsTopInfos" style="display:none;"> \
-		<span><i class="glyphicon glyphicon-list-alt"></i>' + e.seasonsCount + ' ' + seasonString + '</span> \
+		<span><i class="glyphicon glyphicon-list-alt"></i>' + count + ' ' + seasonString + '</span> \
 		</div> \
 		<div class="mvthumb"> \
 		<img class="cpbthumb" style="float:left;" src="' + e.poster + '" /> \
@@ -270,13 +282,14 @@ function printSeriesList(list) {
     });
 }
 
-function loadSerie(id) {
+function loadSerie(id,lang) {
     $("#searchSeriesContainer").hide();
     bongo.db('seriesDb').collection('series').find({
         'id': id
     }).toArray(function(error, list) {
         if (!error) {
             var serie = list[0];
+            console.log(serie)
             var genre = serie.infos.Genre !== null ? serie.infos.Genre : _("Unknown");
             var network = serie.infos.Network !== null ? serie.infos.Network : _("Unknown");
             var status = serie.infos.Status == 'Continuing' ? _("Continuing") : _("Ended");
@@ -306,46 +319,59 @@ function loadSerie(id) {
 					</div> \
 				</div>';
             $('#seriesContainer').empty().append(html);
-            var num = 1;
-            $.each(serie.seasons, function(key, val) {
-                if (Object.keys(val.episode).length > 0) {
-                    $('#seasonsList').append('<button href="#" class="seasonItem btn btn-infos" data-id="' + serie.id + '" data-num="' + key + '"><span>' + _("Season") + ' ' + key + '</span></button>');
-                }
-                if (num == Object.keys(serie.seasons).length) {
-                    $('#seasonsList .btn')[0].click();
-                    $('#seriesContainer .row').css('height', 'calc(100% - ' + parseInt(65 + $("#seasonsList").height()) + 'px)');
-                    var rating = parseInt(serie.infos.Rating) / 2;
-                    $('#raty').raty({
-                        score: rating,
-                        path: 'images',
-                        half: true,
-                        click: undefined,
-                        mouseover: undefined,
-                        mouseout: undefined,
-                        readOnly: true
-                    });
-                }
-                num += 1;
-            });
-            $('#seriesContainer').css('background', 'url("' + serie.fanart + '") no-repeat');
+            if(lang && serie.seasonsCount[lang] !== 0) {
+              loadAllSeasons(serie,lang)
+            } else {
+              if(serie.seasonsCount['fr'] !== 0) {
+                loadAllSeasons(serie,'fr')
+              } else {
+                loadAllSeasons(serie,'vostfr')
+              }
+            }
         } else {
             return false;
         }
     });
 }
 
-function loadSeasonTable(id, num) {
-    console.log('hereeeeeeeeeee')
+function loadAllSeasons(serie,lang) {
+  var num = 1;
+    $.each(serie.seasons[lang], function(key, val) {
+        if (Object.keys(val.episode).length > 0) {
+            $('#seasonsList').append('<button href="#" data-lang="'+lang+'" class="seasonItem btn btn-infos" data-id="' + serie.id + '" data-num="' + key + '"><span>' + _("Season") + ' ' + key + '</span></button>');
+        }
+        if (num == serie.seasonsCount[lang]) {
+            $('#seasonsList .btn')[0].click();
+            $('#seriesContainer .row').css('height', 'calc(100% - ' + parseInt(65 + $("#seasonsList").height()) + 'px)');
+            var rating = parseInt(serie.infos.Rating) / 2;
+            $('#raty').raty({
+                score: rating,
+                path: 'images',
+                half: true,
+                click: undefined,
+                mouseover: undefined,
+                mouseout: undefined,
+                readOnly: true
+            });
+        }
+        num += 1;
+    });
+    $('#seriesContainer').css('background', 'url("' + serie.fanart + '") no-repeat');
+}
+
+function loadSeasonTable(lang,id, num) {
+    var otherLang = lang == 'fr' ? 'vostfr' : 'fr';
     bongo.db('seriesDb').collection('series').find({
         'id': id
     }).toArray(function(error, list) {
-        var html = '<div class="bigTable"><div class="panel panel-default"><div class="panel-heading"><h3 style="margin: -6px 0 0 0 !important;color:white;">' + _("Episodes list:") + '</h3></div><div class="nano"><div class="panel-body nano-content"><table class="table table-stripped table-hover table-bordered table-responsive serieTable"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th><th data-field="size">' + _("Seeders") + '</th><th data-field="size">' + _("Leechers") + '</th></tr></thead><tbody>';
+        var changeLang = list[0].seasonsCount[otherLang] !== 0 ? '<button class="changeLang btn btn-info" data-lang="'+otherLang+'" data-id="'+id+'" data-num="'+num+'">'+_("load %s episodes",otherLang)+'</button>' : '';
+        var html = '<div class="bigTable"><div class="panel panel-default"><div class="panel-heading"><h3 style="margin: -6px 0 0 0 !important;color:white;">' + _("Episodes list ("+lang+"):") + ' '+changeLang+'</h3></div><div class="nano"><div class="panel-body nano-content"><table class="table table-stripped table-hover table-bordered table-responsive serieTable"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th><th data-field="size">' + _("Seeders") + '</th><th data-field="size">' + _("Leechers") + '</th></tr></thead><tbody>';
         var count = 1;
         var infos = list[0];
         var cover = "http://thetvdb.com/banners/" + list[0].infos.fanart;
         num = parseInt(num);
         try {
-            $.each(list[0].seasons[num]['episode'], function(i, file) {
+            $.each(list[0].seasons[lang][num]['episode'], function(i, file) {
                 file.cover = '';
                 if (list[0].engine == "eztv") {
                     file.imdbId = infos.eztvId;
@@ -446,9 +472,12 @@ function loadSeasonTable(id, num) {
                         infos.ep = count;
                         html += '<tr><td><a href="#" class="openTorrent ' + newItem + '" data="' + encodeURIComponent(JSON.stringify(file)) + '">' + count + ' - ' + file.title + '</a></td><td><span><i style="display:' + viewed + ';line-height: 23px;margin-right:5px;float:left;" class="glyphicon glyphicon-eye-open"></i>' + watched + '</span></td><td> ' + file.size + '</td><td>' + file.seeders + '</td><td>' + file.leechers + '</td></tr>';
                     }
-                    if (count == Object.keys(list[0].seasons[num]['episode']).length) {
+                    if (count == Object.keys(list[0].seasons[lang][num]['episode']).length) {
                         html += '</tbody></table><div style="clear:both;"></div></div></div></div></div>';
                         $('#epContainer').empty().append(html)
+                        $('.seasonItem').attr('data-lang',lang)
+                        $('.seasonItem').removeClass('active')
+                        $('.seasonItem[data-num="'+num+'"]').addClass('active')
                     }
                     count += 1;
                 }
@@ -461,15 +490,16 @@ function loadSeasonTable(id, num) {
 
 function updateEpisode() {
     var id = $('.btn-infos.active').attr('data-id')
-    $('.active');bongo.db('seriesDb').collection('series').find({
+    var lang = $('.btn-infos.active').attr('data-lang')
+    bongo.db('seriesDb').collection('series').find({
         'id': id
     }).toArray(function(error, list) {
         if(list.length !== 0) {
             var serie = list[0]
-            __.each(serie.seasons[currentEpisode.season].serie,function(ep,index) {
-                if(ep.torrentTitle == currentEpisode.torrentTitle) {
+            __.each(serie.seasons[lang][currentEpisode.season].serie,function(ep,index) {
+                if(ep.id == currentEpisode.id) {
                     ep.newItem=false;
-                    serie.seasons[currentEpisode.season].episode[index] = ep;
+                    serie.seasons[lang][currentEpisode.season].episode[index] = ep;
                     serie.newItems-=1
                 }
             })

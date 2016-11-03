@@ -300,5 +300,8 @@
 	"Transcoding": "Transcodage",
 	"Playing on your airplay device !": "Lecture en cours sur votre péripérique airplay !",
 	"Playing on your upnp device !": "Lecture en cours sur votre péripérique upnp !",
-	"Playing on your chromecast device !": "Lecture en cours sur votre péripérique chromecast !"
+	"Playing on your chromecast device !": "Lecture en cours sur votre péripérique chromecast !",
+	"Episodes list (vostfr):": "Liste des épisodes (vostfr):",
+	"load %s episodes": "Charger les épisodes %s",
+	"Episodes list (fr):": "Liste des épisodes (fr):"
 }
