@@ -325,11 +325,16 @@ $(document).ready(function() {
 		} else {
 			if(upnpToggleOn){
 				newTime = pct * state.playing.duration / 100
-				console.log('SEEKING UPNP TO ', newTime)
-				if(state.playing.location == "airplay") {
-					mediaRenderer.scrub(newTime)
+				if(upnpTranscoding) {
+					var m = state.media
+					m.link = state.media.link.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+					initPlay(m);
 				} else {
-					mediaRenderer.seek(newTime)
+					if(state.playing.location == "airplay") {
+						mediaRenderer.scrub(newTime)
+					} else {
+						mediaRenderer.seek(newTime)
+					}
 				}
 			} else {
 				player.media.setCurrentTime(newTime);
@@ -747,6 +752,7 @@ function launchPlay() {
 			mediaRenderer.play(currentMedia.link,currentMedia)
 			state.playing.location=mediaRendererType
 			startStatusInterval()
+			player.play()
 		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);

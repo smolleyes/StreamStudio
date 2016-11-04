@@ -1,3 +1,7 @@
+V 3.1
+ * add seeking support thru transcoding with dlna/airplay/chromecast
+ * small fix
+
 V 3.0
  * rewrite series section, separate fr and vostfr
  * small bugs fix

@@ -611,7 +611,7 @@ function downloadFFMpeg(link, title, vid, toTorrent, audio) {
             }
             var title = sanitize(title.split('::')[0].trim().replace(/\\|\//g, '_').replace('.webm', '.mkv'));
         } else {
-            title = sanitize(title.replace('.mp4', '.aac'));
+            title = sanitize(title.replace('.mp4', '.mp3'));
         }
     } else {
         vlink = link;
@@ -663,9 +663,9 @@ function downloadFFMpeg(link, title, vid, toTorrent, audio) {
     if (!audio && vlink && alink) {
         encoder = child_process.spawn(ffmpegPath, ['-y', '-i', vlink, '-i', alink, '-c:v', 'libx264', '-c:a', 'copy', '-f', 'matroska', target]);
     } else if (!audio && vlink && !alink) {
-        encoder = child_process.spawn(ffmpegPath, ['-y', '-i', link, '-c:a', 'aac', '-c:v', 'libx264', '-preset', 'ultrafast','-strict', '-2', target]);
+        encoder = child_process.spawn(ffmpegPath, ['-y', '-i', link, '-c:a', 'libmp3lame', '-c:v', 'libx264', '-preset', 'fast', target]);
     } else {
-        encoder = child_process.spawn(ffmpegPath, ['-y', '-i', link, '-c:a', 'aac', '-b:a', '240k', '-strict', '-2', target]);
+        encoder = child_process.spawn(ffmpegPath, ['-y', '-i', link, '-c:a', 'libmp3lame', '-b:a', '320k', target]);
     }
     opt.process = encoder;
     current_download[vid] = opt;

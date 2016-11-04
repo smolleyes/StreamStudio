@@ -456,13 +456,13 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     var start = '00:00:01.00'
     var args;
     if(seekTo !== 0) {
-        start = seekTo+'.0';
+        start = seekTo;
     }
-    if(upnpToggleOn || upnpToggleOn && search_engine == 'twitch') {
+    if(upnpToggleOn) {
         link = decodeURIComponent(link);
         audio = 'libmp3lame';
     } else {
-        audio = 'aac';
+        audio = 'copy';
     }
     if (host === undefined || link !== '') {
         //local file...
@@ -475,7 +475,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
-                args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
+                args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', audio, '-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
                 if(search_engine !== 'dailymotion') {
                     args = ['-ss' , start,'-re','-i', ''+link+'','-sn','-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
@@ -511,11 +511,12 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     var total_time = 0,
         total_data = '';
 
+
     ffmpeg.stderr.on('data', function(data) {
         if(data) {
             total_data += data.toString();
             if (total_data.toString().match(/Duration:\s\d\d:\d\d:\d\d\.\d\d/)) {
-                var time = total_data.toString().match(/Duration:\s(\d\d:\d\d:\d\d\.\d\d)/).toString().substring(10,21);
+                var time = total_data.toString().match(/Duration:\s(\d\d:\d\d:\d\d)/).toString().substring(10,21);
                 var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
                 total_data = '';
                 total_time = seconds;
@@ -533,11 +534,15 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 var total = pct+mediaCurrentPct;
                 if (parseInt(total) >= 100) {
                     return;
-                } else if (playFromYoutube || upnpToggleOn && state.playing.location == "chromecast") {
+                } else if (playFromYoutube || upnpTranscoding) {
                    $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
-                   if(upnpToggleOn && state.playing.location == "chromecast") {
+                   if(upnpToggleOn && upnpTranscoding) {
                      $('.mejs-time-current').css('width', pct+'%');
-                     state.playing.currentTime = seconds
+                     if(seekTo) {
+                       state.playing.currentTime = seconds + hmsToSecondsOnly(seekTo)
+                     } else {
+                       state.playing.currentTime = seconds
+                     }
                      state.playing.duration = mediaDuration
                      updateMiniPlayer()
                      updateProgressBar()

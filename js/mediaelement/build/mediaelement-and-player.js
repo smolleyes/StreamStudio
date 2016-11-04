@@ -3291,30 +3291,34 @@ if (typeof jQuery != 'undefined') {
 							mediaCurrentTime = newTime;
 							seekAsked = true;
 							mouseIsDown = false;
-							if(upnpToggleOn && state.playing.location == "airplay"){
-								mediaRenderer.scrub(newTime)
-							} else if (upnpToggleOn && state.playing.location == "chromecast" || state.playing.location == "upnp") {
-								mediaRenderer.seek(newTime)
+							if(upnpTranscoding) {
+								  var m = state.media
+								  m.link = state.media.link.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+									initPlay(m);
 							} else {
-								//player.setCurrentTime(newTime)
-								var m = {};
-								var l = currentMedia.link.replace(/&start=(.*)/,'')
-								$('.mejs-overlay,.mejs-overlay-loading').show();
-								if(playFromFile) {
-									m.link = l.replace('?file=','?file=file://')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
-								} else if(playFromHttp) {
-									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
-								} else if (torrentPlaying) {
-									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
-								} else if (playFromUpnp) {
-									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
-								} else if (playFromYoutube) {
-									console.log("SEEK IN YOUTUBE")
-									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								if(upnpToggleOn && state.playing.location == "airplay"){
+									mediaRenderer.scrub(newTime)
+								} else if (upnpToggleOn && state.playing.location == "chromecast" || state.playing.location == "upnp") {
+									mediaRenderer.seek(newTime)
+								} else {
+									//player.setCurrentTime(newTime)
+									var m = {};
+									var l = currentMedia.link.replace(/&start=(.*)/,'')
+									$('.mejs-overlay,.mejs-overlay-loading').show();
+									if(playFromFile) {
+										m.link = l.replace('?file=','?file=file://')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+									} else if(playFromHttp) {
+										m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
+									} else if (torrentPlaying) {
+										m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
+									} else if (playFromYoutube) {
+										console.log("SEEK IN YOUTUBE")
+										m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+									}
+									m.title = currentMedia.title;
+									m.cover = currentMedia.cover;
+									initPlay(m);
 								}
-								m.title = currentMedia.title;
-								m.cover = currentMedia.cover;
-								initPlay(m);
 							}
 						}
 
