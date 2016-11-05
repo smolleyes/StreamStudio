@@ -1,4 +1,4 @@
-var VERSION = "3.1.1";
+var VERSION = "3.2";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -134,6 +134,7 @@ var videoResolution = false;
 var upnpPlayer;
 var mediaRendererPaused = false;
 var UPNPserverInit = false;
+var upnpStoppedAsked = false;
 //checks
 temp.mkdir(function(err,path){
 	if(err) {

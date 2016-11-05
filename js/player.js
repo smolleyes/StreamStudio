@@ -75,6 +75,9 @@ $(document).ready(function() {
 	});
 	// stop button
 	$(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
+		if(upnpToggleOn){
+			mediaRenderer.stop()
+		}
 		updateMiniPlayer()
 		try {
 			upnpMediaPlaying = false;
@@ -91,9 +94,7 @@ $(document).ready(function() {
 		$('#playerTopBar').hide();
 		$('#closePlayer').click();
 		stopTorrent();
-		setTimeout(function(){
-			initPlayer();
-		},1000)
+		initPlayer();
 	});
 	// pause/stop button
 	$('.mejs-playpause-button').click(function(e) {
@@ -183,7 +184,7 @@ $(document).ready(function() {
 		console.log('media finished')
 		torObj.retried = false;
 		updateMiniPlayer();
-		on_media_finished();
+		on_media_finished()
 		$('.mejs-overlay-play').show();
 		$(".mejs-overlay-loading").hide();
 	});
@@ -337,6 +338,7 @@ $(document).ready(function() {
 					}
 				}
 			} else {
+				console.log(newTime)
 				player.media.setCurrentTime(newTime);
 			}
 		}
@@ -389,6 +391,11 @@ function initPlayer(stopTorrent) {
 	mediaCurrentTime = 0;
 	playFromSeries = false;
 	fromPlayList = false;
+	player.media.duration = 0
+	state.media = {}
+	state.playing.duration = 0
+	state.playing.currentTime = 0
+	state.playing.state = 'STOPPED'
 	try {
 		$('.mejs-captions-button').remove();
 		$('.mejs-captions-layer').remove();
@@ -444,13 +451,6 @@ function initPlayer(stopTorrent) {
 	$(".mejs-overlay-play").show();
 	// reinit mini Player
 	clearInterval(timeUpdater);
-	// clear cast player
-	if(upnpToggleOn) {
-		try {
-			mediaRenderer.stop()
-			clearInterval(castStatusInterval)
-		} catch(err) {}
-	}
 	timeUpdater = null;
 	$("#subPlayer-title").text(' '+_('Waiting...'));
 	$('#subPlayer-play').show();
@@ -501,6 +501,9 @@ function updateMiniPlayer() {
 }
 
 function startPlay(media) {
+	if(upnpToggleOn && castStatusInterval == null){
+		startStatusInterval()
+	}
 	player.addTrack(media)
 }
 
@@ -570,6 +573,7 @@ function initPlay(media) {
 	var localLink = null;
 	playYoutubeDash = false;
 	playFromWat = false;
+	playFromIcecast = false;
 	try {
 		next_vid = media.next;
 		var link = media.link
@@ -688,44 +692,49 @@ function launchPlay() {
 	// && currentMedia.title.indexOf('.avi') !== -1
 	var carray = ['.mp3','.mp4','.opus','.wav','.flac','.mkv','.ts','.mpeg','.mpg','.ogg','.webm','.ogv'];
 	var aArray = ['.mp3','.opus','.wav','.flac','.m4a','.wma'];
+	var needTranscoding = ['hls','m3u8','manifest']
+	var engineWithoutTranscoding = ['mp3stream']
+	var engineWithTranscoding = ['shoutcast']
 
 	if(engine) {
 		engine_name = engine.engine_name;
 	}
 
-	if(playFromYoutube) {
-		if(settings.transcoding || upnpTranscoding || upnpToggleOn || obj.name == 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p') {
+	// set transcoding if needed
+	if(settings.transcoding) { // by default if forced in settings
+		transcoderEnabled = true
+	} else if(playFromYoutube) { // youtube
+		if(!upnpToggleOn && obj.name == 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p') {
 			transcoderEnabled = true;
-		} else {
-			transcoderEnabled = false;
-		}
-	} else if(upnpTranscoding) {
+	} else if(upnpTranscoding) { //force transcoding when upnp transcoding checked
 		upnpLoading = true;
-		if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
-			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
-			currentMedia.link = link;
+			if(mediaRendererType == "chromecast") {
+				currentMedia.type = currentMedia.mime || 'video/mp4'
+			}
+			state.media = currentMedia;
 		}
-	} else {
-		console.log(path.extname(currentMedia.title))
-		if(settings.transcoding || upnpTranscoding || !upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.indexOf(path.extname(currentMedia.title)) == -1 && engine && engine_name !== "Mp3stream" || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)) !== -1 || playFromUpnp && currentMedia.link.indexOf('videoplayback') !== -1 && videoResolution !== "720p" && videoResolution !== "360p") {
+  // force by engine
+} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
 			transcoderEnabled = true;
-		} else {
-			transcoderEnabled = false;
-		}
+  // force by extension
+  } else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
+		transcoderEnabled = true;
+	} else {
+		transcoderEnabled = false;
 	}
 
-	// add link for transcoding
-	if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && !upnpTranscoding|| playFromWat || engine && engine.engine_name == "Shoutcast" && !upnpToggleOn || playFromTwitch || playFromDailymotionLive || obj.name == 'StreamStudio' && currentMedia.link.indexOf('mega.nz') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('hls') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('m3u8') !== -1 || obj.name == 'StreamStudio' && currentMedia.link.toLowerCase().indexOf('manifest') !== -1) {
-		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim();
+	//&& aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)
+
+	//final check
+	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 		currentMedia.link = link;
+		state.media = currentMedia;
 	}
-	console.log("VIDEORESOLUTION " + videoResolution, transcoderEnabled,currentMedia)
+	console.log("VIDEORESOLUTION " + videoResolution)
 
+	// then start on target device local/dlna ... or external
 	if(upnpToggleOn) {
-		if(currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && transcoderEnabled  && upnpTranscoding) {
-			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
-			currentMedia.link = link;
-		}
 		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
 		if(currentMedia.type === undefined) {
 			try {
@@ -741,19 +750,12 @@ function launchPlay() {
 				currentMedia.mime = "video/mp4"
 			}
 		}
-		if(upnpToggleOn) {
-			if(upnpTranscoding) {
-					if(mediaRendererType == "chromecast") {
-						currentMedia.type = currentMedia.mime || 'video/mp4'
-					}
-					state.media = currentMedia;
-			}
-			console.log('avant lecture upnp', currentMedia)
-			mediaRenderer.play(currentMedia.link,currentMedia)
-			state.playing.location=mediaRendererType
+		console.log('avant lecture upnp', currentMedia)
+		if(upnpToggleOn && castStatusInterval == null){
 			startStatusInterval()
-			player.play()
 		}
+		state.playing.location=mediaRendererType
+		mediaRenderer.play(currentMedia.link,currentMedia)
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
@@ -855,6 +857,7 @@ function playNextVideo(vid_id) {
 }
 
 function getNext() {
+	console.log('in getnext')
 	initPlayer()
 	if (activeTab == 1) {
 		try {
@@ -878,6 +881,8 @@ function getNext() {
 				$('.highlight').next().find("a").click();
 			} catch(err) {
 				console.log("no more torrents to play...");
+				upnpStoppedAsked = false;
+	      upnpTransitionning = false;
 				initPlayer();
 			}
 		} else {
@@ -905,7 +910,10 @@ function getNext() {
 							},2000);
 							break;
 						} else {
+							upnpStoppedAsked = false;
+				      upnpTransitionning = false;
 							console.log("no more videos to play in the playlists");
+							initPlayer()
 							break;
 						}
 					}
@@ -951,6 +959,9 @@ function getPrev() {
 						break;
 					} else {
 						console.log("no more videos to play in the playlists");
+						upnpStoppedAsked = false;
+			      upnpTransitionning = false;
+						initPlayer()
 						$('#closePlayer').click();
 						break;
 					}
@@ -960,32 +971,36 @@ function getPrev() {
 	}
 }
 
+var upnpTransitionning = false;
+
 function on_media_finished(){
+	console.log('in on media finished')
+	if(upnpToggleOn && upnpStoppedAsked) {
+		upnpStoppedAsked = true
+		initPlayer()
+		$('#closePlayer').click();
+		return;
+	}
+
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	if (playlistMode === 'normal' && !seekAsked) {
-		initPlayer();
-		$('#closePlayer').click();
+			initPlayer();
+			$('#closePlayer').click();
 	} else if (playlistMode === 'loop') {
-		if(upnpToggleOn) {
-			if(upnpContinuePlay){
-				playUpnpRenderer(currentMedia)
-			}
-		} else {
+		if(upnpToggleOn && !upnpTransitionning) {
 			initPlay(currentMedia);
+		} else {
+			if(!upnpToggleOn){
+				initPlay(currentMedia);
+			}
 		}
 	} else if (playlistMode === 'shuffle') {
 
-	} else if (playlistMode === 'continue') {
-		if(upnpToggleOn) {
-			if(upnpContinuePlay){
-				getNext();
-			}
-		} else {
+	} else if (playlistMode === 'continue' && !fromPlayList) {
 			getNext();
-		}
 	} else {
 		seekAsked = false;
-		if(!upnpStoppedAsked && playFromUpnp && player.playlistTracks.length !== 0 || !upnpStoppedAsked && fromPlayList && player.playlistTracks.length !== 0) {
+		if(upnpToggleOn && player.playlistTracks.length !== 0 && !upnpTransitionning || fromPlayList && player.playlistTracks.length !== 0) {
 			player.playNextTrack()
 		}
 	}
@@ -1018,10 +1033,11 @@ function updateProgressBar() {
 		try {
 			if(transcoderEnabled) {
 				var percentage = ((100 / duree) * (current+mediaCurrentTime));
+				$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
 			} else {
 				var percentage = ((100 / duree) * current);
+				$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))
 			}
-
 			progressBar.value = percentage;
 		} catch(err) {
 		}

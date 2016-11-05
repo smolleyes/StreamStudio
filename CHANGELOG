@@ -1,3 +1,8 @@
+V 3.2
+ * rewrite transcoding section
+ * fix unseen episode counter
+ * fix playlist modes 
+ 
 V 3.1.1
  * fix linux ffmpeg 32/64 bits
 

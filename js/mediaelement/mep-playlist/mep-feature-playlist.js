@@ -223,7 +223,10 @@ var showText = _('Show/Hide Playlist');
 
       // when current track ends - play the next one
       media.addEventListener('ended', function(e) {
-        player.playNextTrack();
+          if(upnpToggleOn) {
+            console.log('finished in playlist')
+            on_media_finished()
+          }
       }, false);
     },
     playNextTrack: function() {

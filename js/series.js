@@ -499,12 +499,14 @@ function loadSeasonTable(lang,id, num) {
 function updateEpisode() {
     var id = $('.btn-infos.active').attr('data-id')
     var lang = $('.btn-infos.active').attr('data-lang')
+    console.log('in updateEpisode', id, lang)
     bongo.db('seriesDb').collection('series').find({
         'id': id
     }).toArray(function(error, list) {
         if(list.length !== 0) {
             var serie = list[0]
-            __.each(serie.seasons[lang][currentEpisode.season].serie,function(ep,index) {
+            __.each(serie.seasons[lang][currentEpisode.season].episode,function(ep,index) {
+                console.log(id, currentEpisode.id)
                 if(ep.id == currentEpisode.id) {
                     ep.newItem=false;
                     serie.seasons[lang][currentEpisode.season].episode[index] = ep;

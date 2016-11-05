@@ -25,16 +25,27 @@ function updateState(state) {
 }
 
 function startStatusInterval () {
-  clearInterval(castStatusInterval)
-  castStatusInterval = null;
-
   castStatusInterval = setInterval(function () {
+    if(upnpStoppedAsked && state.playing.state !== 'STOPPED') {
+      console.log('stop asked in airmedia')
+      state.playing.state = "STOPPED"
+      clearInterval(castStatusInterval)
+      castStatusInterval = null;
+      upnpStoppedAsked = false;
+      upnpTransitionning = false;
+      setTimeout(function() {
+        initPlayer()
+      },2000)
+    } else {
+      upnpStoppedAsked = false;
+    }
     var mediaPlayer = mediaRenderer
     if (mediaPlayer) {
       if(state.playing.location == "airplay") {
         mediaPlayer.playbackInfo(function(err,body,res) {
           if (err) return;
           if(res.readyToPlay && state.playing.state !== "PAUSED") {
+            upnpTransitionning = false;
             state.playing.state = "PLAYING"
             player.play()
             state.playing.currentTime = res.position
@@ -43,11 +54,16 @@ function startStatusInterval () {
             updateProgressBar()
           } else {
             if(state.playing.state !== "PAUSED") {
-              state.playing.state = "STOPPED"
-              mediaPlayer.stop()
-              clearInterval(castStatusInterval)
-              castStatusInterval = null;
-              initPlayer()
+                if(upnpTransitionning) {
+                  return;
+                }
+                state.playing.state = "STOPPED"
+                clearInterval(castStatusInterval)
+                castStatusInterval = null;
+                if(!upnpTransitionning){
+                  upnpTransitionning = true;
+                  on_media_finished()
+                }
             }
           }
         })
@@ -56,11 +72,18 @@ function startStatusInterval () {
           if (err) return;
           if(state.playing.location == 'chromecast' && !res) {
             state.playing.state = "STOPPED";
-            mediaPlayer.stop()
-            initPlayer()
+            clearInterval(castStatusInterval)
+            castStatusInterval = null;
+            upnpTransitionning = true;
+            if(!upnpTransitionning){
+              upnpTransitionning = true;
+              on_media_finished()
+            }
+            return;
           }
           state.playing.state = res.playerState
           if(res.playerState == 'PLAYING' || res.PlayerState == 'BUFFERING') {
+            upnpTransitionning = false;
             player.play()
             if(state.playing.location == 'upnp'){
               state.playing.currentTime = res.position.currentTime
@@ -76,10 +99,16 @@ function startStatusInterval () {
             updateMiniPlayer()
             updateProgressBar()
           } else if(res.playerState == "STOPPED") {
-            clearInterval(castStatusInterval)
-            castStatusInterval = null;
-            mediaPlayer.stop()
-            initPlayer()
+              if(upnpTransitionning) {
+                return;
+              }
+              clearInterval(castStatusInterval)
+              castStatusInterval = null;
+              if(!upnpTransitionning){
+                upnpTransitionning = true;
+                console.log('before on media finished in airmedia')
+                on_media_finished()
+              }
           }
         })
       }
