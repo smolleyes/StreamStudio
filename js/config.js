@@ -1,15 +1,15 @@
-//~ Copyright (C) 
+//~ Copyright (C)
 //
 //~ This program is free software; you can redistribute it and/or
 //~ modify it under the terms of the GNU General Public License
 //~ as published by the Free Software Foundation; either version 2
 //~ of the License, or (at your option) any later version.
-//~ 
+//~
 //~ This program is distributed in the hope that it will be useful,
 //~ but WITHOUT ANY WARRANTY; without even the implied warranty of
 //~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //~ GNU General Public License for more details.
-//~ 
+//~
 //~ You should have received a copy of the GNU General Public License
 //~ along with this program; if not, write to the Free Software
 //~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -71,8 +71,8 @@ $(document).on('ready', function() {
             <li><a class="open_in_browser" href="http://ffmpeg.org/">FFMpeg</a></li> \
         </ul><br/> \
         <p><u>'+_("Links and informations:")+'</u></p>  \
-        '+_('You can find informations on how to use StreamStudio in the <a class="open_in_browser" href="http://wiki.streamstudio.cm">wiki</a><br/> \
-        Since we don\'t have a specific forum yet, please report any bug <a class="open_in_browser" href="http://forum.streamstudio.cm">here</a> or by mail <a class="open_in_browser" href="mailto:staff@streamstudio.cm">here</a><br/> \
+        '+_('You can find informations on how to use StreamStudio in the <a class="open_in_browser" href="http://wiki.streamstudio.cc">wiki</a><br/> \
+        Since we don\'t have a specific forum yet, please report any bug <a class="open_in_browser" href="http://forum.streamstudio.cc">here</a> or by mail <a class="open_in_browser" href="mailto:staff@streamstudio.cc">here</a><br/> \
         (use the "d" key to open the debug console (informations about this console <a class="open_in_browser" href="https://developer.chrome.com/devtools">here</a>) and copy/paste all the errors you can see!)<br/><br/>Thanks for your support !')+'</div>';
         showPopup(html,'body')
     });

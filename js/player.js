@@ -585,7 +585,6 @@ function initPlay(media) {
 		console.log("media avant currentMedia", media)
 		var title = media.title;
 		currentMedia = media;
-		state.media=currentMedia
 		currentMedia.link = link.trim();
 
 		// set title
@@ -711,7 +710,6 @@ function launchPlay() {
 			if(mediaRendererType == "chromecast") {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
-			state.media = currentMedia;
 		}
   // force by engine
 } else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
@@ -729,7 +727,6 @@ function launchPlay() {
 	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 		currentMedia.link = link;
-		state.media = currentMedia;
 	}
 	console.log("VIDEORESOLUTION " + videoResolution)
 
@@ -755,7 +752,12 @@ function launchPlay() {
 			startStatusInterval()
 		}
 		state.playing.location=mediaRendererType
-		mediaRenderer.play(currentMedia.link,currentMedia)
+		if(state.playing.state == "PLAYING") {
+			mediaRenderer.stop()
+			mediaRenderer.play(currentMedia.link,currentMedia)
+		} else {
+			mediaRenderer.play(currentMedia.link,currentMedia)
+		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}

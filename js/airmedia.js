@@ -47,6 +47,7 @@ function startStatusInterval () {
           if(res.readyToPlay && state.playing.state !== "PAUSED") {
             upnpTransitionning = false;
             state.playing.state = "PLAYING"
+            state.media=currentMedia
             player.play()
             state.playing.currentTime = res.position
             state.playing.duration = res.duration
@@ -69,7 +70,15 @@ function startStatusInterval () {
         })
       } else {
         mediaPlayer.status(function(err,res) {
+          //console.log(err,res)
           if (err) return;
+          // fix freebox
+          if(res.playerState =="NO_MEDIA_PRESENT" && state.playing.state !== "LOADING" ||  state.media.link && state.media.link !== currentMedia.link && state.playing.state !== "LOADING") {
+            state.playing.state = "LOADING"
+            state.media=currentMedia
+            mediaRenderer.client.load(currentMedia.link,currentMedia)
+            return;
+          }
           if(state.playing.location == 'chromecast' && !res) {
             state.playing.state = "STOPPED";
             clearInterval(castStatusInterval)
@@ -84,6 +93,7 @@ function startStatusInterval () {
           state.playing.state = res.playerState
           if(res.playerState == 'PLAYING' || res.PlayerState == 'BUFFERING') {
             upnpTransitionning = false;
+            state.media=currentMedia
             player.play()
             if(state.playing.location == 'upnp'){
               state.playing.currentTime = res.position.currentTime

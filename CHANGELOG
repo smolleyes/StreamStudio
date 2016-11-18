@@ -1,4 +1,8 @@
-V 3.2
+V 3.3
+ * fix upnp freebox player 
+ * change domain name 
+ 
+V3.2
  * rewrite transcoding section
  * fix unseen episode counter
  * fix playlist modes 
@@ -14,7 +18,7 @@ V 3.0
  * rewrite series section, separate fr and vostfr
  * small bugs fix
 
-V 2.9.9.9
+ 2.9.9.9
  * fix app loading without internet
  * add airplay support
  * upnp rewrite
@@ -31,7 +35,7 @@ V 2.9.9.7
 
 V 2.9.9.6
   * fix youtube always auto playing next song
-  * fix us-gb youtube most populars videos
+V  * fix us-gb youtube most populars videos
   * fix series counter 
   * add us language 
 
