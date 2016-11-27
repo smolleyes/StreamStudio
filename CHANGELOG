@@ -1,3 +1,7 @@
+V 3.3.1
+ * fix series walking dead 
+ * update ffmpeg linux 64 bits
+
 V 3.3
  * fix upnp freebox player 
  * change domain name 

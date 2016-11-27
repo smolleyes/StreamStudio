@@ -525,7 +525,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:7000,content:_("Can't connect to this station, please retry later !"),btnId:'',btnTitle:'',btnColor:'black',btnDisplay: 'none',updateDisplay:'none'})
                 initPlayer();
             }
-            console.log('grep stderr: ' + data);
+            //console.log('grep stderr: ' + data);
 
             if (data.toString().substr(0,5) == 'frame') {
                 var time = data.toString().match(/time=(\d\d:\d\d:\d\d)/)[1];

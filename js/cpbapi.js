@@ -5,7 +5,7 @@ function initCpbSearch(results,cb) {
 	if(results.page == 0) {
 		$.post('http://www.cpasbien.cm/recherche/',{"champ_recherche":results.query}).done(function(datas){
 			var link = $($('#pagination a',datas)[0]).attr('href');
-			results.basePath = path.dirname(link);
+			results.basePath = path.dirname(link).replace('/recherche/','/recherche/series/');
 			return parseDatas(datas, results,cb);
 		}).fail(function(error){
 			results.success = false;

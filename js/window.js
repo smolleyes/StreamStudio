@@ -27,7 +27,7 @@ onload = function() {
             $.each(engines, function(key, value) {
                 var page = value.page;
                 if (page !== undefined) {
-                    if (upnpMediaPlaying || playFromUpnp) {
+                    if (state.playing.state == "PLAYING") {
                         try {
                             mediaRenderer.stop();
                         } catch(err) { }
@@ -44,7 +44,7 @@ onload = function() {
             }
         });
     } catch (err) {
-        if (upnpMediaPlaying || playFromUpnp) {
+        if (state.playing.state == "PLAYING") {
             try {
                 mediaRenderer.stop();
             } catch(err) { }

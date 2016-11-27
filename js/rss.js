@@ -67,57 +67,60 @@ function analyseCpbDatas(results,cb) {
 function storeCpbDatas(lang,list,results,cb) {
 	results.needRebuild = false;
 	Iterator.iterate(list).forEach(function (item,index) {
-		try {
-			//detect season
+		if(item.title.toLowerCase().indexOf('webserie') == -1 && item.title.toLowerCase().indexOf('webisode') == -1) {
 			try {
-				item.season = parseInt(item.title.toUpperCase().match(/S(\d{1,3})/)[1])
-				item.type = 'episode'
-			} catch(err) {
+				//detect season
 				try {
-					item.season = parseInt(item.title.toUpperCase().replace(/\s+/g,'').match(/SAISON(\d{1,3})/).pop())
-					item.type = 'complete'
+					item.season = parseInt(item.title.toUpperCase().match(/S(\d{1,3})/)[1])
+					item.type = 'episode'
 				} catch(err) {
 					try {
-						item.season = parseInt(item.title.toUpperCase().match(/(\s\d{1,3}\s)/)[1])
-						results.needRebuild = true
-						item.type = 'episode'
+						item.season = parseInt(item.title.toUpperCase().replace(/\s+/g,'').match(/SAISON(\d{1,3})/).pop())
+						item.type = 'complete'
 					} catch(err) {
-						return true;
-					}
-				}
-			}
-			// parse episodes to extract seasons number
-			if(!results.seasons[lang].hasOwnProperty(item.season)){
-				results.seasons[lang][item.season] = {}
-				results.seasons[lang][item.season]['episode'] = {}
-			}
-			// check if we have an episode number, set is a episode type first
-			try {
-				item.ep = parseInt(item.title.toUpperCase().match(/S(\d{1,3})E(\d{1,3})/)[2]);
-				Iterator.iterate(results.infos['Episodes']).forEach(function(e) {
-					if(!results.seasons[lang][item.season]['episode'].hasOwnProperty(item.ep)) {
-						if(results.infos['Episodes'].hasOwnProperty(item.ep)) {
-							if(e['EpisodeNumber'] && parseInt(e['EpisodeNumber']) == item.ep && e['SeasonNumber'] && parseInt(e['SeasonNumber']) == item.season) {
-								if(e['EpisodeName'] !== null) {
-									item.title = e['EpisodeName'];
-									results.seasons[lang][item.season]['episode'][item.ep] = item;
-								} else {
-									results.seasons[lang][item.season]['episode'][item.ep] = item;
-								}
-							}
-						} else {
-							results.seasons[lang][item.season]['episode'][item.ep] = item;
+						try {
+								console.log("ENTRAINE REBUILD ", item)
+								item.season = parseInt(item.title.toUpperCase().match(/(\s\d{3}\s)/)[1])
+								results.needRebuild = true
+								item.type = 'episode'
+						} catch(err) {
+							return true;
 						}
 					}
-				});
-			} catch(err) {
-				// if not if we have a season number, add it as complete season torrent...
-				if(!item.needRebuild && !results.seasons[lang][item.season]['episode'].hasOwnProperty('complete')) {
-					item.type = 'complete';
-					results.seasons[lang][item.season]['episode']['complete'] = item;
 				}
-			}
-		} catch(err) {}
+				// parse episodes to extract seasons number
+				if(!results.seasons[lang].hasOwnProperty(item.season)){
+					results.seasons[lang][item.season] = {}
+					results.seasons[lang][item.season]['episode'] = {}
+				}
+				// check if we have an episode number, set is a episode type first
+				try {
+					item.ep = parseInt(item.title.toUpperCase().match(/S(\d{1,3})E(\d{1,3})/)[2]);
+					Iterator.iterate(results.infos['Episodes']).forEach(function(e) {
+						if(!results.seasons[lang][item.season]['episode'].hasOwnProperty(item.ep)) {
+							if(results.infos['Episodes'].hasOwnProperty(item.ep)) {
+								if(e['EpisodeNumber'] && parseInt(e['EpisodeNumber']) == item.ep && e['SeasonNumber'] && parseInt(e['SeasonNumber']) == item.season) {
+									if(e['EpisodeName'] !== null) {
+										item.title = e['EpisodeName'];
+										results.seasons[lang][item.season]['episode'][item.ep] = item;
+									} else {
+										results.seasons[lang][item.season]['episode'][item.ep] = item;
+									}
+								}
+							} else {
+								results.seasons[lang][item.season]['episode'][item.ep] = item;
+							}
+						}
+					});
+				} catch(err) {
+					// if not if we have a season number, add it as complete season torrent...
+					if(!item.needRebuild && !results.seasons[lang][item.season]['episode'].hasOwnProperty('complete')) {
+						item.type = 'complete';
+						results.seasons[lang][item.season]['episode']['complete'] = item;
+					}
+				}
+			} catch(err) {}
+	  }
 	});
 	cb(results);
 }
