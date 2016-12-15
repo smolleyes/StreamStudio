@@ -582,6 +582,7 @@ function initPlay(media) {
 		} else {
 			link = link.replace('&tv','');
 		}
+		link.replace(/chrome-extension:\/\/.*?\//,'file:\/\/')
 		console.log("media avant currentMedia", media)
 		var title = media.title;
 		currentMedia = media;
@@ -632,7 +633,7 @@ function initPlay(media) {
 			// local files links
 		} else if (link.indexOf('file://') !== -1) {
 			playFromFile = true;
-			currentMedia.link = link.replace('file://','');
+			currentMedia.link = link;
 			scanSubTitles(link);
 			// play from upnp server
 		} else if (linkType === 'upnp' || upnpToggleOn) {
@@ -689,8 +690,9 @@ function launchPlay() {
 
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	var carray = ['.mp3','.mp4','.opus','.wav','.flac','.mkv','.ts','.mpeg','.mpg','.ogg','.webm','.ogv'];
-	var aArray = ['.mp3','.opus','.wav','.flac','.m4a','.wma'];
+	var carray = ['.mp3','.mp4','.m4a','.opus','.wav','.flac','.mkv','.ts','.mpeg','.mpg','.ogg','.webm','.ogv',".aac"];
+	var aArray = ['.wma'];
+	//['.mp3','.opus','.wav','.flac','.m4a','.wma','.aac'];
 	var needTranscoding = ['hls','m3u8','manifest']
 	var engineWithoutTranscoding = ['mp3stream']
 	var engineWithTranscoding = ['shoutcast']
@@ -705,17 +707,17 @@ function launchPlay() {
 	} else if(playFromYoutube) { // youtube
 		if(!upnpToggleOn && obj.name == 'StreamStudio' && videoResolution !== '720p' && videoResolution !== '360p') {
 			transcoderEnabled = true;
-	} else if(upnpTranscoding) { //force transcoding when upnp transcoding checked
-		upnpLoading = true;
+		} else if(upnpTranscoding) { //force transcoding when upnp transcoding checked
+			upnpLoading = true;
 			if(mediaRendererType == "chromecast") {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-  // force by engine
-} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
-			transcoderEnabled = true;
-  // force by extension
-  } else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
+		// force by engine
+	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
+		transcoderEnabled = true;
+		// force by extension
+	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
@@ -884,7 +886,7 @@ function getNext() {
 			} catch(err) {
 				console.log("no more torrents to play...");
 				upnpStoppedAsked = false;
-	      upnpTransitionning = false;
+				upnpTransitionning = false;
 				initPlayer();
 			}
 		} else {
@@ -913,7 +915,7 @@ function getNext() {
 							break;
 						} else {
 							upnpStoppedAsked = false;
-				      upnpTransitionning = false;
+							upnpTransitionning = false;
 							console.log("no more videos to play in the playlists");
 							initPlayer()
 							break;
@@ -962,7 +964,7 @@ function getPrev() {
 					} else {
 						console.log("no more videos to play in the playlists");
 						upnpStoppedAsked = false;
-			      upnpTransitionning = false;
+						upnpTransitionning = false;
 						initPlayer()
 						$('#closePlayer').click();
 						break;
@@ -986,8 +988,8 @@ function on_media_finished(){
 
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
 	if (playlistMode === 'normal' && !seekAsked) {
-			initPlayer();
-			$('#closePlayer').click();
+		initPlayer();
+		$('#closePlayer').click();
 	} else if (playlistMode === 'loop') {
 		if(upnpToggleOn && !upnpTransitionning) {
 			initPlay(currentMedia);
@@ -999,7 +1001,7 @@ function on_media_finished(){
 	} else if (playlistMode === 'shuffle') {
 
 	} else if (playlistMode === 'continue' && !fromPlayList) {
-			getNext();
+		getNext();
 	} else {
 		seekAsked = false;
 		if(upnpToggleOn && player.playlistTracks.length !== 0 && !upnpTransitionning || fromPlayList && player.playlistTracks.length !== 0) {

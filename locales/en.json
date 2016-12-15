@@ -102,5 +102,6 @@
 	"Downloading plugins...": "Downloading plugins...",
 	"done at": "done at",
 	"Installing update...": "Installing update...",
-	"Please add local folders to scan in the settings": "Please add local folders to scan in the settings"
+	"Please add local folders to scan in the settings": "Please add local folders to scan in the settings",
+	"Cast": "Cast"
 }

@@ -2,10 +2,12 @@ var Iterator = require('iterator').Iterator;
 var path = require('path');
 
 function initCpbSearch(results,cb) {
+	console.log('SEARCH FOR', results.query)
 	if(results.page == 0) {
-		$.post('http://www.cpasbien.cm/recherche/',{"champ_recherche":results.query}).done(function(datas){
-			var link = $($('#pagination a',datas)[0]).attr('href');
-			results.basePath = path.dirname(link).replace('/recherche/','/recherche/series/');
+		$.post('http://www.torrent9.biz/search_torrent/',{"champ_recherche":results.query}).done(function(datas){
+			console.log(datas)
+			var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
+			results.basePath = path.dirname(link);
 			return parseDatas(datas, results,cb);
 		}).fail(function(error){
 			results.success = false;
@@ -25,22 +27,23 @@ function initCpbSearch(results,cb) {
 
 function parseDatas(data, results,cb) {
 	try {
-		results.totalResults = parseInt($('#titre',data).text().split(':')[1].trim().match(/\d{1,10}/)[0]);
+		results.totalResults = parseInt($($('small',data)[0]).text().match(/\d{1,5}/)[0]);
 		if(results.totalResults == 0) {
 			results.seasons = {};
 			return getOmgDatas(results,cb,1);
 		}
-		var mlist=$('.ligne0,.ligne1',data).get();
+		var mlist=$('.cust-table tr',data).get().slice(1)
 		console.log(mlist)
 		Iterator.iterate(mlist).forEach(function (item,i) {
 			try {
 				var video = {};
-				video.torrentLink = 'http://www.cpasbien.cm/telechargement/'+path.basename($(item).find('.titre').attr('href').replace('.html','.torrent'));
-				video.seeders = $(item).find('.up').text();
-				video.leechers = $(item).find('.down').text();
-				video.title = $(item).find('.titre').text();
+				console.log(item)
+				video.torrentLink = 'http://www.torrent9.biz/get_torrent/'+path.basename($(item).find('a').attr('href')+'.torrent');
+				video.seeders = $($(item).find('td')[2]).text();
+				video.leechers = $($(item).find('td')[3]).text();
+				video.title = $($(item).find('a')[0]).text();
 				video.torrentTitle = video.title;
-				video.size = $(item).find('.poid').text().trim();
+				video.size = $($(item).find('td')[1]).text();
 				results.list.push(video)
 			} catch(err) {
 				console.log(err)

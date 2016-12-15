@@ -135,12 +135,14 @@ function checkFreebox() {
           //show gui
           createLocalRootNodes();
           Cast = require('casts')
+          Cast.init(state,updateUpnpList)
           cli.searchDevices()
         }).fail(function(err){
           //show gui
           console.log('no freebox available, airplay disabled');
           createLocalRootNodes();
           Cast = require('casts')
+          Cast.init(state,updateUpnpList)
           cli.searchDevices()
         });
     } catch(err) {

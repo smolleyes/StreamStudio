@@ -1,3 +1,10 @@
+V 3.5
+ * new custom build of nwjs for osx and linux x64
+ * fix plugins
+ * fix upnp server init
+ * small css fix
+ * remove cpasbien 
+
 V 3.3.2
  * add torrent9.biz engine
  * fix translation

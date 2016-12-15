@@ -1,5 +1,5 @@
 var engines = [];
-var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza','kickass','twitch','thepiratebay'];
+var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','cpasbien','songza','kickass','twitch','thepiratebay'];
 var pluginsDir;
 var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','torrent-project','mp3stream','torrent9'];
 
