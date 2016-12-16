@@ -266,10 +266,10 @@ function printSeriesList(list) {
 		<span><i class="glyphicon glyphicon-list-alt"></i>' + count + ' ' + seasonString + '</span> \
 		</div> \
 		<div class="mvthumb"> \
-		<img class="cpbthumb" style="float:left;" src="' + e.poster + '" /> \
+		<img class="cpbthumb" style="float:left;" src="file://' + e.poster + '" /> \
 		</div> \
 		<div> \
-			<img class="coverPlayImg loadSerie" style="display:none;" id="' + e.id + '" /> \
+			<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="coverPlayImg loadSerie" style="display:none;" id="' + e.id + '" /> \
 		</div> \
 		<span class="optionsBottom" style="display:none;"></span> \
 		<div id="optionsBottomInfos" style="display:none;"> \
@@ -364,7 +364,7 @@ function loadAllSeasons(serie,lang) {
         }
         num += 1;
     });
-    $('#seriesContainer').css('background', 'url("' + serie.fanart + '") no-repeat');
+    $('#seriesContainer').css('background', 'url("file://' + serie.fanart + '") no-repeat');
 }
 
 function loadSeasonTable(lang,id, num) {

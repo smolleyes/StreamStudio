@@ -1,5 +1,6 @@
 var mediaDuration;
 var stArr = [];
+var ip = require('ip');
 
 function startHt5Server() {
     ht5Server = http.createServer(function(req, res) {
@@ -9,7 +10,7 @@ function startHt5Server() {
             }
             startStreaming(req, res)
         }
-    }).listen(8887);
+    }).listen(8887,ip.address());
     console.log('StreamStudio Transcoding Server ready on port 8887');
 }
 
@@ -34,7 +35,7 @@ function startProxyServer() {
                 resp.end(err);
             });
         }
-    }).listen(8081);
+    }).listen(8091,ip.address());
 }
 
 function startStreaming(req, res, width, height) {
@@ -606,7 +607,7 @@ function startWebServer() {
                 res.end('ok');
             }
         }
-    }).listen(8898);
+    }).listen(8898,ip.address());
     console.log('StreamStudio WebServer ready on port 8898');
 }
 

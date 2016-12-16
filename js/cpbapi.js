@@ -6,8 +6,10 @@ function initCpbSearch(results,cb) {
 	if(results.page == 0) {
 		$.post('http://www.torrent9.biz/search_torrent/',{"champ_recherche":results.query}).done(function(datas){
 			console.log(datas)
-			var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
-			results.basePath = path.dirname(link);
+			try {
+				var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
+			  results.basePath = path.dirname(link);
+      } catch (err) {}
 			return parseDatas(datas, results,cb);
 		}).fail(function(error){
 			results.success = false;

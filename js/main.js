@@ -513,6 +513,7 @@ $(document).ready(function() {
     // Else call parent method
     $.magnificPopup.proto._onFocusIn.call(this,e);
   }
+  createLocalRootNodes();
 });
 
 function main() {
@@ -1478,6 +1479,12 @@ function main() {
   $('.mejs-playmode-button').clone().appendTo('#playlistBtnSub')
   $('.mejs-cast-button').clone().appendTo('#castBtnSub')
   $('.song-title').clone().appendTo('#subPlayer-title-container')
+  loadUpnpRenderers()
+  Cast.init()
+  cli.searchDevices()
+  setTimeout(function() {
+    cli.searchDevices()
+  },2000)
 }
 
 $(document).bind("scrollend", ".nano",function(e){
