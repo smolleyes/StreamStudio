@@ -1,3 +1,6 @@
+V 3.5.1
+ * new nwjs build for linux32 
+
 V 3.5
  * new custom build of nwjs for osx and linux x64
  * fix plugins
