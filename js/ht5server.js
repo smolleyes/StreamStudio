@@ -17,25 +17,41 @@ function startHt5Server() {
 function startProxyServer() {
     proxyServer = http.createServer(function(req, resp) {
         if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
-            var url = req.url.split('?link=')[1];
-            var jqxhr = $.get(url, function(data) {
-            })
-            .done(function(data) {
-                if(typeof(data) === 'object'){
-                    resp.writeHead(200,{'Content-type': 'application/json;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-                    resp.end(JSON.stringify(data));
-                } else {
-                    resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-                    resp.end(data);
+            // twitch login
+            if(req.url.indexOf('code=') !== -1) {
+              try {
+                var token = req.url.match(/code=(.*?)&/)[1]
+                if(token) {
+                  settings.twitchToken=token;
+                  saveSettings()
+                  setTimeout(function(){
+                    twitchWindow.close()
+                  },2000)
                 }
-            })
-            .fail(function(err) {
-                console.log(err)
-                resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
-                resp.end(err);
-            });
+                resp.writeHead(200,{'Content-type': 'application/json;charset=utf-8'});
+                resp.end(JSON.stringify({success:true,token:token}));
+              } catch(err) {}
+            } else {
+              var url = req.url.split('?link=')[1];
+              var jqxhr = $.get(url, function(data) {
+              })
+              .done(function(data) {
+                  if(typeof(data) === 'object'){
+                      resp.writeHead(200,{'Content-type': 'application/json;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
+                      resp.end(JSON.stringify(data));
+                  } else {
+                      resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
+                      resp.end(data);
+                  }
+              })
+              .fail(function(err) {
+                  console.log(err)
+                  resp.writeHead(200,{'Content-type': 'text/html;charset=utf-8','Access-Control-Allow-Origin' : '*','transferMode.dlna.org': 'Streaming','contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000'});
+                  resp.end(err);
+              });
+            }
         }
-    }).listen(8091,ip.address());
+    }).listen(8091);
 }
 
 function startStreaming(req, res, width, height) {
@@ -171,7 +187,7 @@ function startStreaming(req, res, width, height) {
                 }
                 console.log('Starting twitch streaming '+ link + " with quality " + quality);
                 ffmpegLive = true;
-                var st = spawn(livestreamerPath, ['-O',link, quality]);
+                var st = spawn(livestreamerPath, ['-O','--twitch-oauth-token','7r98hdtbfxnivxrgwwenr0n3sjnc3n',link, quality]);
                 var ffmpeg = spawnFfmpeg('', device, 'truc', bitrate, 0, function(code) { // exit
                             console.log('child process exited with code ' + code);
                             res.end();

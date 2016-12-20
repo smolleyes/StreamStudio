@@ -76,7 +76,12 @@ $(document).ready(function() {
 	// stop button
 	$(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
 		if(upnpToggleOn){
-			mediaRenderer.stop()
+			try{
+			   mediaRenderer.stop()
+		  } catch(err) {
+				player.stop()
+				initPlayer()
+			}
 		}
 		updateMiniPlayer()
 		try {
@@ -695,7 +700,7 @@ function launchPlay() {
 	//['.mp3','.opus','.wav','.flac','.m4a','.wma','.aac'];
 	var needTranscoding = ['hls','m3u8','manifest']
 	var engineWithoutTranscoding = ['mp3stream']
-	var engineWithTranscoding = ['shoutcast']
+	var engineWithTranscoding = ['shoutcast','twitch']
 
 	if(engine) {
 		engine_name = engine.engine_name;

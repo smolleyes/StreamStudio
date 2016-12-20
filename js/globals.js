@@ -1,4 +1,4 @@
-var VERSION = "3.5.1";
+var VERSION = "3.6";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -135,6 +135,7 @@ var upnpPlayer;
 var mediaRendererPaused = false;
 var UPNPserverInit = false;
 var upnpStoppedAsked = false;
+var twitchWindow=null;
 //checks
 temp.mkdir(function(err,path){
 	if(err) {

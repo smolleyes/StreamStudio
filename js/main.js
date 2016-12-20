@@ -323,6 +323,10 @@ var htmlContent =
 <label for="torrent9">torrent9</label> \
 <input class="pluginCheckBox" type="checkbox" id="torrent9" name="torrent9"> \
 </div> \
+<div class="ItemCheckbox left">\
+ 		<label for="twitch">Twitch</label>\
+ 		<input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch">\
+</div>\
 <div id="t411Login" style="display:none;"> \
 <p><u><b>' + _("T411 login informations:") + '</b></u></p> \
 <p style="font-size:10px;font-weight:bold;">'+_("Note: No informations are stored or sended to streamstudio's servers !")+'</p> \

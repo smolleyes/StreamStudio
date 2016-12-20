@@ -20,9 +20,13 @@ $(document).on('ready', function() {
         if (this.checked) {
             if (this.name === "twitch") {
                 if (livestreamerPath === '') {
-                    alert(_('You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://livestreamer.readthedocs.org/en/latest/install.html'));
+                    alert(_('You need Livestreamer >=v1.11.1 installed in /usr/bin or /usr/local/bin to use this plugin ! \n\n Please read install instructions here: \n http://docs.livestreamer.io/install.html'));
                     $(this).attr('checked', false);
                     return;
+                }
+                // check token
+                if(!settings.twitchToken) {
+                  getTwitchToken()
                 }
             } else if(this.name === "t411") {
                 $('#t411Login').show();
@@ -78,6 +82,25 @@ $(document).on('ready', function() {
     });
 
 });
+
+function getTwitchToken() {
+  if(!settings.twitchToken) {
+    var win = nw.Window.get();
+    // Create a new window and get it
+    nw.Window.open('https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=etzhxu868r53vbzh76wwd0o3fogdwn&redirect_uri=http%3A%2F%2Flocalhost%3A8091&scope=https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=etzhxu868r53vbzh76wwd0o3fogdwn&scope=user_read+chat_login',{
+      "position": "center",
+      "focus": true,
+      "frame": true,
+      "width":500,
+      "title": "Twitch",
+      "height":500
+    },function(new_win) {
+      twitchWindow = new_win
+      twitchWindow.requestAttention(1)
+      twitchWindow.setBadgeLabel("Twitch")
+    })
+  }
+}
 
 function loadConfig() {
     $('#config_title').empty().append(_("StreamStudio configuration:"));

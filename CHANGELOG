@@ -1,3 +1,8 @@
+V 3.6
+ * new nwjs 32 bits for windos
+ * add new windows 64 bit version
+ * twitch plugin is back
+
 V 3.5.1
  * new nwjs build for linux32 
 
