@@ -1,3 +1,10 @@
+V 3.7
+ * avi files now play natively if possible
+ * transcode only audio or only video if needed
+ * fix seeking with transcoder enabled
+ * update ffmpeg lib on linux 64/32, win 32/64
+ * torrent downloading stats always displayed until download completed 
+
 V 3.6
  * new nwjs 32 bits for windos
  * add new windows 64 bit version

@@ -291,6 +291,7 @@ app.updateStats = function(streamInfo) {
 
     this.downloaded = (swarm.downloaded) ? swarm.downloaded : 0;
     this.percent = parseInt(swarm.downloaded / (BUFFERING_SIZE / 100)).toFixed(2);
+    $('#downloadStats').empty().html('<span style="margin:0 5px;">' + _("Speed:") + '</span><i class="arrow down"></i>' + this.downloadSpeed + ' <i class="arrow up"></i>' + this.uploadSpeed + '<span style="padding:5px;">| ' + _("Connected peers: ") + this.active_peers + ' / ' + this.total_peers + '</span>');
     if (stateModel.state != 'ready') {
         if (stateModel.state === 'connecting') {
             if (parseInt(stateModel.numTry) >= 10 && !torObj.retried) {

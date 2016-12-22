@@ -479,7 +479,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         link = decodeURIComponent(link);
         audio = 'libmp3lame';
     } else {
-        audio = 'copy';
+        audio = 'aac';
     }
     if (host === undefined || link !== '') {
         //local file...
@@ -492,12 +492,21 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
-                args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', audio, '-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
+                args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'', '-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
                 if(search_engine !== 'dailymotion') {
-                    args = ['-ss' , start,'-re','-i', ''+link+'','-sn','-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                    if(transcodeAudioOnly) {
+                      console.log('Transcoding audio only!')
+                      args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-map', '0:0', '-map', '0:1', '-c:v', 'copy', '-c:a:0', 'ac3','-threads', '0','-f', 'matroska','pipe:1'];
+                    } else if (transcodeVideoOnly) {
+                      console.log('Transcoding video only!')
+                      args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
+                    } else {
+                      console.log('Transcoding video and audio')
+                      args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                    }
                 } else  {
-                    args = ['-ss' , start,'-i', ''+link+'','-sn','-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",'-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                    args = ['-ss' , start,'-i', ''+link+'','-sn','-vf','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
                 }
             }
         } else {

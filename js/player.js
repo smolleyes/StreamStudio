@@ -513,6 +513,13 @@ function startPlay(media) {
 }
 
 function initPlay(media) {
+	if(transcoderEnabled && seekAsked) {
+		currentMedia = media;
+		seekAsked = false;
+		cleanffar()
+		launchPlay()
+		return;
+	}
 	player.playlistToggleClick();
 	$('.mejs-playlist').hide();
 	$('.mejs-playlist  > ul').hide();
@@ -695,15 +702,19 @@ function launchPlay() {
 
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	var carray = ['.mp3','.mp4','.m4a','.opus','.wav','.flac','.mkv','.ts','.mpeg','.mpg','.ogg','.webm','.ogv',".aac"];
+	var carray = ['.mp3','.mp4','.m4a','.opus','.wav','.flac','.mkv','.avi','.mpeg','.mpg','.ogg','.webm','.ogv','.aac'];
 	var aArray = ['.wma'];
 	//['.mp3','.opus','.wav','.flac','.m4a','.wma','.aac'];
 	var needTranscoding = ['hls','m3u8','manifest']
 	var engineWithoutTranscoding = ['mp3stream']
 	var engineWithTranscoding = ['shoutcast','twitch']
+  var engineWithFFmpegCheck = ['torrent9','t411','torrent-project']
+	var needFFmpegCheck = false;
+	transcodeAudioOnly = false;
+	transcodeVideoOnly = false;
 
 	if(engine) {
-		engine_name = engine.engine_name;
+		engine_name = engine.engine_name.toLowerCase();
 	}
 
 	// set transcoding if needed
@@ -718,14 +729,20 @@ function launchPlay() {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-		// force by engine
+	// check avi et dts on engines with possibles avi
 	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
 		transcoderEnabled = true;
-		// force by extension
+	// force by extension
 	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
 		transcoderEnabled = true;
-	} else {
+  } else {
 		transcoderEnabled = false;
+	}
+
+  // check avi et dts on engines with possibles avi
+	if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
+		console.log('CHECK FFMPEG FORMAT')
+		needFFmpegCheck = true;
 	}
 
 	//&& aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)
@@ -771,11 +788,15 @@ function launchPlay() {
 	} else {
 		var link = currentMedia.link;
 		if(obj.name === 'StreamStudio') {
-			player.setSrc(currentMedia.link);
-			player.play();
-			if(player.tracks.length > 0) {
-				$('input[value="'+_("Track").toLowerCase()+'1"]').attr('checked',true);
-				player.setTrack(''+_("Track").toLowerCase()+'1');
+			if(needFFmpegCheck) {
+				checkFFmpegFormat();
+			} else {
+				player.setSrc(currentMedia.link);
+				player.play();
+				if(player.tracks.length > 0) {
+					$('input[value="'+_("Track").toLowerCase()+'1"]').attr('checked',true);
+					player.setTrack(''+_("Track").toLowerCase()+'1');
+				}
 			}
 		} else {
 			startExtPlayer(obj);
@@ -784,6 +805,44 @@ function launchPlay() {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
 	}
+}
+
+function checkFFmpegFormat() {
+	// check if stream is XVID with Advances Simple Profile or has DTS audio, if yes enable transcoder
+  var args = ['-i',""+currentMedia.link.match(/(.*)\//)[1]+""];
+	var ffmpegCheck = spawn(ffmpegPath, args);
+	var total_data = '';
+	ffmpegCheck.stderr.on('data', function(data) {
+			if(data) {
+				total_data += data.toString();
+			}
+	});
+
+	ffmpegCheck.on('exit',function(code) {
+		console.log('FFMPEG FORMAT EXIT')
+		var data = total_data.replace(/[\(\)]/g,'').replace(/(\r\n|\r|\n)/g,' ').toLowerCase()
+		console.log(data)
+		if(data.match(/mpeg4 advanced simple profile xvid/) !== null) {
+			transcoderEnabled = true;
+			transcodeVideoOnly = true;
+		}
+		if(data.match(/dts/) !== null) {
+			transcoderEnabled = true;
+			transcodeAudioOnly = true;
+		}
+
+		if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
+			currentMedia.link = link;
+		}
+
+		player.setSrc(currentMedia.link);
+		player.play();
+		if(player.tracks.length > 0) {
+			$('input[value="'+_("Track").toLowerCase()+'1"]').attr('checked',true);
+			player.setTrack(''+_("Track").toLowerCase()+'1');
+		}
+	})
 }
 
 function startExtPlayer(obj) {

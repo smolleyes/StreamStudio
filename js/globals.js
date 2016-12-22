@@ -1,4 +1,4 @@
-var VERSION = "3.6";
+var VERSION = "3.7";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -136,6 +136,9 @@ var mediaRendererPaused = false;
 var UPNPserverInit = false;
 var upnpStoppedAsked = false;
 var twitchWindow=null;
+
+var transcodeAudioOnly = false;
+var transcodeVideoOnly = false;
 //checks
 temp.mkdir(function(err,path){
 	if(err) {
