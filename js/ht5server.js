@@ -583,7 +583,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     return ffmpeg;
 }
 
-function cleanffar() {
+function cleanffar(seek) {
     state.playing.state = "STOPPED"
     player.options.duration = 0;
     $.each(ffar, function(index, ff) {
@@ -602,6 +602,9 @@ function cleanffar() {
             stArr = [];
         }
     });
+    if(seek) {
+      launchPlay()
+    }
 }
 
 function startWebServer() {

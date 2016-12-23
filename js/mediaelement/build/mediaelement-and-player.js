@@ -3280,48 +3280,60 @@ if (typeof jQuery != 'undefined') {
 							x = width + offset.left;
 						}
 						pos = x - offset.left;
-						percentage = (pos / width);
-						try {
-							newTime = (percentage <= 0.0001) ? 0 : percentage * mediaDuration;
-						} catch(err) {}
-						// seek to where the mouse is
+					  percentage = (pos / width);
+						var duree;
+						if(upnpTranscoding){
+							duree = mediaDuration;
+						} else {
+							duree = (media.duration == Infinity || isNaN(media.duration)) ? mediaDuration : media.duration;
+						}
+						newTime = (percentage <= 0.0001) ? 0 : percentage * duree;
 						if (mouseIsDown && newTime !== media.currentTime) {
-							media.setCurrentTime(newTime);
-							mediaCurrentPct = ((pos*100) / width);
+							mediaCurrentPct = percentage;
 							mediaCurrentTime = newTime;
 							seekAsked = true;
-							mouseIsDown = false;
-							if(upnpTranscoding) {
-								  var m = state.media
-								  m.link = state.media.link.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
-									initPlay(m);
+							mouseIsDown =false;
+							if(transcoderEnabled || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+								var m = {};
+								var l = currentMedia.link.replace(/&start=(.*)/,'')
+								if(playFromFile) {
+									m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								} else if(playFromHttp) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
+								} else if (torrentPlaying) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
+								} else if (playFromUpnp) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+								} else if (playFromYoutube) {
+									doNotSwitch = true;
+									currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+									m.link = l.split('?file=')[1].trim()+'&start='+mejs.Utility.secondsToTimeCode(newTime).trim();
+								}
+								m.title = currentMedia.title;
+								m.cover = currentMedia.cover;
+								console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
+								initPlay(m);
+								//player.media.setCurrentTime(newTime);
 							} else {
-								if(upnpToggleOn && state.playing.location == "airplay"){
-									mediaRenderer.scrub(newTime)
-								} else if (upnpToggleOn && state.playing.location == "chromecast" || state.playing.location == "upnp") {
-									mediaRenderer.seek(newTime)
-								} else {
-									//player.setCurrentTime(newTime)
-									var m = {};
-									var l = currentMedia.link.replace(/&start=(.*)/,'')
-									$('.mejs-overlay,.mejs-overlay-loading').show();
-									if(playFromFile) {
-										m.link = l.replace('?file=','?file=file://')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
-									} else if(playFromHttp) {
-										m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
-									} else if (torrentPlaying) {
-										m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
-									} else if (playFromYoutube) {
-										console.log("SEEK IN YOUTUBE")
-										m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								if(upnpToggleOn){
+									newTime = percentage * state.playing.duration / 100
+									if(upnpTranscoding) {
+										var m = state.media
+										m.link = state.media.link.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+										initPlay(m);
+									} else {
+										if(state.playing.location == "airplay") {
+											mediaRenderer.scrub(newTime)
+										} else {
+											mediaRenderer.seek(newTime)
+										}
 									}
-									m.title = currentMedia.title;
-									m.cover = currentMedia.cover;
-									initPlay(m);
+								} else {
+									console.log(newTime)
+									media.setCurrentTime(newTime);
 								}
 							}
 						}
-
 						// position floating time box
 						if (!mejs.MediaFeatures.hasTouch) {
 								timefloat.css('left', pos);
@@ -3634,7 +3646,7 @@ if (typeof jQuery != 'undefined') {
 						'<div class="mejs-volume-total"></div>'+ // line background
 						'<div class="mejs-volume-current"></div>'+ // current volume
 						'<div class="mejs-volume-handle"></div>'+ // handle
-						'<div class="mejs-volume-pct" style="margin-top:-12px;margin-left:-1px;"></div>'+ // handle
+						'<div class="mejs-volume-percentage" style="margin-top:-12px;margin-left:-1px;"></div>'+ // handle
 					'</div>'+
 				'</div>')
 					.appendTo(controls),
@@ -3642,7 +3654,7 @@ if (typeof jQuery != 'undefined') {
 			volumeTotal = t.container.find('.mejs-volume-total, .mejs-horizontal-volume-total'),
 			volumeCurrent = t.container.find('.mejs-volume-current, .mejs-horizontal-volume-current'),
 			volumeHandle = t.container.find('.mejs-volume-handle, .mejs-horizontal-volume-handle'),
-			volumePct = t.container.find('.mejs-volume-pct'),
+			volumePct = t.container.find('.mejs-volume-percentage'),
 
 			positionVolumeHandle = function(volume, secondTry) {
 				if (!volumeSlider.is(':visible') && typeof secondTry == 'undefined') {

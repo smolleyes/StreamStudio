@@ -516,8 +516,7 @@ function initPlay(media) {
 	if(transcoderEnabled && seekAsked) {
 		currentMedia = media;
 		seekAsked = false;
-		cleanffar()
-		launchPlay()
+		cleanffar(true)
 		return;
 	}
 	player.playlistToggleClick();
@@ -684,7 +683,6 @@ function initPlay(media) {
 }
 
 function launchPlay() {
-	seekAsked = false;
 	var obj = JSON.parse(settings.ht5Player);
 	try {
 		if((activeTab == 1 || activeTab == 2) && (search_engine=== 'dailymotion' || search_engine=== 'youtube' || engine.type == "video") && obj.name === "StreamStudio") {
