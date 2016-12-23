@@ -3316,7 +3316,7 @@ if (typeof jQuery != 'undefined') {
 								//player.media.setCurrentTime(newTime);
 							} else {
 								if(upnpToggleOn){
-									newTime = percentage * state.playing.duration / 100
+									newTime = percentage * state.playing.duration
 									if(upnpTranscoding) {
 										var m = state.media
 										m.link = state.media.link.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
