@@ -1,3 +1,6 @@
+V 3.7.1
+ * fix win 32/64 locales and fonts in series
+ 
 V 3.7
  * avi files now play natively if possible
  * transcode only audio or only video if needed
