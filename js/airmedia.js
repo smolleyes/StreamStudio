@@ -56,6 +56,9 @@ function startStatusInterval () {
         mediaRenderer.playbackInfo(function(err,body,res) {
           if (err) return;
           if(res.readyToPlay && state.playing.state !== "PAUSED") {
+            $('.mejs-playpause-button').removeClass('mejs-play').addClass('mejs-pause');
+            $('#subPlayer-play').hide();
+            $('#subPlayer-pause').show();
             upnpTransitionning = false;
             state.playing.state = "PLAYING"
             state.media=currentMedia
@@ -69,6 +72,9 @@ function startStatusInterval () {
                 if(upnpTransitionning) {
                   return;
                 }
+                $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play');
+                $('#subPlayer-play').show();
+                $('#subPlayer-pause').hide();
                 state.playing.state = "STOPPED"
                 clearInterval(castStatusInterval)
                 castStatusInterval = null;
@@ -81,7 +87,7 @@ function startStatusInterval () {
         })
       } else {
         mediaRenderer.status(function(err,res) {
-          console.log(err,res)
+          //console.log(err,res)
           if(state.playing.duration !== 0 && res.currentTime && res.currentTime+1 > state.playing.duration) {
              on_media_finished()
              return;
@@ -101,6 +107,9 @@ function startStatusInterval () {
 
           state.playing.state = res.playerState
           if(state.playing.state == 'PLAYING' || state.playing.state == 'BUFFERING') {
+            $('.mejs-playpause-button').removeClass('mejs-play').addClass('mejs-pause');
+            $('#subPlayer-play').hide();
+            $('#subPlayer-pause').show();
             //console.log("in player playing or buffering:",err,res)
             upnpTransitionning = false;
             upnpLoading = false;
@@ -118,12 +127,18 @@ function startStatusInterval () {
             updateMiniPlayer()
             updateProgressBar()
           } else if (state.playing.state == "PAUSED" || state.playing.state == "TRANSITIONING"){
+            $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play');
+            $('#subPlayer-play').show();
+            $('#subPlayer-pause').hide();
             updateMiniPlayer()
             updateProgressBar()
           } else if(state.playing.state == "STOPPED") {
               if(upnpTransitionning) {
                 return;
               }
+              $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play');
+              $('#subPlayer-play').show();
+              $('#subPlayer-pause').hide();
               clearInterval(castStatusInterval)
               castStatusInterval = null;
               if(!upnpTransitionning){

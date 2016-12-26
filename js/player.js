@@ -77,9 +77,10 @@ $(document).ready(function() {
 	$(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
 		if(upnpToggleOn){
 			try{
-			   mediaRenderer.stop()
-				 clearInterval(castStatusInterval)
-		  } catch(err) {
+				mediaRenderer.stop()
+				clearInterval(castStatusInterval)
+				castStatusInterval = null;
+			} catch(err) {
 				initPlayer()
 				player.media.stop()
 			}
@@ -308,7 +309,7 @@ $(document).ready(function() {
 		mediaCurrentPct = pct;
 		mediaCurrentTime = newTime;
 		seekAsked = true;
-		if(transcoderEnabled || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+		if(transcoderEnabled || upnpTranscoding || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
 			if(playFromFile) {
@@ -707,7 +708,7 @@ function launchPlay() {
 	var needTranscoding = ['hls','m3u8','manifest']
 	var engineWithoutTranscoding = ['mp3stream']
 	var engineWithTranscoding = ['shoutcast','twitch']
-  var engineWithFFmpegCheck = ['torrent9','t411','torrent-project']
+	var engineWithFFmpegCheck = ['torrent9','t411','torrent-project']
 	var needFFmpegCheck = false;
 	transcodeAudioOnly = false;
 	transcodeVideoOnly = false;
@@ -728,26 +729,24 @@ function launchPlay() {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-	// check avi et dts on engines with possibles avi
+		// check avi et dts on engines with possibles avi
 	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
 		transcoderEnabled = true;
-	// force by extension
+		// force by extension
 	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
 		transcoderEnabled = true;
-  } else {
+	} else {
 		transcoderEnabled = false;
 	}
 
-  // check avi et dts on engines with possibles avi
-	if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
+	// check avi et dts on engines with possibles avi
+	if(engine && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
 		console.log('CHECK FFMPEG FORMAT')
 		needFFmpegCheck = true;
 	}
 
-	//&& aArray.indexOf(path.extname(currentMedia.title)) !== -1 || !upnpToggleOn && obj.name == 'StreamStudio' && aArray.indexOf(path.extname(currentMedia.link)
-
 	//final check
-	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+	if((transcoderEnabled || upnpTranscoding) && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
 		var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 		currentMedia.link = link;
 	}
@@ -776,31 +775,31 @@ function launchPlay() {
 			}
 		}
 		console.log('avant lecture upnp', currentMedia)
-		castNoResponseCount = 0;
 		upnpTransitionning =  true;
 		upnpLoading = true
 		state.playing.location=mediaRendererType
 		if(state.playing.state !== "STOPPED") {
 			if(castStatusInterval) {
-			  upnpStoppedAsked = true
+				upnpStoppedAsked = true
 				upnpTransitionning = true;
 			} else {
-				clearInterval(statusInterval)
 				setTimeout(function() {
 					mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
-						if(!castStatusInterval) {
-							startStatusInterval()
-						}
+
 					})
 				},1000)
 			}
 		} else {
-			  mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
-					if(!castStatusInterval) {
-						startStatusInterval()
-					}
-				})
+			mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
+
+			})
 		}
+		setTimeout(function() {
+			console.log("CHECK STATUSINTERVAL", castStatusInterval)
+			if(!castStatusInterval) {
+				startStatusInterval()
+			}
+		},2000)
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
@@ -828,13 +827,13 @@ function launchPlay() {
 
 function checkFFmpegFormat() {
 	// check if stream is XVID with Advances Simple Profile or has DTS audio, if yes enable transcoder
-  var args = ['-i',""+currentMedia.link.match(/(.*)\//)[1]+""];
+	var args = ['-i',""+currentMedia.link.match(/(.*)\//)[1]+""];
 	var ffmpegCheck = spawn(ffmpegPath, args);
 	var total_data = '';
 	ffmpegCheck.stderr.on('data', function(data) {
-			if(data) {
-				total_data += data.toString();
-			}
+		if(data) {
+			total_data += data.toString();
+		}
 	});
 
 	ffmpegCheck.on('exit',function(code) {
@@ -1070,12 +1069,18 @@ var upnpTransitionning = false;
 
 function on_media_finished(){
 	console.log('in on media finished')
-	if(upnpToggleOn && playlistMode== "normal") {
-		upnpStoppedAsked = true
-		upnpTransitionning = false;
-		$('#closePlayer').click();
-		initPlayer()
-		return;
+	if(upnpToggleOn) {
+		clearInterval(castStatusInterval)
+		castStatusInterval = null;
+		if(playlistMode== "normal") {
+			upnpStoppedAsked = true
+			upnpTransitionning = false;
+			$('#closePlayer').click();
+			clearInterval(castStatusInterval)
+			castStatusInterval = null;
+			initPlayer()
+			return;
+		}
 	}
 
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}

@@ -3293,7 +3293,7 @@ if (typeof jQuery != 'undefined') {
 							mediaCurrentTime = newTime;
 							seekAsked = true;
 							mouseIsDown =false;
-							if(transcoderEnabled || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+							if(transcoderEnabled || upnpTranscoding || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
 								var m = {};
 								var l = currentMedia.link.replace(/&start=(.*)/,'')
 								if(playFromFile) {
