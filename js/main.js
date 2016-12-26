@@ -903,10 +903,10 @@ function main() {
         continueTransition = false;
         mediaRenderer.stop();
         setTimeout(function() {
-          playUpnpRenderer(stream);
+          startPlay(stream);
         }, 3000);
       } else {
-        playUpnpRenderer(stream);
+        startPlay(stream);
       }
     } else {
       startPlay(stream);

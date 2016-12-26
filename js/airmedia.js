@@ -20,37 +20,48 @@ var API = {};
 var BASE_URL = '';
 var session_token = '';
 
+var currentPos = 0;
+var previousCurrent = 0;
+
 function updateState(state) {
   console.log(state)
 }
 
 function startStatusInterval () {
+  console.log("IN STARTSTATUSINTERVAL", castStatusInterval, upnpStoppedAsked,state.playing.state)
+  try {
   castStatusInterval = setInterval(function () {
     if(upnpStoppedAsked && state.playing.state !== 'STOPPED') {
       console.log('stop asked in airmedia')
       state.playing.state = "STOPPED"
+      $('#fbxMsg').empty()
       clearInterval(castStatusInterval)
       castStatusInterval = null;
       upnpStoppedAsked = false;
-      upnpTransitionning = false;
-      setTimeout(function() {
-        initPlayer()
-      },2000)
+      if(!upnpTransitionning) {
+          initPlayer()
+          upnpTransitionning = true;
+      } else {
+        mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
+            startStatusInterval()
+            upnpLoading = false
+        })
+      }
+      return;
     } else {
       upnpStoppedAsked = false;
     }
-    var mediaPlayer = mediaRenderer
-    if (mediaPlayer) {
+    if (mediaRenderer) {
       if(state.playing.location == "airplay") {
-        mediaPlayer.playbackInfo(function(err,body,res) {
+        mediaRenderer.playbackInfo(function(err,body,res) {
           if (err) return;
           if(res.readyToPlay && state.playing.state !== "PAUSED") {
             upnpTransitionning = false;
             state.playing.state = "PLAYING"
             state.media=currentMedia
-            player.play()
             state.playing.currentTime = res.position
             state.playing.duration = res.duration
+            upnpLoading = false
             updateMiniPlayer()
             updateProgressBar()
           } else {
@@ -69,32 +80,34 @@ function startStatusInterval () {
           }
         })
       } else {
-        mediaPlayer.status(function(err,res) {
-          //console.log(err,res)
-          if (err) return;
+        mediaRenderer.status(function(err,res) {
+          console.log(err,res)
+          if(state.playing.duration !== 0 && res.currentTime && res.currentTime+1 > state.playing.duration) {
+             on_media_finished()
+             return;
+          }
+          // if(!err && !res && castNoResponseCount < 2) {
+          //   castNoResponseCount+=1
+          // }
+          if (err || !res) return;
           // fix freebox
-          if(res.playerState =="NO_MEDIA_PRESENT" && state.playing.state !== "LOADING" ||  state.media.link && state.media.link !== currentMedia.link && state.playing.state !== "LOADING") {
+          try {
+          if(state.playing.location !== 'chromecast' && (res.playerState =="NO_MEDIA_PRESENT" && state.playing.state !== "LOADING" ||  state.media.link && state.media.link !== currentMedia.link && state.playing.state !== "LOADING")) {
             state.playing.state = "LOADING"
             state.media=currentMedia
             mediaRenderer.client.load(currentMedia.link,currentMedia)
             return;
           }
-          if(state.playing.location == 'chromecast' && !res) {
-            state.playing.state = "STOPPED";
-            clearInterval(castStatusInterval)
-            castStatusInterval = null;
-            upnpTransitionning = true;
-            if(!upnpTransitionning){
-              upnpTransitionning = true;
-              on_media_finished()
-            }
-            return;
-          }
+
           state.playing.state = res.playerState
-          if(res.playerState == 'PLAYING' || res.PlayerState == 'BUFFERING') {
+          if(state.playing.state == 'PLAYING' || state.playing.state == 'BUFFERING') {
+            //console.log("in player playing or buffering:",err,res)
             upnpTransitionning = false;
+            upnpLoading = false;
             state.media=currentMedia
-            player.play()
+            if(state.playing.state== "BUFFERING") {
+              $('#fbxMsg').remove()
+            }
             if(state.playing.location == 'upnp'){
               state.playing.currentTime = res.position.currentTime
               state.playing.duration = res.position.duration
@@ -104,11 +117,10 @@ function startStatusInterval () {
             }
             updateMiniPlayer()
             updateProgressBar()
-          } else if (res.playerState == "PAUSED" || res.playerState == "TRANSITIONING"){
-            player.pause()
+          } else if (state.playing.state == "PAUSED" || state.playing.state == "TRANSITIONING"){
             updateMiniPlayer()
             updateProgressBar()
-          } else if(res.playerState == "STOPPED") {
+          } else if(state.playing.state == "STOPPED") {
               if(upnpTransitionning) {
                 return;
               }
@@ -120,10 +132,16 @@ function startStatusInterval () {
                 on_media_finished()
               }
           }
+        } catch(err) {
+          console.log(err)
+        }
         })
       }
     }
   }, 1000)
+} catch(err) {
+  console.log(err)
+}
 }
 
 function checkFreebox() {
@@ -132,23 +150,18 @@ function checkFreebox() {
           console.log('freebox available, airplay enabled');
           //$('#airplayContainer').show();
           freeboxAvailable = true;
-          //show gui
-          createLocalRootNodes();
-          Cast = require('casts')
-          Cast.init(state,updateUpnpList)
-          cli.searchDevices()
         }).fail(function(err){
           //show gui
           console.log('no freebox available, airplay disabled');
-          createLocalRootNodes();
-          Cast = require('casts')
-          Cast.init(state,updateUpnpList)
-          cli.searchDevices()
         });
     } catch(err) {
         console.log('no freebox available, airplay disabled');
     }
     // get api version
+    createLocalRootNodes();
+    Cast = require('casts')
+    Cast.init(state,updateUpnpList)
+    cli.searchDevices()
     http.get(''+FREEBOX_URL+API_VERSION+'',function(res,err){
         var datas = [];
         res.on('data',function(chunk){

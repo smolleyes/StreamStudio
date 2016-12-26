@@ -357,6 +357,7 @@ app.updateStats = function(streamInfo) {
             try {
                 $('#fbxMsg2').remove();
             } catch (err) {}
+            $('#fbxMsg').hide()
             $('.mejs-container').append('<div id="fbxMsg2" class="preloadingMsg" style="height:calc(100% - 60px);"><div style="top:62%;position: relative;"><p style="font-weight:bold;text-align: center;">' + _("Please wait while loading your video... (Can take a few seconds)") + '</p></div></div>');
             if(!torrentsArr[0] || !torrentsArr[0].link) {
                console.log('PAS DE LIEN DANS INITPLAY FLIX ! attends !')
@@ -650,6 +651,7 @@ function loadTable(files) {
                 }
             } else {
                 $('.mejs-playlist ul li:first').click()
+                fromPlayList = true
             }
         }
     })

@@ -11,6 +11,9 @@ function startHt5Server() {
             startStreaming(req, res)
         }
     }).listen(8887,ip.address());
+    ht5Server.on('connection', function (socket) {
+      socket.setTimeout(36000000)
+    })
     console.log('StreamStudio Transcoding Server ready on port 8887');
 }
 
@@ -52,6 +55,9 @@ function startProxyServer() {
             }
         }
     }).listen(8091);
+    proxyServer.on('connection', function (socket) {
+      socket.setTimeout(36000000)
+    })
 }
 
 function startStreaming(req, res, width, height) {
@@ -607,39 +613,6 @@ function cleanffar(seek) {
     }
 }
 
-function startWebServer() {
-    ht5Server = http.createServer(function(req, res) {
-        if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
-            if(req.url.indexOf("getAirMediaDevices") !== -1) {
-                var list = $(cli._renderers).map(function(i){
-                    return {
-                        "ip":$(this)[0].baseUrl,
-                        "id":$(this)[0]._index,
-                        "name":$(this)[0].friendlyName
-                        }
-                    }).get();
-                var body = JSON.stringify(list);
-                res.end(body);
-            }
-            // get engines list
-            else if(req.url.indexOf("getEngines") !== -1) {
-                var body = JSON.stringify(enginesList);
-                res.end(body);
-            }
-            // change engine
-            else if(req.url.indexOf("loadEngine") !== -1) {
-                var engine = req.url.split('&engine=')[1];
-                console.log('changing to engine ' + engine)
-                $('#engines_select').val(engine).change();
-                res.writeHead(200,{'Content-type': 'text/html','Access-Control-Allow-Origin' : '*'});
-                res.end('ok');
-            }
-        }
-    }).listen(8898,ip.address());
-    console.log('StreamStudio WebServer ready on port 8898');
-}
-
 // start
 startHt5Server();
 startProxyServer();
-startWebServer();

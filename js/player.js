@@ -78,9 +78,10 @@ $(document).ready(function() {
 		if(upnpToggleOn){
 			try{
 			   mediaRenderer.stop()
+				 clearInterval(castStatusInterval)
 		  } catch(err) {
-				player.stop()
 				initPlayer()
+				player.media.stop()
 			}
 		}
 		updateMiniPlayer()
@@ -395,7 +396,6 @@ function initPlayer(stopTorrent) {
 	mediaCurrentPct = 0;
 	mediaCurrentTime = 0;
 	playFromSeries = false;
-	fromPlayList = false;
 	player.media.duration = 0
 	state.media = {}
 	state.playing.duration = 0
@@ -471,7 +471,7 @@ function initPlayer(stopTorrent) {
 function updateMiniPlayer() {
 
 	if (upnpToggleOn) {
-		if(state.playing.state =="PLAYING") {
+		if(!upnpLoading && (state.playing.state =="PLAYING" || state.playing.state =="BUFFERING")) {
 			$('.mejs-overlay-button').hide();
 			$('.mejs-overlay-loading').hide();
 			$('.mejs-container p#fbxMsg').remove();
@@ -513,6 +513,7 @@ function startPlay(media) {
 }
 
 function initPlay(media) {
+	player.media.stop()
 	if(transcoderEnabled && seekAsked) {
 		currentMedia = media;
 		seekAsked = false;
@@ -754,31 +755,51 @@ function launchPlay() {
 
 	// then start on target device local/dlna ... or external
 	if(upnpToggleOn) {
-		currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
+		if(mediaRendererType == "upnp") {
+			currentMedia.data = JSON.stringify({"protocolInfo" : "http-get:*"});
+		} else {
+			currentMedia.seek = 0;
+			currentMedia.subtitles = []
+			currentMedia.autoSubtitles = false;
+		}
 		if(currentMedia.type === undefined) {
 			try {
 				if (mime.lookup(currentMedia.title).indexOf('audio/') !== -1 || mime.lookup(currentMedia.link).indexOf('audio/') !== -1) {
-					currentMedia.type = "audio";
-					currentMedia.mime = mime.lookup(currentMedia.title) || "audio/mp3"
+					//currentMedia.type = "audio";
+					currentMedia.type = mime.lookup(currentMedia.title) || "audio/mp3"
 				} else if (mime.lookup(currentMedia.title).indexOf('video/') !== -1 || mime.lookup(currentMedia.link).indexOf('video/') !== -1) {
-					currentMedia.type = "video";
-					currentMedia.mime = mime.lookup(currentMedia.title) || "video/mp4"
+					//currentMedia.type = "video";
+					currentMedia.type = mime.lookup(currentMedia.title) || "video/mp4"
 				}
 			} catch(err) {
-				currentMedia.type = "video";
-				currentMedia.mime = "video/mp4"
+				currentMedia.type = "video/mp4";
 			}
 		}
 		console.log('avant lecture upnp', currentMedia)
-		if(upnpToggleOn && castStatusInterval == null){
-			startStatusInterval()
-		}
+		castNoResponseCount = 0;
+		upnpTransitionning =  true;
+		upnpLoading = true
 		state.playing.location=mediaRendererType
-		if(state.playing.state == "PLAYING") {
-			mediaRenderer.stop()
-			mediaRenderer.play(currentMedia.link,currentMedia)
+		if(state.playing.state !== "STOPPED") {
+			if(castStatusInterval) {
+			  upnpStoppedAsked = true
+				upnpTransitionning = true;
+			} else {
+				clearInterval(statusInterval)
+				setTimeout(function() {
+					mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
+						if(!castStatusInterval) {
+							startStatusInterval()
+						}
+					})
+				},1000)
+			}
 		} else {
-			mediaRenderer.play(currentMedia.link,currentMedia)
+			  mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
+					if(!castStatusInterval) {
+						startStatusInterval()
+					}
+				})
 		}
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
@@ -925,6 +946,10 @@ function playNextVideo(vid_id) {
 function getNext() {
 	console.log('in getnext')
 	initPlayer()
+	if(fromPlayList) {
+		player.playNextTrack()
+		return;
+	}
 	if (activeTab == 1) {
 		try {
 			engine.play_next();
@@ -990,7 +1015,11 @@ function getNext() {
 }
 
 function getPrev() {
-	initPlayer()
+	initPlayer();
+	if(fromPlayList) {
+		player.playNextTrack()
+		return;
+	}
 	if (activeTab == 1) {
 		if(search_engine == 'youtube' || search_engine == 'dailymotion') {
 			$('.highlight').closest('.youtube_item').prev().find('.coverPlayImg').click()
@@ -1041,10 +1070,11 @@ var upnpTransitionning = false;
 
 function on_media_finished(){
 	console.log('in on media finished')
-	if(upnpToggleOn && upnpStoppedAsked) {
+	if(upnpToggleOn && playlistMode== "normal") {
 		upnpStoppedAsked = true
-		initPlayer()
+		upnpTransitionning = false;
 		$('#closePlayer').click();
+		initPlayer()
 		return;
 	}
 

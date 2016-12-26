@@ -236,10 +236,6 @@ function updateUpnpList() {
   loadUpnpRenderers()
 }
 
-var aiplayPlayersArr = []
-var chromecastPlayers = []
-var dlnaPlayers = []
-
 function loadUpnpRenderers() {
   if($('#castPopup').children().length == 0) {
     $('#castPopup').append(`
@@ -268,14 +264,14 @@ function loadUpnpRenderers() {
           }
         });
         $.each(state.devices.chromecast.getDevices(),function(index,item) {
+          console.log("chromecast detected:", item)
           var name = item.name;
           if(name.toLowerCase()=="chromecast_") {
             return;
           }
-          var id = item.id;
           if(name !== "") {
               if(chromecastPlayers.indexOf(name) == -1) {
-                $('#chromecastPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="chromecast" name="cast" value="'+id+'"> <br />');
+                $('#chromecastPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="chromecast" name="cast" value="'+name+'"> <br />');
                 upnpDevices.push(name);
                 chromecastPlayers.push(name)
               }
@@ -283,12 +279,11 @@ function loadUpnpRenderers() {
         });
         $.each(state.devices.airplay.getDevices(),function(index,item) {
           var name = item.name;
-          var id = item.id;
           if(name !== "") {
-              if(aiplayPlayersArr.indexOf(name) == -1) {
-                $('#airplayPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="airplay" name="cast" value="'+id+'"> <br />');
+              if(airplayPlayersArr.indexOf(name) == -1) {
+                $('#airplayPlayers').append('<span style="position:relative;top:-3px;">'+name + ' :</span> <input class="upnp" data-name="'+name+'" type="radio" data-type="airplay" name="cast" value="'+name+'"> <br />');
                 upnpDevices.push(name);
-                aiplayPlayersArr.push(name);
+                airplayPlayersArr.push(name);
               }
           }
         });

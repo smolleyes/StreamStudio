@@ -304,5 +304,6 @@
 	"Episodes list (vostfr):": "Liste des épisodes (vostfr):",
 	"load %s episodes": "Charger les épisodes %s",
 	"Episodes list (fr):": "Liste des épisodes (fr):",
-	"Website streamstudio.cc is unreachable !": "Website streamstudio.cc is unreachable !"
+	"Website streamstudio.cc is unreachable !": "Website streamstudio.cc is unreachable !",
+	"Playing on your local device !": "Playing on your local device !"
 }

@@ -1,4 +1,4 @@
-var VERSION = "3.7.1";
+var VERSION = "3.7.2";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -42,6 +42,10 @@ var upnpLoading = false;
 var tseWin = false; // hidden window for cloudflare
 var Cast = null;
 var castStatusInterval = null;
+var airplayPlayersArr = []
+var chromecastPlayers = []
+var dlnaPlayers = []
+var castNoResponseCount = 0;
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
@@ -52,6 +56,7 @@ var state = {}
 state.player={}
 state.devices={}
 state.playing={}
+state.playing.state = "STOPPED"
 state.devices.castMenu={}
 state.playing.location="local"
 

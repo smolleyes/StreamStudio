@@ -1,3 +1,6 @@
+V 3.7.2
+ * fix chromecast
+
 V 3.7.1
  * fix win 32/64 locales and fonts in series
  
