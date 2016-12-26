@@ -323,6 +323,10 @@ var htmlContent =
 <label for="torrent9">torrent9</label> \
 <input class="pluginCheckBox" type="checkbox" id="torrent9" name="torrent9"> \
 </div> \
+<div class="ItemCheckbox left"> \
+<label for="cpasbien">cpasbien</label> \
+<input class="pluginCheckBox" type="checkbox" id="cpasbien" name="cpasbien"> \
+</div> \
 <div class="ItemCheckbox left">\
  		<label for="twitch">Twitch</label>\
  		<input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch">\
@@ -1070,7 +1074,7 @@ function main() {
     };
     try {
       engine = engines[search_engine];
-      engine.init(gui, win.window, document);
+      engine.init(gui, win.window, document,console);
       $("#search p").empty().append(_("Engine %s ready...!", engine.engine_name)).show();
       // hide not needed menus
       $.each(engine.menuEntries, function(index, type) {
