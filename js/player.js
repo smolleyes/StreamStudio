@@ -537,6 +537,11 @@ function initPlay(media) {
 	ffmpegLive = false;
 	transcoderEnabled = false;
 	upnpTranscoding = false;
+	if ($("#upnpTranscoding input").is(':checked')) {
+    upnpTranscoding = true;
+  } else {
+    upnpTranscoding = false;
+  }
 	if(upnpMediaPlaying || playFromUpnp) {
 		play_next = true;
 	}
@@ -721,6 +726,8 @@ function launchPlay() {
 
 	if(engine) {
 		engine_name = engine.engine_name.toLowerCase();
+	} else {
+		engine_name = ""
 	}
 
 	// set transcoding if needed
@@ -784,7 +791,8 @@ function launchPlay() {
 		upnpLoading = true
 		state.playing.location=mediaRendererType
 
-		if(!upnpTranscoding && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
+		// enable audio visualisation for shoutcast thru upnp
+		if(upnpToggleOn && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && engine_name && engine_name == "shoutcast") {
 			upnpTranscoding = true
 			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 			currentMedia.link = link;

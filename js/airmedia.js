@@ -142,9 +142,9 @@ function startStatusInterval () {
               clearInterval(castStatusInterval)
               castStatusInterval = null;
               if(!upnpTransitionning){
-                upnpTransitionning = true;
-                console.log('before on media finished in airmedia')
-                on_media_finished()
+                 upnpTransitionning = true;
+                 console.log('before on media finished in airmedia')
+                 on_media_finished()
               }
           }
         } catch(err) {
