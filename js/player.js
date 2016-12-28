@@ -100,6 +100,9 @@ $(document).ready(function() {
 		$('#playerContainer').hide();
 		$('#playerTopBar').hide();
 		$('#closePlayer').click();
+		$('#subPlayer-play').show();
+		$('#subPlayer-pause').hide();
+		$('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play');
 		stopTorrent();
 		initPlayer();
 	});
@@ -385,6 +388,10 @@ $(document).ready(function() {
 function initPlayer(stopTorrent) {
 	// clean subtitles
 	$('.soloTorrent').remove();
+	player.durationD.html(mejs.Utility.secondsToTimeCode(0));
+	player.currenttime.html(mejs.Utility.secondsToTimeCode(0))
+	$('.mejs-currenttime-sub').text('00:00:00')
+	$('.mejs-duration-sub').text('00:00:00')
 	stopIceTimer()
 	cleanffar()
 	state.playing.currentTime = 0
@@ -446,8 +453,6 @@ function initPlayer(stopTorrent) {
 	player.pause();
 	player.setSrc('');
 	player.currentTime = 0;
-	player.durationD.text('00:00:00');
-	player.currenttime.text('00:00:00')
 	player.loaded.width(0);
 	player.current.width(0);
 	$('#infosPage').remove();
@@ -464,7 +469,7 @@ function initPlayer(stopTorrent) {
 	$('#subPlayer-Progress progress').val(0);
 	$('.mejs-time-current').width(0)
 	$('#progress-bar').val(0)
-	$('.mejs-duration,.mejs-currenttime').text('00:00:00')
+	//$('.mejs-duration,.mejs-currenttime').text('00:00:00')
 	$('#subPlayer-img').attr('src','images/play-overlay.png');
 	$('#fbxMsg,#fbxMsg2').remove();
 }
@@ -517,10 +522,10 @@ function initPlay(media) {
 	player.media.stop()
 	if(transcoderEnabled && seekAsked) {
 		currentMedia = media;
-		seekAsked = false;
 		cleanffar(true)
 		return;
 	}
+	seekAsked = false
 	player.playlistToggleClick();
 	$('.mejs-playlist').hide();
 	$('.mejs-playlist  > ul').hide();
@@ -531,6 +536,7 @@ function initPlay(media) {
 	stopIceTimer()
 	ffmpegLive = false;
 	transcoderEnabled = false;
+	upnpTranscoding = false;
 	if(upnpMediaPlaying || playFromUpnp) {
 		play_next = true;
 	}
@@ -729,7 +735,6 @@ function launchPlay() {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-		// check avi et dts on engines with possibles avi
 	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
 		transcoderEnabled = true;
 		// force by extension
@@ -778,6 +783,13 @@ function launchPlay() {
 		upnpTransitionning =  true;
 		upnpLoading = true
 		state.playing.location=mediaRendererType
+
+		if(!upnpTranscoding && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
+			upnpTranscoding = true
+			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
+			currentMedia.link = link;
+		}
+
 		if(state.playing.state !== "STOPPED") {
 			if(castStatusInterval) {
 				upnpStoppedAsked = true
@@ -1084,9 +1096,9 @@ function on_media_finished(){
 	}
 
 	if(win.isFullscreen) {$('body').css({'cursor':'default'});}
-	if (playlistMode === 'normal' && !seekAsked) {
+	if (playlistMode === 'normal') {
 		initPlayer();
-		$('#closePlayer').click();
+		$('.mejs-stop button').click()
 	} else if (playlistMode === 'loop') {
 		if(upnpToggleOn && !upnpTransitionning) {
 			initPlay(currentMedia);
@@ -1116,16 +1128,16 @@ function updateProgressBar() {
 		try {
 			var percentage = ((100 / duree) * (state.playing.currentTime));
 			progressBar.value = percentage;
-			$('.mejs-duration').text(mejs.Utility.secondsToTimeCode(duree))
+			$('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(duree))
 			var total = $('.mejs-time-total').width()
 			var newWidth = Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)
 			if(total > newWidth) {
 				$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
 			}
-			$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
+		  $('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
 			$('#subPlayer-img').attr('src',currentMedia.cover);
 			if(upnpTranscoding && percentage == 0) {
-				$('.mejs-currenttime').text('Live')
+				$('.mejs-currenttime, .mejs-currenttime-sub').text('Live')
 			}
 		} catch(err) { console.log(err)}
 	} else {
@@ -1134,10 +1146,10 @@ function updateProgressBar() {
 		try {
 			if(transcoderEnabled) {
 				var percentage = ((100 / duree) * (current+mediaCurrentTime));
-				$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
+				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
 			} else {
 				var percentage = ((100 / duree) * current);
-				$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))
+				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))
 			}
 			progressBar.value = percentage;
 		} catch(err) {

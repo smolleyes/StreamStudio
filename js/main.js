@@ -320,11 +320,11 @@ var htmlContent =
 <input class="pluginCheckBox" type="checkbox" id="torrent-project" name="torrent-project"> \
 </div> \
 <div class="ItemCheckbox left"> \
-<label for="torrent9">torrent9</label> \
+<label for="torrent9">Torrent9</label> \
 <input class="pluginCheckBox" type="checkbox" id="torrent9" name="torrent9"> \
 </div> \
 <div class="ItemCheckbox left"> \
-<label for="cpasbien">cpasbien</label> \
+<label for="cpasbien">Cpasbien.cx</label> \
 <input class="pluginCheckBox" type="checkbox" id="cpasbien" name="cpasbien"> \
 </div> \
 <div class="ItemCheckbox left">\
@@ -466,7 +466,7 @@ var htmlContent =
 <div id="playlistBtnSub"></div>  \
 <div id="castBtnSub"></div>  \
 <div id="transcodingBtnSub"></div> \
-<div id="subPlayer-Timer"><span class="mejs-currenttime">00:00:00</span><span> | </span> <span class="mejs-duration">00:00:00</span></div> \
+<div id="subPlayer-Timer"><span class="mejs-currenttime-sub">00:00:00</span><span> | </span> <span class="mejs-duration-sub">00:00:00</span></div> \
 <div id="subPlayer-title-container"></div> \
 </div> \
 </div> \
@@ -496,8 +496,12 @@ try {
           updateDisplay: 'none'
         });
         initPlayer();
+      } else {
+        console.log(error)
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err)
+    }
   });
 } catch (err) {
   console.log("exception error" + err);
@@ -522,6 +526,7 @@ $(document).ready(function() {
     $.magnificPopup.proto._onFocusIn.call(this,e);
   }
   createLocalRootNodes();
+
 });
 
 function main() {
@@ -756,13 +761,6 @@ function main() {
     gui.Shell.showItemInFolder(settings.download_dir + '/StreamStudio');
   });
 
-  $("div.mejs-time").bind('DOMCharacterDataModified', function() {
-    if ($('div.mejs-time').html() != $('#subPlayer-Timer').html()) {
-      $('#subPlayer-Timer').empty().append($('div.mejs-time').html());
-    }
-    var img = null;
-  });
-
   $("#playlistBtn").bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
     $("#playlistBtnSub").empty().append($("#playlistBtn").html());
   });
@@ -773,7 +771,15 @@ function main() {
   $("#transcodeBtnContainer").bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function() {
     $("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
   });
+
   $("#transcodingBtnSub").empty().append($("#transcodeBtnContainer").html());
+
+  $('.mejs-currenttime').on('chnage input', function() {
+    console.log('CHANGEDDDDD')
+    if ($('.mejs-time').html() != $('#subPlayer-Timer').html()) {
+      $('#subPlayer-Timer').empty().append($('.mejs-time').html());
+    }
+  });
 
   // fullscreen signal and callback
   var left;

@@ -444,6 +444,8 @@ mejs.HtmlMediaElement = {
 				if (this.canPlayType(media.type)) {
 					this.src = media.src;
 					break;
+				} else {
+					console.log('PAS POSSIBLE CE CODEC')
 				}
 			}
 		}
@@ -593,6 +595,8 @@ mejs.PluginMediaElement.prototype = {
 					this.pluginApi.setSrc(mejs.Utility.absolutizeUrl(media.src));
 					this.src = mejs.Utility.absolutizeUrl(url);
 					break;
+				} else {
+					console.log('PAS POSSIBLE CODEC 2 ')
 				}
 			}
 		}
@@ -2307,7 +2311,7 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		hideControls: function(doAnimation) {
-			if(playerBarsLocked || $('#box').is(':focus') || $('#castPopup').is(":hover") || $('#castPopup').is(":visible")) {
+			if(playerBarsLocked || $('#box').is(':focus') || $('#castPopup').is(":hover") || $('#castPopup').is(":visible")) {
 				return;
 			}
 			var t = this;
@@ -2587,7 +2591,7 @@ if (typeof jQuery != 'undefined') {
 
 				// resize on the first play
 				t.media.addEventListener('loadedmetadata', function(e) {
-					if(t.media.duration == Infinity || chromecastPlaying) {
+					if(t.media.duration == Infinity) {
 						t.options.duration = mediaDuration;
 					}
 					if (t.updateDuration) {
@@ -3282,7 +3286,7 @@ if (typeof jQuery != 'undefined') {
 						pos = x - offset.left;
 					  percentage = (pos / width);
 						var duree;
-						if(upnpTranscoding){
+						if(upnpTranscoding) {
 							duree = mediaDuration;
 						} else {
 							duree = (media.duration == Infinity || isNaN(media.duration)) ? mediaDuration : media.duration;
@@ -3437,6 +3441,7 @@ if (typeof jQuery != 'undefined') {
 					}
 				}
 			} else {
+				return;
 				try {
 					var target = (e != undefined) ? e.target : t.media,
 					percent = null;
@@ -3474,12 +3479,12 @@ if (typeof jQuery != 'undefined') {
 		setCurrentRail: function() {
 			var t = this;
 		    if(t.media.duration == Infinity) {
-				if (t.media.currentTime != undefined && mediaDuration || upnpToggleOn) {
+				if (t.media.currentTime != undefined && mediaDuration) {
 					// update bar and handle
 					if (t.total && t.handle) {
 						var
 							newWidth = Math.round(t.total.width() * (mediaCurrentTime+t.media.currentTime) / mediaDuration),
-							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
+							handlePos = newWidth - Math.round(t.handle.outerWidth(true));
 						if(t.total.width() < newWidth || t.total.width() < handlePos) {
 							return;
 						}
@@ -3493,7 +3498,7 @@ if (typeof jQuery != 'undefined') {
 					if (t.total && t.handle) {
 						var
 							newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
-							handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
+							handlePos = newWidth - Math.round(t.handle.outerWidth(true));
 							if(t.total.width() < newWidth || t.total.width() < handlePos) {
 								return;
 							}
@@ -3536,7 +3541,7 @@ if (typeof jQuery != 'undefined') {
 
 		buildduration: function(player, controls, layers, media) {
 			var t = this;
-			if(t.media.duration == Infinity || chromecastPlaying) {
+			if(t.media.duration == Infinity) {
 				t.options.duration = mediaDuration;
 			} else {
 				t.options.duration = media.duration;
@@ -3574,32 +3579,36 @@ if (typeof jQuery != 'undefined') {
 
 		updateCurrent:  function() {
 			var t = this;
-			if(t.media.duration == Infinity || chromecastPlaying) {
-				t.options.duration = mediaDuration;
+			if(t.media.duration == Infinity || upnpToggleOn || transcoderEnabled) {
+				//t.options.duration = mediaDuration;
 				if (t.currenttime) {
 					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					$('.mejs-currenttime-sub').html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 				}
 			} else {
 				if (t.currenttime) {
-					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					$('.mejs-currenttime-sub').html(mejs.Utility.secondsToTimeCode(t.media.currentTime, t.options.alwaysShowHours || t.media.duration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 				}
 			}
 		},
 
 		updateDuration: function() {
 			var t = this;
-			if(t.media.duration == Infinity || chromecastPlaying) {
+			if(t.media.duration == Infinity || upnpToggleOn || transcoderEnabled) {
 				t.options.duration = mediaDuration;
 				//Toggle the long video class if the video is longer than an hour.
 				t.container.toggleClass("mejs-long-video", mediaDuration > 3600);
 				if (t.durationD && (t.options.duration > 0 || t.media.duration)) {
 					t.durationD.html(mejs.Utility.secondsToTimeCode(mediaDuration > 0 ? mediaDuration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
+					$('.mejs-duration-sub').html(mejs.Utility.secondsToTimeCode(mediaDuration > 0 ? mediaDuration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
 				}
 			} else {
 				//Toggle the long video class if the video is longer than an hour.
 				t.container.toggleClass("mejs-long-video", t.media.duration > 3600);
 				if (t.durationD && (t.options.duration > 0 || t.media.duration)) {
 					t.durationD.html(mejs.Utility.secondsToTimeCode(t.options.duration > 0 ? t.options.duration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
+					$('.mejs-duration-sub').html(mejs.Utility.secondsToTimeCode(t.options.duration > 0 ? t.options.duration : t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25).replace('NaN:NaN:NaN','LIVE'));
 				}
 			}
 		}

@@ -531,7 +531,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         if(playFromWat) {
             args = ['-re','-i','pipe:0','-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
         } else if (playFromIcecast) {
-            args = ['-re','-i','pipe:0','-c:a', 'libopus','-b:a',bitrate,'-f', 'opus', '-threads','0',  'pipe:1'];
+            args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'', '-b:a',''+bitrate+'','-threads', '0','-f', 'matroska','pipe:1'];
         } else {
             args = ['-re','-i', 'pipe:0', '-sn', '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2", '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'matroska', 'pipe:1'];
         }
@@ -560,6 +560,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
             //console.log('grep stderr: ' + data);
 
             if (data.toString().substr(0,5) == 'frame') {
+              return;
                 var time = data.toString().match(/time=(\d\d:\d\d:\d\d)/)[1];
                 var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
                 var pct = (seconds / total_time) * 100;

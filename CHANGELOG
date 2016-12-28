@@ -1,3 +1,9 @@
+V 3.8
+ * rewrite code for timer and progress bars
+ * fix shoutcast engine
+ * add audio visualisation for shoutcast thru upnp/airplay/chromecast
+ * typo fix 
+ 
 V 3.7.3
  * add cpasbien.cx plugin 
 
