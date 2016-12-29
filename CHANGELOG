@@ -1,3 +1,7 @@
+V 3.8.1
+ * fix uncaught exception when file has invalid duration (now it automatically replay thru transcoder)
+ * fix local files playing when an engine is selected (trascoding was forced before)
+
 V 3.8
  * rewrite code for timer and progress bars
  * fix shoutcast engine

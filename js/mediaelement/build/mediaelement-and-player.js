@@ -2968,7 +2968,15 @@ if (typeof jQuery != 'undefined') {
 			this.setControlsSize();
 		},
 		play: function() {
-			this.media.play();
+			const p = this.media.play();
+            if (!transcoderEnabled && p && (typeof Promise !== 'undefined') && (p instanceof Promise)) {
+                p.catch((e) => {
+                    console.log(`Caught pending play exception - continuing (${e})`);
+										console.log("restarting media with transcoder")
+										forceTranscoding = true;
+										launchPlay()
+                });
+            }
 		},
 		pause: function() {
 			this.media.pause();

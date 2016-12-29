@@ -1,4 +1,4 @@
-var VERSION = "3.8";
+var VERSION = "3.8.1";
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -46,6 +46,7 @@ var airplayPlayersArr = []
 var chromecastPlayers = []
 var dlnaPlayers = []
 var castNoResponseCount = 0;
+var forceTranscoding = false;
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
