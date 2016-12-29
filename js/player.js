@@ -752,7 +752,7 @@ function launchPlay() {
 	}
 
 	// check avi et dts on engines with possibles avi
-	if(engine && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
+	if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
 		console.log('CHECK FFMPEG FORMAT')
 		needFFmpegCheck = true;
 	}
@@ -847,7 +847,7 @@ function launchPlay() {
 
 function checkFFmpegFormat() {
 	// check if stream is XVID with Advances Simple Profile or has DTS audio, if yes enable transcoder
-	var args = ['-i',""+currentMedia.link.match(/(.*)\//)[1]+""];
+	var args = ['-i',""+currentMedia.link.match(/(.*)\//)[1]+"",'-analyzeduration','5','-probesize', '5'];
 	var ffmpegCheck = spawn(ffmpegPath, args);
 	var total_data = '';
 	ffmpegCheck.stderr.on('data', function(data) {
