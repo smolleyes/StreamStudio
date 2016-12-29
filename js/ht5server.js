@@ -503,13 +503,13 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 if(search_engine !== 'dailymotion') {
                     if(transcodeAudioOnly) {
                       console.log('Transcoding audio only!')
-                      args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-map', '0:0', '-map', '0:1', '-c:v', 'copy', '-c:a:0', 'ac3','-threads', '0','-f', 'matroska','pipe:1'];
+                      args = ['-ss' , start,'-re','-i', ''+link+'','-analyzeduration','2147483647','-probesize', '2147483647','-preset', 'ultrafast','-map', '0:0', '-map', '0:1', '-c:v', 'copy', '-c:a:0', 'ac3','-threads', '0','-f', 'matroska','pipe:1'];
                     } else if (transcodeVideoOnly) {
                       console.log('Transcoding video only!')
-                      args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
+                      args = ['-ss' , start,'-re','-i', ''+link+'','-analyzeduration','2147483647','-probesize', '2147483647','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
                     } else {
                       console.log('Transcoding video and audio')
-                      args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                      args = ['-ss' , start,'-re','-i', ''+link+'','-analyzeduration','2147483647','-probesize', '2147483647','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
                     }
                 } else  {
                     args = ['-ss' , start,'-i', ''+link+'','-sn','-vf','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];

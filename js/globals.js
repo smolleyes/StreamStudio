@@ -47,6 +47,7 @@ var chromecastPlayers = []
 var dlnaPlayers = []
 var castNoResponseCount = 0;
 var forceTranscoding = false;
+var currentTorrentFilePath = ''
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
