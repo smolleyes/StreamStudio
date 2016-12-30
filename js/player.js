@@ -853,9 +853,9 @@ function launchPlay() {
 
 function checkFFmpegFormat() {
 	// check if stream is XVID with Advances Simple Profile or has DTS audio, if yes enable transcoder
-	if(currentMedia.link.indexOf('8887') == -1) {
-	  currentMedia.link = currentMedia.link.match(/(.*?):\d{1,5}/)[0]
-  }
+	// if(currentMedia.link.indexOf('8887') == -1) {
+	//   currentMedia.link = currentMedia.link.match(/(.*?):\d{1,5}/)[0]
+  // }
 	var args = ['-i',""+currentMedia.link+"",'-analyzeduration','2147483647','-probesize', '2147483647'];
 	var ffmpegCheck = spawn(ffmpegPath, args);
 	var total_data = '';
