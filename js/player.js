@@ -106,38 +106,6 @@ $(document).ready(function() {
 		stopTorrent();
 		initPlayer();
 	});
-	// pause/stop button
-	$('.mejs-playpause-button').click(function(e) {
-		if (playAirMedia === true) {
-			if (airMediaPlaying === true) {
-				login(stop_on_fbx);
-				if (currentMedia.link !== currentAirMedia.link) {
-					setTimeout(function() {
-						$('.mejs-overlay-button').hide();
-						play_on_fbx(currentMedia.link);
-					}, 2000);
-				}
-			} else {
-				$('.mejs-overlay-button').hide();
-				play_on_fbx(currentMedia.link);
-			}
-		}
-		if(upnpToggleOn) {
-			if(state.playing.state =="PLAYING") {
-				state.playing.state =="PAUSED"
-				mediaRenderer.pause()
-				player.pause()
-			} else {
-				state.playing.state =="PLAYING"
-				if(state.playing.location=="airplay") {
-					mediaRenderer.resume()
-				} else {
-					mediaRenderer.play()
-				}
-				player.play()
-			}
-		}
-	});
 	//transcoder button
 	$(document).on('click','#transcodeBtnContainer,#transcodingBtnSub',function(e) {
 		e.preventDefault();
@@ -203,15 +171,9 @@ $(document).ready(function() {
 
 	});
 
-	player.media.addEventListener('pause', function() {
-		console.log("pause event")
-		$('#subPlayer-play').show();
-		$('#subPlayer-pause').hide();
-		updateMiniPlayer();
-		if(upnpToggleOn && state.playing.location=="airplay") {
-			state.playing.state ="PAUSED"
-		}
-	});
+	// player.media.addEventListener('pause', function() {
+	// 	playPause()
+	// });
 	player.media.addEventListener('seeking', function() {
 		$(".mejs-overlay-loading").show();
 		$('.mejs-overlay-play').hide();
@@ -251,35 +213,15 @@ $(document).ready(function() {
 		}
 	});
 
+  // click subplayer play/pause
 	$('#subPlayer-play, #subPlayer-pause').click(function() {
+		playPausePLayer()
+	});
+
+  // play/pause btn in main player, pause won t work without upnp like this... so let the player do with paused state in !upnpToggleOn
+	$('.mejs-playpause-button').click(function() {
 		if(upnpToggleOn) {
-			if(state.playing.state == 'PAUSED' || state.playing.state == "PAUSED_PLAYBACK") {
-				if(state.playing.location =="airplay") {
-					mediaRenderer.resume()
-				} else {
-					mediaRenderer.play()
-				}
-				state.playing.state = "PLAYING"
-				player.play()
-				$('#subPlayer-play').hide();
-				$('#subPlayer-pause').show();
-			} else {
-				mediaRenderer.pause()
-				player.pause()
-				state.playing.state = 'PAUSED'
-				$('#subPlayer-play').show();
-				$('#subPlayer-pause').hide();
-			}
-		} else {
-			if(player.media.paused) {
-				if(player.media.src.indexOf('index.html') !== -1) {
-					initPlay(currentMedia);
-				} else {
-					player.play();
-				}
-			} else {
-				player.pause();
-			}
+			playPausePLayer()
 		}
 	});
 
@@ -384,6 +326,36 @@ $(document).ready(function() {
 	$('.mejs-volume-pct').text('80%')
 });
 
+
+function playPausePLayer() {
+	if(upnpToggleOn) {
+		if(state.playing.state !== 'PAUSED') {
+			mediaRenderer.pause()
+			state.playing.state = 'PAUSED'
+			$('#subPlayer-play').show();
+			$('#subPlayer-pause').hide();
+		} else {
+			if(state.playing.location =="airplay") {
+				mediaRenderer.resume()
+			} else {
+				mediaRenderer.play()
+			}
+			state.playing.state = "PLAYING"
+			$('#subPlayer-play').hide();
+			$('#subPlayer-pause').show();
+		}
+	} else {
+		if(player.media.paused) {
+			if(player.media.src.indexOf('index.html') !== -1) {
+				return;
+			} else {
+				player.play();
+			}
+		} else {
+			player.pause();
+		}
+	}
+}
 
 function initPlayer(stopTorrent) {
 	// clean subtitles

@@ -126,7 +126,7 @@ function startStatusInterval () {
             }
             updateMiniPlayer()
             updateProgressBar()
-          } else if (state.playing.state == "PAUSED" || state.playing.state == "TRANSITIONING"){
+          } else if (state.playing.state.indexOf("PAUSED") !== -1 || state.playing.state == "TRANSITIONING"){
             $('.mejs-playpause-button').removeClass('mejs-pause').addClass('mejs-play');
             $('#subPlayer-play').show();
             $('#subPlayer-pause').hide();

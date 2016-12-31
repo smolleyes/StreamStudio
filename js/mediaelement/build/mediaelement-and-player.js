@@ -2240,8 +2240,12 @@ if (typeof jQuery != 'undefined') {
         if (t.options.clickToPlayPause) {
             if (t.media.paused) {
               t.media.play();
+							$('#subPlayer-play').hide();
+							$('#subPlayer-pause').show();
             } else {
               t.media.pause();
+							$('#subPlayer-play').show();
+							$('#subPlayer-pause').hide();
             }
         }
       };
@@ -2558,6 +2562,8 @@ if (typeof jQuery != 'undefined') {
 							var p = mejs.players[playerIndex];
 							if (p.id != t.id && t.options.pauseOtherPlayers && !p.paused && !p.ended) {
 								p.pause();
+								$('#subPlayer-play').show();
+								$('#subPlayer-pause').hide();
 							}
 							p.hasFocus = false;
 						}
@@ -2980,6 +2986,8 @@ if (typeof jQuery != 'undefined') {
 		},
 		pause: function() {
 			this.media.pause();
+			$('#subPlayer-play').show();
+			$('#subPlayer-pause').hide();
 		},
 		load: function() {
 			this.media.load();
@@ -3131,8 +3139,12 @@ if (typeof jQuery != 'undefined') {
 
 					if (media.paused) {
 						media.play();
+						$('#subPlayer-play').hide();
+						$('#subPlayer-pause').show();
 					} else {
 						media.pause();
+						$('#subPlayer-play').show();
+						$('#subPlayer-pause').hide();
 					}
 
 					return false;
