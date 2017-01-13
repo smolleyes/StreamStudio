@@ -60,7 +60,11 @@ $(document).on('click','#updateBtn',function(e) {
 	var arch = process.arch;
 	var file = '';
 	var link = '';
-	if (process.platform === 'win32') {
+	if(isOSWin64() && !['darwin','linux'].includes(process.platform)) {
+		file = 'streamstudio-setup.exe';
+		link = 'https://download.streamstudio.cc/windows-64/'+file;
+		return downloadUpdate(link,file);
+	} else if (process.platform === 'win32') {
 		file = 'streamstudio-setup.exe';
 		link = 'https://download.streamstudio.cc/windows/'+file;
 		return downloadUpdate(link,file);
@@ -104,6 +108,10 @@ $(document).on('click','#updateBtn',function(e) {
 		}
 	}
 });
+
+function isOSWin64() {
+  return process.arch === 'x64' || process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
+}
 
 $(document).on('click','#startWinUpdate',function(e) {
 	e.preventDefault();

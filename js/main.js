@@ -1162,7 +1162,7 @@ function main() {
       } else {
         $("#search p").empty().append(_("Engine %s ready...!", 'youtube')).show();
         var html = '<li class="active"><a href="#" data-value="relevance" class="active">' + _("Relevance") + '</a></li> \
-        <li><a href="#" data-value="published">' + _("Published") + '</a></li> \
+        <li><a href="#" data-value="date">' + _("Published") + '</a></li> \
         <li><a href="#" data-value="viewCount">' + _("Views") + '</a></li> \
         <li><a href="#" data-value="rating">' + _("Rating") + '</a></li>';
         $('#orderBy_select ul').empty().append(html);
