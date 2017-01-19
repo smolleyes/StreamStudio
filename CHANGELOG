@@ -1,3 +1,6 @@
+V 3.9.1
+ * fix app exit 
+
 V 3.9
  * nwjs rebuilded on ubuntu 14.04 for linux 32/64 bits
 
