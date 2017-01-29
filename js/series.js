@@ -368,10 +368,12 @@ function loadAllSeasons(serie,lang) {
 }
 
 function loadSeasonTable(lang,id, num) {
+    var newItemsTotal = 0;
     var otherLang = lang == 'fr' ? 'vostfr' : 'fr';
     bongo.db('seriesDb').collection('series').find({
         'id': id
     }).toArray(function(error, list) {
+        var serie = list[0]
         var changeLang = list[0].seasonsCount[otherLang] !== 0 ? '<button class="changeLang btn btn-info" data-lang="'+otherLang+'" data-id="'+id+'" data-num="'+num+'">'+_("load %s episodes",otherLang)+'</button>' : '';
         var html = '<div class="bigTable"><div class="panel panel-default"><div class="panel-heading"><h3 style="margin: -6px 0 0 0 !important;color:white;">' + _("Episodes list ("+lang+"):") + ' '+changeLang+'</h3></div><div class="nano"><div class="panel-body nano-content"><table class="table table-stripped table-hover table-bordered table-responsive serieTable"><thead><tr><th data-field="name">' + _("Name") + '</th><th data-field="viewed">' + _("Status") + '</th><th data-field="size">' + _("Size") + '</th><th data-field="size">' + _("Seeders") + '</th><th data-field="size">' + _("Leechers") + '</th></tr></thead><tbody>';
         var count = 1;
@@ -436,6 +438,7 @@ function loadSeasonTable(lang,id, num) {
                             var viewed = c.length > 0 ? 'block' : 'none';
                             var watched = c.length > 0 ? _("already watched") : _("Not seen");
                             var watchedCheck =  c.length > 0 ? true : false;
+                            console.log("EPISODE:", file)
                             var newItem = !watchedCheck ? 'newEpisode' : '';
                             infos.season = parseInt(num);
                             if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
@@ -459,19 +462,33 @@ function loadSeasonTable(lang,id, num) {
                         });
                 } else {
                     file.engine = 'tvdb'
+                    console.log("EPISODE:", file)
                     var c = sdb.find({
                         "title": file.torrentTitle
                     });
                     var viewed = c.length > 0 ? 'block' : 'none';
                     var watchedCheck =  c.length > 0 ? true : false;
                     var watched = c.length > 0 ? _("already watched") : _("Not seen");
-                    var newItem = !watchedCheck ? 'newEpisode' : '';
+                    var newEp = file.newItem;
                     infos.season = parseInt(num);
                     if (settings.locale == 'fr' && file.torrentTitle.toLowerCase().indexOf('vostfr') !== -1) {
                         file.title += ' (VOSTFR)';
                     }
-                    if (newItem) {
-                        file.title += _(" (NEW)");
+                    // check if newEp but already seen
+                    if (newEp && watchedCheck) {
+                      serie.newItems -= 1;
+                      list[0].seasons[lang][num]['episode'][i].newItem = false;
+                      newItem = ''
+                      updateSeriesDb(serie,function(res) {
+                          console.log(res)
+                      })
+                    }
+                    if (newEp && !watchedCheck) {
+                      newItemsTotal+=1;
+                      file.title += _(" (NEW)");
+                      newItem = 'newEpisode'
+                    } else {
+                      newItem = '';
                     }
                     if (file.type == "complete") {
                         infos.ep = 'complete';
@@ -490,9 +507,16 @@ function loadSeasonTable(lang,id, num) {
                     count += 1;
                 }
             })
+
         } catch(err) {
             console.log(err)
         }
+        // if(serie.newItems !== newItemsTotal) {
+        //   serie.newItems = newItemsTotal;
+        //   updateSeriesDb(serie,function(res) {
+        //       console.log(res)
+        //   })
+        // }
     });
 }
 

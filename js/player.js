@@ -365,7 +365,6 @@ function initPlayer(stopTorrent) {
 	$('.mejs-currenttime-sub').text('00:00:00')
 	$('.mejs-duration-sub').text('00:00:00')
 	stopIceTimer()
-	cleanffar()
 	state.playing.currentTime = 0
 	state.playing.duration = 0
 	chromeCastplaying = false;
@@ -375,7 +374,6 @@ function initPlayer(stopTorrent) {
 	seekAsked = false;
 	mediaCurrentPct = 0;
 	mediaCurrentTime = 0;
-	playFromSeries = false;
 	transcoderEnabled = false;
 	player.media.duration = 0
 	state.media = {}
@@ -952,7 +950,7 @@ function playNextVideo(vid_id) {
 function getNext() {
 	console.log('in getnext')
 	initPlayer()
-	if(fromPlayList) {
+	if(fromPlayList && !playFromSeries) {
 		player.playNextTrack()
 		return;
 	}

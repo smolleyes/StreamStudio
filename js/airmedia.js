@@ -88,7 +88,7 @@ function startStatusInterval () {
       } else {
         mediaRenderer.status(function(err,res) {
           //console.log(err,res)
-          if(state.playing.duration !== 0 && res.currentTime && res.currentTime+1 > state.playing.duration) {
+          if(state.playing.duration !== 0 && res.position.currentTime && res.position.currentTime+1 > state.playing.duration) {
              on_media_finished()
              return;
           }

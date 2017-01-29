@@ -1,19 +1,41 @@
 var mediaDuration;
 var stArr = [];
 var ip = require('ip');
+var rangeParser = require('range-parser')
 
 function startHt5Server() {
-    ht5Server = http.createServer(function(req, res) {
+    ht5Server = http.createServer()
+    ht5Server.on('request', function (req, res) {
+      console.log("HT5SERVER REQUEST:", req)
         if ((req.url !== "/favicon.ico") && (req.url !== "/")) {
             if(upnpToggleOn && mediaRendererType == "chromecast") {
                 cleanffar();
             }
+
+            currentRes = res;
+
+            res.setHeader('Accept-Ranges', 'bytes')
+            res.setHeader('Content-Type', 'video/mp4')
+            res.setHeader('transferMode.dlna.org', 'Streaming')
+            res.setHeader('contentFeatures.dlna.org', 'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000')
             startStreaming(req, res)
+
+            res.on("close", function() {
+                currentRes= null;
+                console.log('request end!!!!!!!!!!!!!!!!')
+                ffmpegLive = false;
+                state.playing.state = "STOPPED"
+                cleanffar();
+            });
         }
-    }).listen(8887,ip.address());
-    ht5Server.on('connection', function (socket) {
-      socket.setTimeout(36000000)
     })
+
+    ht5Server.listen(8887);
+
+    ht5Server.on('connection', function (socket) {
+      socket.setTimeout(0)
+    })
+
     console.log('StreamStudio Transcoding Server ready on port 8887');
 }
 
@@ -74,16 +96,6 @@ function startStreaming(req, res, width, height) {
         var device = deviceType(req.headers['user-agent']);
         $('.mejs-overlay, .mejs-overlay-loading').show();
         $('.mejs-overlay-play').hide();
-        res.writeHead(200, { // NOTE: a partial http response
-            // 'Date':date.toUTCString(),
-            'Connection': 'closed',
-            'Content-Type': 'video/mp4',
-            'Server':'CustomStreamer/0.0.1',
-            'transferMode.dlna.org': 'Streaming',
-            'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000'
-        });
-        res.setTimeout(10000000)
-        currentRes = res;
         var linkParams = parsedLink.split('&');
         var bitrate = 300;
         var time = 0;
@@ -412,13 +424,6 @@ function startStreaming(req, res, width, height) {
     } catch (err) {
         console.log(err);
     }
-    res.on("close", function() {
-        currentRes= null;
-        console.log('request end!!!!!!!!!!!!!!!!')
-        ffmpegLive = false;
-        state.playing.state = "STOPPED"
-        cleanffar();
-    });
 }
 
 function checkDuration(link, device, host, bitrate,res,seekTo) {
@@ -542,6 +547,10 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 
     var total_time = 0,
         total_data = '';
+
+  ffmpeg.on('exit',function(err,code) {
+    console.log('FFMPEG PROCESS DIED WITH CODE', err, code)
+  })
 
 
     ffmpeg.stderr.on('data', function(data) {
