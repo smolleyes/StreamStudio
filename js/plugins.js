@@ -1,7 +1,7 @@
 var engines = [];
-var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza','kickass','thepiratebay'];
+var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza','thepiratebay','cpasbien'];
 var pluginsDir;
-var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','torrent-project','mp3stream','torrent9','cpasbien'];
+var pluginsList = ['twitch','songza','cpasbien','thepiratebay','t411','torrent-project','mp3stream','torrent9'];
 
 function initPlugins() {
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
@@ -67,6 +67,15 @@ function loadApp() {
                         if (pluginsList.indexOf(eng.engine_name.toLowerCase()) == -1 || settings.plugins.indexOf(eng.engine_name.toLowerCase()) !== -1) {
                             engines[eng.engine_name.toLowerCase()] = eng;
                             enginesList.push(eng.engine_name.toLowerCase())
+                            if(eng.protected) {
+                                gui.Window.open(eng.url, {show:false},function(win) {
+                                    console.log(win)
+                                    win.on('loaded',function() {
+                                        console.log(`ENGINE LOADEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD`)
+                                        win.close()
+                                    });
+                                })
+                            }
                             // add entry to main gui menu
                             $('#engines_select ul').append('<li><a href="#" data-value="' + eng.engine_name.toLowerCase() + '">'+eng.engine_name+'</li>');
                         }

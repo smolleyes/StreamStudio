@@ -29,7 +29,14 @@ $(document).on('click', '.loadSerie', function(e) {
 });
 
 $(document).on('click', '#reloadSeries', function(e) {
-    reloadSeries();
+  gui.Window.open('http://www.torrent9.biz/search_torrent/the-magicians.html', {show:false},function(win) {
+                                 win.on('loaded',function() {
+                                     console.log("TW9 CLOUDFLARE CHECK DONE !")
+                                     win.close()
+                                     reloadSeries();
+                                 });
+                             })
+
 });
 
 $(document).off('click', '.seasonItem');

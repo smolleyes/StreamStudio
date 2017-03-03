@@ -323,10 +323,6 @@ var htmlContent =
 <label for="torrent9">Torrent9</label> \
 <input class="pluginCheckBox" type="checkbox" id="torrent9" name="torrent9"> \
 </div> \
-<div class="ItemCheckbox left"> \
-<label for="cpasbien">Cpasbien.cx</label> \
-<input class="pluginCheckBox" type="checkbox" id="cpasbien" name="cpasbien"> \
-</div> \
 <div class="ItemCheckbox left">\
  		<label for="twitch">Twitch</label>\
  		<input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch">\
@@ -507,6 +503,7 @@ try {
   console.log("exception error" + err);
 }
 $(document).ready(function() {
+
   $('#menuContainer').append(htmlStr).hide();
   $('#content').append(htmlContent).hide();
   $('#loadingApp p').empty().append(_("Loading StreamStudio..."));
@@ -780,6 +777,14 @@ function main() {
       $('#subPlayer-Timer').empty().append($('.mejs-time').html());
     }
   });
+
+   // LOAD CLOUDFLARE ENGINE
+     gui.Window.open('http://www.torrent9.biz', {show:true,width:1,height:1,frame:false},function(win) {
+                                    win.on('loaded',function() {
+                                        console.log("TW9 CLOUDFLARE CHECK DONE !")
+                                        win.close()
+                                    });
+                                })
 
   // fullscreen signal and callback
   var left;
