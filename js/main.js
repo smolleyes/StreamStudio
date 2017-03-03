@@ -779,12 +779,7 @@ function main() {
   });
 
    // LOAD CLOUDFLARE ENGINE
-     gui.Window.open('http://www.torrent9.biz', {show:true,width:1,height:1,frame:false},function(win) {
-                                    win.on('loaded',function() {
-                                        console.log("TW9 CLOUDFLARE CHECK DONE !")
-                                        win.close()
-                                    });
-                                })
+     gui.Window.open('http://www.torrent9.biz', {show:false})
 
   // fullscreen signal and callback
   var left;

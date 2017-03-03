@@ -68,13 +68,7 @@ function loadApp() {
                             engines[eng.engine_name.toLowerCase()] = eng;
                             enginesList.push(eng.engine_name.toLowerCase())
                             if(eng.protected) {
-                                gui.Window.open(eng.url, {show:false},function(win) {
-                                    console.log(win)
-                                    win.on('loaded',function() {
-                                        console.log(`ENGINE LOADEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD`)
-                                        win.close()
-                                    });
-                                })
+                                gui.Window.open(eng.url, {show:false})
                             }
                             // add entry to main gui menu
                             $('#engines_select ul').append('<li><a href="#" data-value="' + eng.engine_name.toLowerCase() + '">'+eng.engine_name+'</li>');
