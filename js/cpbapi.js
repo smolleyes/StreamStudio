@@ -11,12 +11,31 @@ function initCpbSearch(results,cb) {
 					results.error = "Can't get results for " + results.query;
 					cb(results);
 			} else {
-					console.log(datas)
+				 if (response.statusCode >= 300 && response.statusCode < 400 && hasHeader('location', response.headers)) {
+    					var location = response.headers[hasHeader('location', response.headers)];
+						$.get('http://www.torrent9.biz'+location).done(function(datas) {
+							try {
+										var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
+									  results.basePath = path.dirname(link);
+						     } catch (err) {
+								results.success = false;
+								results.error = "Can't get results for " + results.query;
+								cb(results);
+							 }
+ 							return parseDatas(datas, results,cb);
+						}).fail(function(err) {
+							results.success = false;
+							results.error = "Can't get results for " + results.query;
+							cb(results);
+						})
+				} else {
 					try {
 						var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
-					  results.basePath = path.dirname(link);
-		      } catch (err) {}
-					return parseDatas(datas, results,cb);
+					  	results.basePath = path.dirname(link);
+					} catch (err) {
+						return parseDatas(datas, results,cb);
+					}
+				}
 			}
 		});
 	} else {
@@ -30,6 +49,17 @@ function initCpbSearch(results,cb) {
 			}
 		});
 	}
+}
+
+function hasHeader(header, headers) {
+  var headers = Object.keys(headers || this.headers)
+    , lheaders = headers.map(function (h) {return h.toLowerCase()})
+    ;
+  header = header.toLowerCase()
+  for (var i=0;i<lheaders.length;i++) {
+    if (lheaders[i] === header) return headers[i]
+  }
+  return false
 }
 
 function parseDatas(data, results,cb) {
