@@ -1,5 +1,6 @@
 var ytl = require('youtube-dl');
 var __ = require('underscore');
+var cloudscraper = require('cloudscraper');
 
 function saveSettings() {
     localStorage.StdSettings = JSON.stringify(settings);

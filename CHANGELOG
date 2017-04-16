@@ -1,3 +1,7 @@
+V 3.9.4
+ * test cloudflare bypass
+ * update t411 domain
+
 V 3.9.3
  * trying fixing cloudflare check
 

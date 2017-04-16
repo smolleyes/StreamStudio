@@ -1,7 +1,7 @@
 {
   "name": "StreamStudio",
   "main": "index.html",
-  "page-cache" : true,
+  "page-cache": true,
   "user-agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.157 Safari/537.36",
   "window": {
     "icon": "setup-images/48x48/streamstudio.png",
@@ -11,7 +11,10 @@
     "min_width": 995,
     "min_height": 550,
     "show": false,
-    "frame":false
+    "frame": false
   },
-  "chromium-args":"--ignore-gpu-blacklist --harmony"
+  "chromium-args": "--ignore-gpu-blacklist --harmony",
+  "dependencies": {
+    "cloudscraper": "^1.4.1"
+  }
 }
