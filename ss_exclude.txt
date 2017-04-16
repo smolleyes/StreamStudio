@@ -4,7 +4,7 @@ ffmpeg
 locales/*.pak
 ss_exclude.txt
 pnacl/
-lib/
+./lib
 chromedriver
 credits.html
 icudtl.dat
