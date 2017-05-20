@@ -168,16 +168,15 @@ $(document).on('click', '#refreshSeries', function(e) {
     $("#mySeries").empty();
     $("#seriesContainer p").empty().append('<p>' + _("Searching updates for your series, please wait ... !") + '</p>');
     cloudscraper.get('http://www.torrent9.biz',function(error, response, datas) {
-    checkSeriesUpdates(function(data) {
-        if (data.success) {
-             setTimeout(function() {
-                 reloadSeries()
-            }, 2000)
-        } else {
-            swal(_("Error!"), _("Series update error, please try again later !"), "error")
-            printSeriesList(list)
-        }
-    });
+        checkSeriesUpdates(function(data) {
+            console.log('END REFRESH', data)
+            if (data.success) {
+                //reloadSeries()
+            } else {
+                swal(_("Error!"), _("Series update error, please try again later !"), "error")
+                reloadSeries()
+            }
+        });
     });
 });
 

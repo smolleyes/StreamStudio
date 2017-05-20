@@ -28,10 +28,6 @@ function startHt5Server() {
 
     ht5Server.listen(8887);
 
-    ht5Server.on('connection', function (socket) {
-      socket.setTimeout(0)
-    })
-
     console.log('StreamStudio Transcoding Server ready on port 8887');
 }
 

@@ -5,49 +5,26 @@ function initCpbSearch(results,cb) {
 	console.log('SEARCH FOR', results.query)
 	// LOAD CLOUDFLARE ENGINE
 	if(results.page == 0) {
-		cloudscraper.post('http://www.torrent9.biz/search_torrent/',{"champ_recherche":results.query},function(error, response, datas) {
-			if(error) {
+				$.post('http://www.torrent9.biz/search_torrent/',{"champ_recherche":results.query}).done(function(datas){
+					console.log(datas)
+					try {
+						var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
+					  results.basePath = path.dirname(link);
+		      } catch (err) {}
+					return parseDatas(datas, results,cb);
+				}).fail(function(error){
 					results.success = false;
 					results.error = "Can't get results for " + results.query;
 					cb(results);
-			} else {
-				 if (response.statusCode >= 300 && response.statusCode < 400 && hasHeader('location', response.headers)) {
-    					var location = response.headers[hasHeader('location', response.headers)];
-						$.get('http://www.torrent9.biz'+location).done(function(datas) {
-							try {
-										var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
-									  results.basePath = path.dirname(link);
-						     } catch (err) {
-								results.success = false;
-								results.error = "Can't get results for " + results.query;
-								cb(results);
-							 }
- 							return parseDatas(datas, results,cb);
-						}).fail(function(err) {
-							results.success = false;
-							results.error = "Can't get results for " + results.query;
-							cb(results);
-						})
-				} else {
-					try {
-						var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
-					  	results.basePath = path.dirname(link);
-					} catch (err) {
-						return parseDatas(datas, results,cb);
-					}
-				}
-			}
-		});
+				})
 	} else {
-		cloudscraper.get(results.basePath+'/page-'+results.page,function(error, response, datas) {
-			if(error) {
-				results.success = false;
-				results.error = "Can't get results for " + results.query;
-				cb(results);
-			} else {
-				return parseDatas(datas, results, cb);
-			}
-		});
+				$.get(results.basePath+'/page-'+results.page).done(function(datas){
+					return parseDatas(datas, results, cb);
+				}).fail(function(error){
+					results.success = false;
+					results.error = "Can't get results for " + results.query;
+					cb(results);
+				})
 	}
 }
 
