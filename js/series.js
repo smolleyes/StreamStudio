@@ -167,15 +167,17 @@ $(document).on('keyup', '#searchSerieByName', function(e) {
 $(document).on('click', '#refreshSeries', function(e) {
     $("#mySeries").empty();
     $("#seriesContainer p").empty().append('<p>' + _("Searching updates for your series, please wait ... !") + '</p>');
+    cloudscraper.get('http://www.torrent9.biz',function(error, response, datas) {
     checkSeriesUpdates(function(data) {
         if (data.success) {
-            // setTimeout(function() {
-            //     reloadSeries()
-            // }, 2000)
+             setTimeout(function() {
+                 reloadSeries()
+            }, 2000)
         } else {
             swal(_("Error!"), _("Series update error, please try again later !"), "error")
             printSeriesList(list)
         }
+    });
     });
 });
 
@@ -228,17 +230,17 @@ function download (localFile, remotePath, callback) {
 
 function searchSerie() {
     var query = $("#searchSerieByName").val()
-    if (query == "") {
+        if (query == "") {
         return;
-    } else {
-        $("#mySeries").empty();
-        searchTVdb(query, function(data) {
-            if (!data.success) {
-                swal(_("Error!"), _("Can't find results for %s !", query), "error");
-                reloadSeries();
+            } else {
+                $("#mySeries").empty();
+                searchTVdb(query, function(data) {
+                    if (!data.success) {
+                        swal(_("Error!"), _("Can't find results for %s !", query), "error");
+                        reloadSeries();
+                    }
+                }, true)
             }
-        }, true)
-    }
 }
 
 function loadMySeries() {

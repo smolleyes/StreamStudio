@@ -55,6 +55,7 @@ var selectTypes = ["searchTypes", "orderBy", "dateTypes", "searchFilters", "cate
 var searchOptions = {};
 // for navigation mode
 var browse = true;
+
 var htmlStr ='<div id="menu"> \
 <div class="input-group" style="margin-bottom: 15px;margin: 0 -5px 15px -5px;"> \
 \
@@ -503,6 +504,12 @@ try {
   console.log("exception error" + err);
 }
 $(document).ready(function() {
+
+  Object.observe(window, function(changes) {
+    if(changes[0].name == "itemsCount" || changes[0].name == "cPreloaderTimeout") {
+      $(".nano").nanoScroller() 
+    }
+  });
 
   $('#menuContainer').append(htmlStr).hide();
   $('#content').append(htmlContent).hide();
@@ -1505,7 +1512,7 @@ $(document).bind("scrollend", ".nano",function(e){
   console.log("scroll end")
   setTimeout(function() {
     updateScroller();
-  },500)
+  },100)
 });
 
 function updateScroller() {
@@ -1519,20 +1526,16 @@ function updateScroller() {
             if ($("#items_container ul li").length < engine.totalItems) {
               console.log("load more")
               engine.loadMore();
+              $(".nano").nanoScroller();
             }
           }
         } else {
           if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height() && pos == 0 && !pageLoading) ||  $("#items_container .youtube_item").length !== 0 && !$('.nano-slider').is(':visible') && !pageLoading) {
-            if (search_engine === "youtube" && searchTypes_select === "playlists" && $("#items_container .youtube_item_playlist").length !== 0 && $("#items_container .youtube_item_playlist").length < totalResults) {
-              pageLoading = true;
-              changePage();
-            } else if (activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container .youtube_item_channel").length !== 0 && $("#items_container .youtube_item_channel").length < totalResults) {
-              pageLoading = true;
-              changePage();
-            } else if (activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container .youtube_item_channel").length == 0 && $("#items_container .youtube_item").length < totalResults) {
+            if (activeTab == 1 && search_engine === "youtube" && searchTypes_select === "channels" && $("#items_container .youtube_item_channel").length == 0 && $("#items_container .youtube_item").length < totalResults) {
               pageLoading = true;
               changeChannelPage();
-            } else if (activeTab == 1 && $("#items_container .youtube_item").length < totalResults) {
+            } else if ($("#items_container .youtube_item").length < totalResults) {
+              console.log('changepage')
               pageLoading = true;
               changePage();
             }
@@ -1557,6 +1560,7 @@ function changePage() {
   console.log('changepage')
   if (activeTab == 1) {
     startSearch(current_search);
+    $(".nano").nanoScroller();
   }
 }
 
@@ -1687,6 +1691,7 @@ function startSearch(query) {
           getVideosDetails(datas, 'youtube', false);
         });
       }
+      $(".nano").nanoScroller();
     }
   }
 }

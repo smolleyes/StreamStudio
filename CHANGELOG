@@ -1,3 +1,8 @@
+V 3.9.5
+ * fix pause in the main player
+ * fix series reloading after update
+ * fix loading bar in the player
+
 V 3.9.4
  * test cloudflare bypass
  * update t411 domain

@@ -14,10 +14,6 @@ function startHt5Server() {
 
             currentRes = res;
 
-            res.setHeader('Accept-Ranges', 'bytes')
-            res.setHeader('Content-Type', 'video/mp4')
-            res.setHeader('transferMode.dlna.org', 'Streaming')
-            res.setHeader('contentFeatures.dlna.org', 'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=017000 00000000000000000000000000')
             startStreaming(req, res)
 
             res.on("close", function() {
@@ -96,6 +92,15 @@ function startStreaming(req, res, width, height) {
         var device = deviceType(req.headers['user-agent']);
         $('.mejs-overlay, .mejs-overlay-loading').show();
         $('.mejs-overlay-play').hide();
+        res.writeHead(200, { // NOTE: a partial http response
+            // 'Date':date.toUTCString(),
+            'Connection': 'closed',
+            'Content-Type': 'video/mp4',
+            'Server':'CustomStreamer/0.0.1',
+            'transferMode.dlna.org': 'Streaming',
+            'contentFeatures.dlna.org':'DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000'
+        });
+        res.setTimeout(10000000)
         var linkParams = parsedLink.split('&');
         var bitrate = 300;
         var time = 0;
@@ -566,18 +571,17 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:7000,content:_("Can't connect to this station, please retry later !"),btnId:'',btnTitle:'',btnColor:'black',btnDisplay: 'none',updateDisplay:'none'})
                 initPlayer();
             }
-            //console.log('grep stderr: ' + data);
+            console.log('grep stderr: ' + data);
 
             if (data.toString().substr(0,5) == 'frame') {
-              return;
                 var time = data.toString().match(/time=(\d\d:\d\d:\d\d)/)[1];
                 var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
                 var pct = (seconds / total_time) * 100;
-                var total = pct+mediaCurrentPct;
+                var total = pct;
                 if (parseInt(total) >= 100) {
                     return;
                 } else if (playFromYoutube || upnpTranscoding) {
-                   $('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
+                   $('.mejs-time-loaded').css('width', (pct)+'%').show();
                    if(upnpToggleOn && upnpTranscoding) {
                      $('.mejs-time-current').css('width', pct+'%');
                      if(seekTo) {

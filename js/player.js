@@ -372,7 +372,6 @@ function initPlayer(stopTorrent) {
 	mediaDuration = 0;
 	mediaCurrentPct = 0;
 	seekAsked = false;
-	mediaCurrentPct = 0;
 	mediaCurrentTime = 0;
 	transcoderEnabled = false;
 	player.media.duration = 0

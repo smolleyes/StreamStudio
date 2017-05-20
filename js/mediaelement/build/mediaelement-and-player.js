@@ -3264,6 +3264,8 @@ if (typeof jQuery != 'undefined') {
 				handle  = controls.find('.mejs-time-handle'),
 				timefloat  = controls.find('.mejs-time-float'),
 				timefloatcurrent  = controls.find('.mejs-time-float-current'),
+				mediaCurrentPct = 0,
+				percentage = 0,
 				handleMouseMove = function (e) {
 					// mouse position relative to the object
 					var x = e.pageX,
@@ -3413,6 +3415,7 @@ if (typeof jQuery != 'undefined') {
 
 			// current time
 			media.addEventListener('timeupdate', function(e) {
+				mediaCurrentPct = percentage;
 				player.setProgressRail(e);
 				player.setCurrentRail(e);
 			}, false);
