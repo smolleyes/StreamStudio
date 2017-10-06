@@ -1,0 +1,136 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>StreamStudio</title>
+	<!-- libs -->
+	<script src="js/jquery.js"></script>
+	<script src="js/mustache.js"></script>
+	<script src="js/DOMEventsLevel3.shim.min.js"></script>
+	<script src="js/tiptip/jquery.tipTip.js"></script>
+	<script src="js/pagination/jquery.simplePagination.js"></script>
+	<script src='js/jstree/jquery.jstree.js'></script>
+	<script src="js/expand.js"></script>
+	<script src="js/x2js/xml2json.js"></script>
+	<script src="js/jquery.notif.min.js"></script>
+	<script src="js/mobile-detect.js"></script>
+	<script src="js/base64.js"></script>
+	<script src="js/jquery.msgbox.min.js"></script>
+	<script src="js/jquery.nanoscroller.min.js"></script>
+	<script src="js/Filesaver.js"></script>
+	<script src="js/jquery.qtip.min.js"></script>
+	<script src='js/bongo.min.js'></script>
+	<script src='js/bootstrap.min.js'></script>
+	<script src='js/storedb.js'></script>
+	<!-- <msdropdown> -->
+	<script src="js/jquery.dd.min.js"></script>
+	<!-- ht5 files-->
+	<script src="js/globals.js"></script>
+	<script src="js/functions.js"></script>
+	<script src="js/settings.js"></script>
+	<script src="js/config.js"></script>
+	<script src="js/plugins.js"></script>
+	<script src="js/update.js"></script>
+	<script src="js/spinner.js"></script>
+	<script src="js/jquery.raty.js"></script>
+	<script src="js/shoutcast.js"></script>
+	<script src="js/parser.min.js"></script>
+	<script src="js/observe.js"></script>
+	<link rel="stylesheet" href="css/main.css" />
+	<link rel="stylesheet" href="js/tiptip/tipTip.css" />
+	<link rel="stylesheet" href="js/mediaelement/build/mediaelementplayer.css" />
+	<link rel="stylesheet" href="js/mediaelement/mep-playlist/mep-feature-playlist.css" />
+	<link rel="stylesheet" href="css/flags.css" />
+	<link rel="stylesheet" href="css/tabs.css" />
+	<link rel="stylesheet" href="js/pagination/simplePagination.css" />
+	<link rel="stylesheet" href="css/notif.css" />
+	<link rel="stylesheet" href="css/pictogram-button.css" />
+	<link rel="stylesheet" href="css/jquery.qtip.min.css" />
+	<link rel="stylesheet" href="css/nanoscroller.css" />
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/magnific-popup.css" />
+	<link rel="stylesheet" href="css/jquery.raty.css" />
+	<!-- <msdropdown> -->
+	<link rel="stylesheet" type="text/css" href="css/flags/dd.css">
+	<link rel="stylesheet" type="text/css" href="css/flags/flags.css">
+	<!-- sweet alert -->
+	<link rel="stylesheet" type="text/css" href="js/alert/sweet-alert.css">
+</head>
+<body>
+	<div id="castPopup" ></div>
+	<div id="header" style="background: #101010;">
+		<div id="appLogo"><span>STREAM</span><img src="images/logo.png" style="height:44px;" /><span>STUDIO</span></div>
+        <ul>
+	        <li><a href='#' title='Minimize' id='windowControlMinimize'></a></li>
+	        <li><a href='#' title='Maximize' id='windowControlMaximize'></a></li>
+	        <li><a href='#' title='Close'    id='windowControlClose'></a></li>
+        </ul>
+    </div>
+	<div id='playerTopBar' style="display:none;"><div id="downloadStats"></div><a id="closePlayer" href="#">X</a></div>
+	<div id="playerContainer" style="display:none;">
+		<video class="mejs-ted" id="videoPlayer" width="100%" height="100%" src="t.mp4" preload="auto" controls></video>
+	</div>
+	<input style="display:none;" id="fileDialog" type="file" nwdirectory />
+	<div class="container-fluid" id="mainContainer" style="margin-left:10px;padding-left:0;">
+		<div id="main">
+			<div class="row">
+				<div class="col-xs-4 col-md-3 col-lg-2" id="menuContainer" style="height:100%;margin-bottom:5px;">
+					<div id='sectionsContainer'>
+						<a href="#_1" id="homeTopButton" class="btn btn-default active" data-toggle="tab"><img src="images/volet.png" /></a>
+						<a href="#tabpage_6" id="favoritesToggle" class="btn btn-default" data-toggle="tab"><img src="images/Favoris.png" /></a>
+						<a href="#tabpage_7" id="settingsToggle" class="btn btn-default" data-toggle="tab"><img src="images/Reglage.png" /></a>
+					</div>
+				</div>
+				<div id="content" class="col-xs-8 col-md-9 col-lg-10">
+				<div class="navbar-header" style="width:100%;margin-bottom: 10px;">
+					<div id="tab" class="btn-group" data-toggle="buttons-radio" style="width:100%;">
+						<ul class="nav nav-tabs" role="tablist">
+							<li role="presentation" class="active"><a href="#tabpage_1" id="homeToggle" class="tab-pane active" data-toggle="tab">Home</a></li>
+							<li role="presentation"><a href="#tabpage_3" id="localFilesToggle"class="tab-pane" data-toggle="tab">Local files</a></li>
+							<li role="presentation"><a href="#tabpage_4" id="downloads_tab" class="tab-pane"  data-toggle="tab">Downloads</a></li>
+							<li role="presentation"><a href="#tabpage_5" id="upnpToggle" class="tab-pane"  data-toggle="tab">Upnp</a></li>
+							<li role="presentation"><a id="playerToggle" href="#playerContainer" class="tab-pane"  data-toggle="tab">Player</a></li>
+						</ul>
+					</div>
+				</div>
+				</div>
+			</div>
+		</div>
+		<div id="loadingApp" style="font-weight:bold;display:none;top:50%;margin-top:-100px;position:absolute;left:50%;width:250px;margin-left:-125px;">
+			<img src="images/logo.png" style="height:200px;width:250px;"/>
+			<p style="position:relative;top:5px;text-align:center;"></p>
+		</div>
+		<input style="display:none;" id="export_file" type="file" nwsaveas style="display:none" nwworkingdir=""/>
+		<div id="fbxMsg" style="display:none;"></div>
+		<div id="subList" class="container" style="display:none;">
+
+		</div>
+		<script src="js/series.js"></script>
+		<script src="js/mediaelement/build/mediaelement-and-player.js"></script>
+		<script src="js/mediaelement/mep-playlist/mep-feature-playlist.js"></script>
+		<script src="js/contextmenu.js"></script>
+		<script src="js/ht5db.js"></script>
+		<script src='js/ht5playlist.js'></script>
+		<script src="js/ht5localdb.js"></script>
+		<script src="js/flix.js"></script>
+		<script src="js/plug.js"></script>
+		<script src="js/plug.upnp_contentdirectory.js"></script>
+		<script src="js/plug.upnp_avtransport.js"></script>
+		<script src="js/window.js"></script>
+		<script src="js/upnpserver.js"></script>
+		<script src="js/fileserver.js"></script>
+		<script src="js/ht5server.js"></script>
+		<script src="js/megaFunctions.js"></script>
+		<script src="js/ht5pagination.js"></script>
+		<script src="js/upnpclient.js"></script>
+		<script src="js/cpbapi.js"></script>
+		<script src="js/rss.js"></script>
+		<script src="js/tvdb.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/youtube-dailym.js"></script>
+		<script src="js/player.js"></script>
+		<script src="js/magnificpopup.js"></script>
+		<script src="js/alert/sweet-alert.min.js"></script>
+		<script src="js/eztv.js"></script>
+		<script src="js/airmedia.js"></script>
+	</body>
+</html>

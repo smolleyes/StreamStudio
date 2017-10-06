@@ -1,0 +1,40 @@
+{
+  "name": "StreamStudio",
+  "main": "index.html",
+  "page-cache": true,
+  "user-agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.157 Safari/537.36",
+  "window": {
+    "icon": "setup-images/48x48/streamstudio.png",
+    "toolbar": false,
+    "position": "center",
+    "title": "StreamStudio",
+    "min_width": 995,
+    "min_height": 550,
+    "show": false,
+    "frame": false
+  },
+  "chromium-args": "--ignore-gpu-blacklist --harmony",
+  "dependencies": {
+    "casts": "^0.4.0",
+    "cfget": "^1.0.1",
+    "cloudscraper": "^1.4.1",
+    "deep-diff": "^0.3.8",
+    "follow-redirects": "^1.2.5",
+    "fs-temp": "^1.1.2",
+    "image-downloader": "^3.3.0",
+    "ip": "^1.1.5",
+    "iterator": "^0.0.0",
+    "node-fs-extra": "^0.8.2",
+    "node-tvdb": "^3.2.0",
+    "parse-torrent": "^5.8.3",
+    "radio-song": "^0.1.8",
+    "range-parser": "^1.2.0",
+    "request": "^2.83.0",
+    "sanitize-filename": "^1.6.1",
+    "shortid": "^2.2.8",
+    "underscore": "^1.8.3",
+    "upnp-mediarenderer-client": "^1.2.4",
+    "wrench": "^1.5.9",
+    "youtube-dl": "^1.12.2"
+  }
+}

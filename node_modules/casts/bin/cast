@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+Cast = require('casts')
+app = process.argv.shift()
+script = process.argv.shift()
+host = process.argv.shift()
+emitter = new Cast()
+emitter.node(host, function() {
+	emitter.emit.apply(emitter, process.argv)
+	process.exit(0)
+})
