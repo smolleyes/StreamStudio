@@ -22,6 +22,8 @@ nw_100_percent.pak
 nw_200_percent.pak
 nwjc
 nw.dll
+*.exe
+*.dll
 payload
 resources.pak
 snasphot_blob.bin
