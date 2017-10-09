@@ -5,29 +5,25 @@ var cloudscraper = require('cloudscraper');
 function initCpbSearch(results,cb) {
 	console.log('SEARCH FOR', results.query)
 	// LOAD CLOUDFLARE ENGINE
-	if(results.page == 0) {
-				cloudscraper.post('http://www.torrent9.pe/search_torrent/',{"champ_recherche":results.query},function(e,r,datas){
-					console.log(datas)
-					if(e) {
-						results.success = false;
-						results.error = "Can't get results for " + results.query;
-						cb(results);
-					}
-					try {
-						var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
-					  results.basePath = path.dirname(link);
-		      } catch (err) {}
-					return parseDatas(datas, results,cb);
-				});
+	if(results.page === 0) {
+		cloudscraper.post('http://www.torrents9.pe/search_torrent/',{"champ_recherche":results.query},function(e,r,datas){
+			console.log('LOG POST CPBAPI', e,r,datas)
+			if(e) {
+				results.success = false;
+				results.error = "Can't get results for " + results.query;
+				cb(results);
+			}
+			return parseDatas(datas, results,cb);
+		});
 	} else {
-				cloudscraper.get(results.basePath+'/page-'+results.page,function(e,r,datas){
-					if(e) {
-						results.success = false;
-						results.error = "Can't get results for " + results.query;
-						cb(results);
-					}
-					return parseDatas(datas, results, cb);
-				})
+		cloudscraper.get('http://www.torrent9.pe/search_torrent/'+encodeURIComponent(results.query)+'/page-'+results.page,function(e,r,datas){
+			if(e) {
+				results.success = false;
+				results.error = "Can't get results for " + results.query;
+				cb(results);
+			}
+			return parseDatas(datas, results, cb);
+		})
 	}
 }
 
@@ -44,13 +40,11 @@ function hasHeader(header, headers) {
 
 function parseDatas(data, results,cb) {
 	try {
-		results.totalResults = parseInt($($('small',data)[0]).text().match(/\d{1,5}/)[0]);
-		if(results.totalResults == 0) {
-			results.seasons = {};
-			return getOmgDatas(results,cb,1);
-		}
 		var mlist=$('.cust-table tr',data).get().slice(1)
-		console.log(mlist)
+		results.totalResults = parseInt($($('small',data)[0]).text().match(/\d{1,5}/)[0]) || mlist;
+
+		//console.log(results, mlist, data)
+		
 		Iterator.iterate(mlist).forEach(function (item,i) {
 			try {
 				var video = {};
@@ -66,12 +60,12 @@ function parseDatas(data, results,cb) {
 				console.log(err)
 			}
 		});
-		if(results.list.length !== results.totalResults) {
-			results.page+=1;
-			initCpbSearch(results,cb)
-		} else {
-			return analyseCpbDatas(results,cb);
-		}
+		 if(results.list.length !== results.totalResults) {
+		 	results.page+=1;
+		 	initCpbSearch(results,cb)
+		 } else {
+		 	return analyseCpbDatas(results,cb);
+		 }
 	} catch(err) {
 		results.success = false;
 		results.error = "Can't get results for " + results.name;

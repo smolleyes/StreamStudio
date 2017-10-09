@@ -192,20 +192,18 @@ function *getTVdbBanners(item, query) {
 }
 
 function storeSerieToDb(serie,cb) {
-	console.log('in store serie db')
 	bongo.db('seriesDb').collection('series').find({'id': serie.id}).toArray(function(error,list) {
 	    if(list.length == 0) {
-	    	if(serie.infos.fanart) {
-	    		serie.fanart = path.join(process.env.APPDATA,'StreamStudio','images',serie.id+'-fanart'+path.extname(serie.infos.fanart)).replace(/\\/g,'/');
+	    	if(serie.infos.fanart && serie.infos.fanart !== null) {
+	    		serie.fanart = confDir + '/images/'+serie.id+'-fanart'+path.extname(serie.infos.fanart);
 	    	} else {
 	    		serie.fanart = null;
 	    	}
-	    	if(serie.infos.poster) {
-	    		serie.poster = path.join(process.env.APPDATA,'StreamStudio','images',serie.id+'-poster'+path.extname(serie.infos.fanart)).replace(/\\/g,'/');
+	    	if(serie.infos.poster && serie.infos.poster.indexOf('tvdb.png') == -1) {
+	    		serie.poster = confDir + '/images/'+serie.id+'-poster'+path.extname(serie.infos.poster);
 	    	} else {
 	    		serie.poster = 'images/tvdb.png';
-			}
-			console.log(serie)
+	    	}
 	    	var name = serie.infos.SeriesName.replace(/\(.*\)/,'').trim();
 	    	bongo.db('seriesDb').collection('series').insert({
 	        id: serie.id,
@@ -339,21 +337,26 @@ function compareSeasons(update,serie,cb) {
 }
 
 function downloadImages(link,target,cb) {
-	const download = require('image-downloader')
-	console.log('DOWNLOADING IMAGE', link, target)
 	options = {
-		url: 'https://www.thetvdb.com/banners/'+link,
-		dest: target        // Save to /path/to/dest/photo.jpg
-	  }
-	   
-	  download.image(options)
-		.then(({ filename, image }) => {
-		  console.log('File saved to', filename)
-		  cb()
-		}).catch((err) => {
-			console.log(err)
-		  throw err
-		})
+    	host: 'thetvdb.com',
+    	port: 80,
+	  	path: '/banners/'+link
+	}
+    var file = fs.createWriteStream(target);
+    http.get(options,function(res) {
+    	var imagedata = ''
+    	res.setEncoding('binary')
+    	res.on("data",function(chunk){
+    		imagedata += chunk;
+    	});
+    	res.on('end', function(){
+	        fs.writeFile(target, imagedata, 'binary', function(err){
+	            if (err) throw err
+	            console.log('File '+target+' saved.'),
+	        	cb();
+	        })
+	    })
+	});
 }
 
 // searchTVdb('dexter',function(data){console.log(data)})
