@@ -28,18 +28,19 @@ $(document).on('ready', function() {
                 if(!settings.twitchToken) {
                   getTwitchToken()
                 }
-            } else if(this.name === "t411") {
-                $('#t411Login').show();
-                if(!settings.t411Username || !settings.t411Password) {
-                    $('#t411LoginUsername').attr('placeholder', '').focus()
-                }
-            }
+            } 
+            // else if(this.name === "t411") {
+            //     $('#t411Login').show();
+            //     if(!settings.t411Username || !settings.t411Password) {
+            //         $('#t411LoginUsername').attr('placeholder', '').focus()
+            //     }
+            // }
             settings.plugins.push(this.name);
             saveSettings();
         } else {
-            if(this.name === "t411") {
-                 $('#t411Login').hide();
-            }
+            // if(this.name === "t411") {
+            //      $('#t411Login').hide();
+            // }
             settings.plugins.splice(settings.plugins.indexOf(this.name), 1);
             saveSettings();
         }
@@ -59,10 +60,10 @@ $(document).on('ready', function() {
         }
     });
 
-    $(document).on('keyup', '#t411LoginUsername,#t411LoginPassword', function(e) {
-        settings.t411Username = $('#t411LoginUsername').val();
-        settings.t411Password = $('#t411LoginPassword').val();
-    });
+    // $(document).on('keyup', '#t411LoginUsername,#t411LoginPassword', function(e) {
+    //     settings.t411Username = $('#t411LoginUsername').val();
+    //     settings.t411Password = $('#t411LoginPassword').val();
+    // });
 
     $(document).on('click', '#aboutStreamStudio', function(e) {
         var html = '<div id="aboutInfos"><h3>'+_("About StreamStudio")+' ('+settings.version+')</h3> \
@@ -122,11 +123,11 @@ function loadConfig() {
     $(document).on('click', '#valid_config', function(e) {
         e.preventDefault();
         settings.init = true;
-        if(settings.plugins.indexOf('t411') !== -1 && (!settings.t411Username || !settings.t411Password)) {
-            $('#t411LoginUsername').attr('placeholder', '').focus();
-            swal(_("Error!"), _("Please enter your login/password for t411 engine !"), "error")
-            return;
-        }
+        // if(settings.plugins.indexOf('t411') !== -1 && (!settings.t411Username || !settings.t411Password)) {
+        //     $('#t411LoginUsername').attr('placeholder', '').focus();
+        //     swal(_("Error!"), _("Please enter your login/password for t411 engine !"), "error")
+        //     return;
+        // }
         saveSettings();
         saveConf();
     });
@@ -256,11 +257,11 @@ without notice.");
     } else {
         var list = settings.plugins;
         $.each(list, function(index, name) {
-            if(name=='t411') {
-                $('#t411Login').show();
-                $('#t411LoginUsername').val(settings.t411Username);
-                $('#t411LoginPassword').val(settings.t411Password);
-            }
+            // if(name=='t411') {
+            //     $('#t411Login').show();
+            //     $('#t411LoginUsername').val(settings.t411Username);
+            //     $('#t411LoginPassword').val(settings.t411Password);
+            // }
             $('input[name=' + name + ']').attr('checked', 'checked');
         });
     }

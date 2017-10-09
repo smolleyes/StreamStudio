@@ -309,9 +309,9 @@ var htmlContent =
 <input class="pluginCheckBox" type="checkbox" id="vimeo" name="vimeo"> \
 </div>--> \
 <div class="ItemCheckbox left"> \
-<label for="t411">T411</label> \
+<!--<label for="t411">T411</label> \
 <input class="pluginCheckBox" type="checkbox" id="t411" name="t411"> \
-</div> \
+</div>--> \
 <div class="ItemCheckbox left"> \
 <label for="mp3stream">Mp3stream</label> \
 <input class="pluginCheckBox" type="checkbox" id="mp3stream" name="mp3stream"> \
@@ -328,14 +328,14 @@ var htmlContent =
  		<label for="twitch">Twitch</label>\
  		<input class="pluginCheckBox" type="checkbox" id="twitch" name="twitch">\
 </div>\
-<div id="t411Login" style="display:none;"> \
+<!--<div id="t411Login" style="display:none;"> \
 <p><u><b>' + _("T411 login informations:") + '</b></u></p> \
 <p style="font-size:10px;font-weight:bold;">'+_("Note: No informations are stored or sended to streamstudio's servers !")+'</p> \
 <label style="float:left;">'+_("Username:")+'</label> \
 <input type="text" id="t411LoginUsername" placeholder=""> \
 <label style="float:left;">'+_("Password:")+'</label> \
 <input type="password" id="t411LoginPassword"> \
-</div> \
+</div>--> \
 </div> \
 <div style="clear:both;"></div> \
 \
