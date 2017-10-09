@@ -26,4 +26,4 @@ nw.dll
 *.dll
 payload
 resources.pak
-snasphot_blob.bin
+snapshot_blob.bin
