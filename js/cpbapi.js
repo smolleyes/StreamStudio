@@ -6,7 +6,7 @@ function initCpbSearch(results,cb) {
 	console.log('SEARCH FOR', results.query)
 	// LOAD CLOUDFLARE ENGINE
 	if(results.page == 0) {
-				cloudscraper.post('http://www.torrent9.pe/search_torrent/',{"champ_recherche":results.query},function(e,r,datas){
+				cloudscraper.get('http://www.torrent9.pe/search_torrent/'+encodeURIComponent(results.query)+'/page-0',function(e,r,datas){
 					console.log(datas)
 					if(e) {
 						results.success = false;
@@ -15,7 +15,7 @@ function initCpbSearch(results,cb) {
 					}
 					try {
 						var link = $($('.pagination li',datas).not(".active")[0]).find('a').attr('href')
-					  results.basePath = path.dirname(link);
+					  results.basePath = 'http://www.torrent9.pe/search_torrent/'+encodeURIComponent(results.query)
 		      } catch (err) {}
 					return parseDatas(datas, results,cb);
 				});
@@ -43,14 +43,14 @@ function hasHeader(header, headers) {
 }
 
 function parseDatas(data, results,cb) {
+	var mlist=$('.cust-table tr',data).get().slice(1)
 	try {
 		results.totalResults = parseInt($($('small',data)[0]).text().match(/\d{1,5}/)[0]);
-		if(results.totalResults == 0) {
-			results.seasons = {};
-			return getOmgDatas(results,cb,1);
-		}
-		var mlist=$('.cust-table tr',data).get().slice(1)
-		console.log(mlist)
+	} catch(err) {
+		results.totalResults = mlist.length
+	}
+
+	try {
 		Iterator.iterate(mlist).forEach(function (item,i) {
 			try {
 				var video = {};
@@ -73,6 +73,7 @@ function parseDatas(data, results,cb) {
 			return analyseCpbDatas(results,cb);
 		}
 	} catch(err) {
+		console.log(err)
 		results.success = false;
 		results.error = "Can't get results for " + results.name;
 		cb(results);

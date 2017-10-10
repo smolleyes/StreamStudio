@@ -8,8 +8,8 @@ ffmpeg
 .git/
 locales/*.pak
 ss_exclude.txt
-/pnacl/
-/lib/
+/pnacl
+/lib
 chromedriver
 credits.html
 icudtl.dat

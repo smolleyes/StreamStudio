@@ -194,14 +194,19 @@ function *getTVdbBanners(item, query) {
 function storeSerieToDb(serie,cb) {
 	console.log('in store serie db')
 	bongo.db('seriesDb').collection('series').find({'id': serie.id}).toArray(function(error,list) {
-	    if(list.length == 0) {
+		var os = require('os');
+		var srcDir = path.join(confDir,'images')
+		if(os.platform() === "win32") {
+			srcDir = path.join(process.env.APPDATA,'StreamStudio','images')
+		}
+		if(list.length == 0) {
 	    	if(serie.infos.fanart) {
-	    		serie.fanart = path.join(process.env.APPDATA,'StreamStudio','images',serie.id+'-fanart'+path.extname(serie.infos.fanart)).replace(/\\/g,'/');
+	    		serie.fanart = path.join(srcDir,serie.id+'-fanart'+path.extname(serie.infos.fanart)).replace(/\\/g,'/');
 	    	} else {
 	    		serie.fanart = null;
 	    	}
 	    	if(serie.infos.poster) {
-	    		serie.poster = path.join(process.env.APPDATA,'StreamStudio','images',serie.id+'-poster'+path.extname(serie.infos.fanart)).replace(/\\/g,'/');
+	    		serie.poster = path.join(srcDir,serie.id+'-poster'+path.extname(serie.infos.fanart)).replace(/\\/g,'/');
 	    	} else {
 	    		serie.poster = 'images/tvdb.png';
 			}
