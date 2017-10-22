@@ -469,6 +469,14 @@ function loadPlayers() {
             type: 'Mpc-hc64',
             switches: ' /sub '
         },
+        'MPC-BE': {
+			type: 'Mpc-be',
+			switches: ' /sub '
+		},
+		'MPC-BE64': {
+			type: 'Mpc-be64',
+			switches: ' /sub '
+		},
         'SMPlayer': {
             type: 'Smplayer',
             switches: ' -sub ',
