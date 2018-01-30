@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 */
 
+
 @font-face {
 	font-family: Ripper;
 	src: url('../fonts/Ripper.ttf');
@@ -26,6 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 @font-face {
 	font-family: OpenSansSemibold;
 	src: url('../fonts/OpenSans-Semibold.ttf');
+}
+
+@font-face {
+	font-family: Gravity;
+	src: url('../fonts/Gravity-Regular.ttf');
 }
 
 .preload_dailymotion_live {
@@ -255,10 +261,12 @@ button[aria-label="playmode"] {
 }
 
 input[type='text'] {
+	border-radius: 4px 0 0 4px !important;
 	width: calc(100% - 50px) !important;
 	margin: 5px 0 10px 5px;
 	display: block !important;
 	height: 32px !important;
+	border-width:0px;
 }
 
 .input-group {
@@ -271,11 +279,12 @@ border-collapse: separate;
 	padding:0;
 }
 
-#searchPanel input[type='submit'] {
+#searchPanel input[type='submit'],#searchPanel input[type='submit']:hover  {
 	float:right;
 	margin-right: 5px;
 	max-width: 125px;
 	margin-top:10px;
+	border-radius: 0 4px 4px 0 !important;
 }
 
 pre {
@@ -512,7 +521,7 @@ html{
 }
 
 body {
-    font:14px OpenSansSemibold, Arial, sans-serif !important;
+    font-family:Gravity !important;
     background-color : #101010 !important;
     line-height: 1 !important;
     color:white !important;
@@ -524,9 +533,6 @@ a {
     color:black;
 }
 
-a:hover {
-    color:red;
-}
 
 ul {
 	list-style-type : none;
@@ -592,11 +598,7 @@ video{
 #search {
     z-index: 500;
     overflow:auto;
-    height:55px;
-}
-
-#search_results {
-	  padding-top: 10px;
+    height:45px;
 }
 
 #search a {
@@ -1925,7 +1927,7 @@ position: relative;
 .list-row,.serieItem {
 	font-size : 12px;
 	width:170px !important;
-	height: 230px;
+	height: 255px;
 	float:left;
 	-webkit-animation-name: flipInX;
 	-webkit-animation-duration: 1s;
@@ -1974,19 +1976,18 @@ position: relative;
 }
 
 .coverInfosTitle {
-	height: auto;
+	
 	color: #fff;
 	max-width: 100%;
 	/**overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;**/
 	font-weight: bold;
-	position: relative;
-	top: 5px;
+	position: absolute;
+	bottom: 5px;
 	width:calc(100% - 20px);
-	  overflow: hidden;
-  max-height: 35px;
-  display: flex;
+	display:block;
+	  word-wrap: break-word;
 }
 
 .optionsTop {
@@ -2001,6 +2002,23 @@ position: relative;
 	min-width:150px;
 }
 
+.dropdown-menu>.active>a, .dropdown-menu>.active>a:hover, .dropdown-menu>.active>a:focus {
+    color: #ffffff;
+    text-decoration: none;
+    outline: 0;
+	background-color: #3d3e3fc4 !important;
+}
+
+.settingsInput {
+	height: 20px !important;
+    margin-left: 10px;
+    width: 250px !important;
+    position: relative;
+    top: -2px;
+    left: 5px;
+    border-radius: 4px !important;
+}
+
 #optionsTopInfos {
 	position: absolute;
 	height: 25px;
@@ -2010,6 +2028,7 @@ position: relative;
 	font-weight: bold;
 	padding: 3px;
   top: 5px;
+  padding: 4px 3px 3px 3px;
 }
 
 #optionsTopInfos i,#optionsBottomInfos i {
@@ -2020,7 +2039,7 @@ position: relative;
 	position: absolute;
 	height: 25px;
 	background: black;
-	bottom: 30px;
+	bottom:55px;
 	width:calc(100% - 20px);
 	opacity:0.5;
 	left:10px;
@@ -2032,7 +2051,7 @@ position: relative;
 #optionsBottomInfos {
 	position: absolute;
 	height: 25px;
-	bottom: 30px;
+	bottom: 55px;
 	width:calc(100% - 20px);
 	color:white;
 	font-size:12px;
@@ -2047,7 +2066,7 @@ position: relative;
 	left: 50%;
 	width: 200px;
 	height: 100px;
-	margin: -65px 0 0 -100px;
+	margin: -75px 0 0 -100px;
 	background: url(../images/bigplay.svg) no-repeat;
 	border:none !important;
 	cursor: pointer !important;
@@ -2064,12 +2083,18 @@ position: relative;
 #header{
     width:         100%;
     height:         54px;
-    background:#101010;
+	background:#101010;
+	position: absolute;
     -webkit-app-region: drag;
     -webkit-user-select: none;
     z-index:1005;
     box-shadow: black -2px 6px 7px;
     }
+
+	.btn, input, button {
+		border-radius: 6px !important;
+		border-width: 0px;
+	}
 
 /*Window Controls*/
 #header>ul{
@@ -2113,11 +2138,12 @@ a#windowControlMinimize{
 
 #sectionsContainer {
 	float: left;
-	position: absolute;
+	position: relative;
 	padding: 7px 0 7px 0px;
 	height: 54px;
-	top:-50px;
+	top:4px;
 	z-index:1007;
+	left: 10px;
 	-webkit-app-region: no-drag;
 }
 
@@ -2130,6 +2156,7 @@ a#windowControlMinimize{
 	text-align: center;
 	position: relative;
 	top: 5px;
+	left: -67px;
 }
 
 #tab li {
@@ -2150,7 +2177,7 @@ a#windowControlMinimize{
 
 #tab li a {
 	color: #ffffff;
-	background-color: rgba(31, 31, 31, 0.4) !important;
+	background-color: rgb(27, 27, 27) !important;
 	cursor: default;
 	border: 0 !important;
 }
@@ -2165,7 +2192,7 @@ a#windowControlMinimize{
 
 #tab li:hover {
 	color: #ffffff;
-	background: rgba(68, 68, 68, 1); !important;
+	background: rgba(68, 68, 68, 1) !important;
 	cursor: default;
 	border-bottom: 2px solid #f9aa37 !important;
 }
@@ -2217,26 +2244,30 @@ padding: 5px 15px !important;
 color: #ffffff;
 text-decoration: none;
 outline: 0;
-background-color: #3D3E3F !important ;
+/*background-color: #3D3E3F !important ;*/
 }
 .dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus {
 text-decoration: none;
 color: #ffffff;
-background-color: #3D3E3F !important;
+/*background-color: #3D3E3F !important;*/
 }
 .dropdown-menu>.active>a, .dropdown-menu>.active>a:hover, .dropdown-menu>.active>a:focus {
 color: #ffffff;
 text-decoration: none;
 outline: 0;
-background-color: #3D3E3F !important;
+/*background-color: #3D3F !important;*/
 }
 
 .progress {
 	background-color: #3D3E3F !important;
 }
 
-.btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default {
+/*.btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default {
 background: rgba(190, 190, 190, 0.11) !important;
+}*/
+
+.btn-success:hover, .btn-warning:hover, .btn-info:hover, .btn-danger:hover {
+	border-top: 2px solid black !important;
 }
 
 .youtube_item li a:hover {
@@ -2389,7 +2420,7 @@ li.dropdown {
 }
 
 #searchSeriesContainer {
-	margin:10px;
+	margin: 20px 10px 10px 10px;
 }
 
 #searchSerieSend {
@@ -2398,6 +2429,7 @@ li.dropdown {
   margin-top: 5px;
   border-radius: 0;
   border: none;
+  margin-left: 10px;
 }
 
 #searchSeries {

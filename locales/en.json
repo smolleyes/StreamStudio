@@ -103,5 +103,14 @@
 	"done at": "done at",
 	"Installing update...": "Installing update...",
 	"Please add local folders to scan in the settings": "Please add local folders to scan in the settings",
-	"Cast": "Cast"
+	"Cast": "Cast",
+	"Disable": "Disable",
+	"Transcoding": "Transcoding",
+	"": "",
+	"Streamstudio plugins:": "Streamstudio plugins:",
+	"Global torrent search settings:": "Global torrent search settings:",
+	"Yggtorrent login informations:": "Yggtorrent login informations:",
+	"Login:": "Login:",
+	"Global": "Global",
+	"Global torrent search": "Global torrent search"
 }

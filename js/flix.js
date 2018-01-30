@@ -97,7 +97,6 @@ function getTorrent(link, cover, fallback,retried,id) {
     if(!torObj.retried) {
      player.cleanTracks();
     }
-    if (link.toString().indexOf('magnet:?') !== -1) {
         if (cover) {
             mediaCover = cover;
         } else {
@@ -127,19 +126,12 @@ function getTorrent(link, cover, fallback,retried,id) {
 		<div id="coaster"></div>  \
 	    </div> \
 	      <div id="peerStats"></div></div>');
-        magnetToTorrent.getLink(link)
-            .then(function(torrentLink) {
-                getTorrent(torrentLink, cover || '')
-            })
-            .fail(function(error) {
-                loadTorrent(link, cover || '') // couldn't get a valid link
-            });
-    } else {
-        loadTorrent(link, cover || '')
-    }
+        
+          loadTorrent(link, cover)
 }
 
 function loadTorrent(link, cover,id, torrInfo) {
+    console.log(link)
     if(!torrInfo) {
         initPlayer()
         stopTorrent();
@@ -148,11 +140,9 @@ function loadTorrent(link, cover,id, torrInfo) {
         initPlayer(true)
         torrentInfo = torrInfo;
     }
-    if (cover) {
-        mediaCover = cover;
-    } else {
-        mediaCover = '';
-    }
+
+    mediaCover = cover || '';
+
     $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     var obj = JSON.parse(settings.ht5Player);
     if ((activeTab == 1 || activeTab == 2) && (search_engine === 'dailymotion' || search_engine === 'youtube' ||  engine.type == "video") && obj.name === "StreamStudio") {
@@ -188,8 +178,20 @@ function loadTorrent(link, cover,id, torrInfo) {
     playStarted = false;
     downloadedPct = 0;
     startLoading();
+
+    console.log(link)
     if(id) {
         handleTorrent(torrentInfo, stateModel,id);
+    
+    } else if(link.toString().indexOf('magnet:?') !== -1) {
+            let infos = rTorrent(link, function(err, torrent, raw) {
+                title = torrent.name;
+                    torrentInfo = {
+                        info: raw,
+                        title: title
+                    };
+                handleTorrent(torrentInfo, stateModel);
+            })
     } else {
         setTimeout(function() {
             rTorrent(link, function(err, torrent, raw) {
@@ -204,6 +206,7 @@ function loadTorrent(link, cover,id, torrInfo) {
                         title: title
                     };
                     try {
+                        console.log(torrent)
                         if (torrent.files.length > 1) {
                             analyseTorrent(torrent.files);
                         } else {
@@ -396,7 +399,7 @@ app.updateStats = function(streamInfo) {
                     totalBuffered = 0;
                     totalBytes = 0;
                 }
-                $('.mejs-time-loaded').width(downloadedPct + '%')
+                //$('.mejs-time-loaded').width(downloadedPct + '%')
                 $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
             }
         }
@@ -516,7 +519,7 @@ function handleTorrent(torrent, stateModel, id) {
         }
         if (typeof id !== "undefined") {
             torObj.id = id;
-            videoStreamer = peerflix(torrent.info, {
+            videoStreamer = peerflix(torrent.info || torrent, {
                 connections: 150,
                 path: tmpFolder,
                 index: parseInt(id),
@@ -524,7 +527,7 @@ function handleTorrent(torrent, stateModel, id) {
             });
         } else {
             //player.cleanTracks();
-            videoStreamer = peerflix(torrent.info, {
+            videoStreamer = peerflix(torrent.info || torrent, {
                 connections: 150,
                 path: tmpFolder,
                 gui: win.window,

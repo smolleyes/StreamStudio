@@ -48,6 +48,7 @@ var dlnaPlayers = []
 var castNoResponseCount = 0;
 var forceTranscoding = false;
 var currentTorrentFilePath = ''
+var searchResults = []
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {

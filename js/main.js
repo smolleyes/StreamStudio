@@ -55,6 +55,7 @@ var selectTypes = ["searchTypes", "orderBy", "dateTypes", "searchFilters", "cate
 var searchOptions = {};
 // for navigation mode
 var browse = true;
+const asyncRequest = require('async-request')
 
 var htmlStr ='<div id="menu"> \
 <div class="input-group" style="margin-bottom: 15px;margin: 0 -5px 15px -5px;"> \
@@ -65,7 +66,7 @@ var htmlStr ='<div id="menu"> \
 </div> \
 </div> \
 <ul id="searchPanel"> \
-<label id="searchTypesMenu_label">' + _("Plugin:") + '</label> \
+<label id="pluginSelect_label">' + _("Plugin:") + '</label> \
 <li id="engines_select" class="dropdown btn-default btn-sm"> \
 <a class="dropdown-toggle" data-toggle="dropdown" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false"> \
 Youtube \
@@ -178,7 +179,7 @@ var htmlContent =
 </div> \
 <div id="search"> \
 <div id="search_results"> \
-<p>' + _("Welcome to StreamStudio !<br><br>Make a new search or select a category to start...") + '</p> \
+<p>' + _("") + '</p> \
 </div> \
 </div> \
 <div id="nanoContent1" class="nano" style="height:calc(100% - 216px);"> \
@@ -256,7 +257,7 @@ var htmlContent =
 <h3>' + _("StreamStudio Settings") + '<span style="font-size: 12px;margin-top: 11px;position: relative;top: -2px;left: 10px;"><b>(V' + settings.version + ')</b></span><span id="aboutStreamStudio"><a href="#">'+_("About StreamStudio")+'</a></span></h3><hr style="margin-right:20px;"> \
 <form style="float-right;margin-left:10px;display:none;" id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank"> \
 <input type="hidden" name="cmd" value="_s-xclick"> \
-<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7----- "> \
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7----- "> \
 <input type="image" style="display:none;" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"> \
 <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"> \
 </form> \
@@ -303,11 +304,16 @@ var htmlContent =
 </div> \
 <div class="form-group"> \
 <div><p><b><u>'+ _("Plugins choice:")+'</u></b></p><p>'+_("Please read the disclaimer here : <u><a id='disclaimer' style='color:red;' href='#'>disclaimer</a></u>")+'</p></div> \
-<div class="input-group well" style="display: table !important;"> \
+<label>' + _("Streamstudio plugins:") + '</label> \
+<div class="input-group well" style="height: 65px;max-width: 95%;"> \
 <!--<div class="ItemCheckbox left"> \
 <label for="vimeo">Vimeo</label> \
 <input class="pluginCheckBox" type="checkbox" id="vimeo" name="vimeo"> \
 </div>--> \
+<div class="ItemCheckbox left"> \
+<label for="global">'+ _("Global torrent search")+'</label> \
+<input class="pluginCheckBox" type="checkbox" id="global" name="global"> \
+</div> \
 <div class="ItemCheckbox left"> \
 <label for="mp3stream">Mp3stream</label> \
 <input class="pluginCheckBox" type="checkbox" id="mp3stream" name="mp3stream"> \
@@ -326,7 +332,18 @@ var htmlContent =
 </div>\
 </div> \
 <div style="clear:both;"></div> \
-\
+</div> \
+<div id="globalSearchSettingsContainer" style="display:none;"> \
+<label>' + _("Global torrent search settings:") + '</label> \
+<div id="GlobalSearchSettings" class="input-group well" style="height: 65px;max-width: 95%;"></div> \
+</div> \
+<div id="YggtorrentLoginContainer" style="display:none;margin-bottom:10px;"> \
+  <p><u><b>' + _("Yggtorrent login informations:") + '</b></u></p> \
+  <p style="font-size:10px;font-weight:bold;">'+_("Note: No informations are stored or sended to streamstudio's servers !")+'</p> \
+  <label style="float:left;">'+_("Login:")+'</label> \
+  <input type="text" style="border-radius: 4px !important;width:250px !important; height:20px !important;position: relative; top: -2px; left: 5px;" id="YggtorrentLogin" placeholder="" name="login"> \
+  <label style="float:left;">'+_("Password:")+'</label> \
+  <input type="password" style="border-radius: 4px !important;width:250px !important; height:20px !important;position: relative; top: -2px; left: 5px;" id="YggtorrentPassword" data-provider="Yggtorrent" class="torrentEnginePassword" name="password"> \
 </div> \
 <div class="form-group" id="subtitles_form"> \
 <label>' + _("Default subtitles language:") + '</label> \
@@ -625,6 +642,9 @@ function main() {
     } catch(err) {}
     $(".nano").nanoScroller();
     setTimeout(function() {
+      if($('#tab li.active a').attr('id') === "settingsToggle") {
+        loadGlobalSearchEngines()
+      }
       if ($('#tab li.active a').attr('id') !== "playerToggle" && $('#tab li.active a').attr('id') !== "settingsToggle" && $('#tab li.active a').attr('id') !== "favoritesToggle") {
         $('#playerContainer').hide();
         $('#playerTopBar').hide();
@@ -1065,17 +1085,18 @@ function main() {
     $("#orderBy_select ul").empty();
     $("#orderBy_select").hide();
     $("#search").show();
-    $("#searchTypesMenu_label").show();
     $("#items_container").empty().hide();
     $("#cover").remove();
     $('#search').show();
     $('#pagination').hide();
+    $('#searchTypesMenu_label').show()
     if ($('#fbxMsg2').length !== 0) {
       $('#fbxMsg2').remove();
     };
     try {
       engine = engines[search_engine];
       engine.init(gui, win.window, document,console);
+      $("#search span").remove();
       $("#search p").empty().append(_("Engine %s ready...!", engine.engine_name)).show();
       // hide not needed menus
       $.each(engine.menuEntries, function(index, type) {
@@ -1135,7 +1156,21 @@ function main() {
       });
     } catch (err) {
       console.log(err)
-      if (search_engine === 'dailymotion') {
+      if(search_engine === "global") {
+        $("#searchTypesMenu_label").hide()
+        $('#video_search_query').prop('disabled', false);
+        $(".nano").nanoScroller({
+          destroy: true
+        });
+        $("#search p").empty().append(_("Torrent search api loading...!")).show();
+        loadTorrentEngines(function(result) {
+          console.log(result);
+          if (result.success) {
+            engine = torrentEngine;
+            $("#search p").empty().append(_("Engine %s ready...!", 'global')).show();
+          }
+        });
+      } else if (search_engine === 'dailymotion') {
         $("#search p").empty().append(_("Engine %s ready...!", 'dailymotion')).show();
         var html = '<li class="active"><a href="#" data-value="relevance" class="active">' + _("Relevance") + '</a></li> \
         <li><a href="#" data-value="recent">' + _("Published") + '</a></li> \
@@ -1177,6 +1212,7 @@ function main() {
       }
       if ((search_engine === 'youtube') || (search_engine === 'dailymotion')) {
         $('#video_search_query').prop('disabled', false);
+        $("#searchTypesMenu_label").show();
         $("#searchTypes_select").show();
         $('#searchTypes_label').show();
         $('#orderBy_label').show();
@@ -1379,6 +1415,7 @@ function main() {
   $('#items_container').hide();
   $('.song-title').empty().append(_('Stopped...'));
   window.ondragover = function(e) {
+    console.log(e,e.target)
     e.preventDefault();
     return false
   };
@@ -1389,6 +1426,7 @@ function main() {
   var holder = document.getElementById('mainContainer');
   holder.ondrop = function(e) {
     e.preventDefault();
+    console.log('on drop file')
     var file = e.dataTransfer.files[0],
     reader = new FileReader();
     reader.onload = function(event) {};
@@ -1488,6 +1526,9 @@ function main() {
   $('.mejs-playmode-button').clone().appendTo('#playlistBtnSub')
   $('.mejs-cast-button').clone().appendTo('#castBtnSub')
   $('.song-title').clone().appendTo('#subPlayer-title-container')
+  if(settings.torrentEnginesEnabled) {
+    $('#engines_select ul').append('<li><a href="#" data-value="global">'+_('Global')+'</li>');
+  }
   loadUpnpRenderers()
   Cast.init()
   cli.searchDevices()
@@ -1495,26 +1536,141 @@ function main() {
     cli.searchDevices()
   },2000)
 }
-
 $(document).bind("scrollend", ".nano",function(e){
   console.log("scroll end")
-  setTimeout(function() {
+  if(!pageLoading) {
+    console.log('before updatescroller')
     updateScroller();
-  },100)
+  }
 });
+function searchComplete()   {
+    console.log('search done!')
+    pageLoading = false;
+    $(".nano").nanoScroller();
+}
+
+$(document).off('click','.preload_global_torrent');
+$(document).on('click','.preload_global_torrent',function(e){
+  e.preventDefault();
+  var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+  var link = obj.link;
+  var id = obj.id;
+  //$('.highlight').removeClass('highlight well');
+  //$(this).closest('li').addClass('highlight well');
+var html = '<div id="fbxMsg_header"> \
+  <h3>'+obj.title+'</h3> \
+  </div> \
+  <div id="fbxMsg_content" style="height:auto;"> \
+    <img src="'+obj.cover+'" /> \
+    <p style="margin-top:10px;font-weight:bold;">'+obj.synopsis+'</p> \
+  </div>';
+showPopup(html,'body');
+});
+
+$(document).off('mouseenter','#global_cont .list-row');
+$(document).on('mouseenter','#global_cont .list-row',function(e){
+var self = $(this);
+if($(this).find('.optionsTop').is(':hidden')) {
+setTimeout(function() {
+  if ($("#global_cont li:hover").attr('id') == self.attr('id')) {
+    self.find('.optionsTop,#optionsTopInfos,.optionsBottom,#optionsBottomInfos').fadeIn("fast");
+    self.find('.coverPlayImg').fadeIn('fast');
+  }
+},100);
+}
+});
+
+$(document).off('mouseleave','#global_cont .list-row');
+$(document).on('mouseleave','#global_cont .list-row',function(e){
+if($(this).find('.optionsTop').is(':visible')) {
+$(this).find('.optionsTop,#optionsTopInfos,.optionsBottom,#optionsBottomInfos').fadeOut("fast");
+$(this).find('.coverPlayImg').fadeOut("fast");
+}
+});
+
+$(document).off('click','.preload_globalPlay_torrent');
+$(document).on('click','.preload_globalPlay_torrent',function(e){
+e.preventDefault();
+saveTorrent = false;
+torrentSaved = false;
+activeItem($(this).closest('.list-row').find('.coverInfosTitle'));
+var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+var link = obj.link;
+var id = obj.id;
+saveTorrent = false;
+var html = '<div style="width:100%;height:100%;position:relative;top:0;left:0;'+obj.background+'"></div><div style="position: absolute;top: 50%;left: 50%;width: 500px;height: 500px;margin-top: -250px;margin-left: -250px;background: rgba(32, 32, 32, 0.63);border-radius: 3px;"><h3>'+obj.title+'</h3><br><img style="width:180;height:240px;" src="'+obj.cover+'" /><br><br> \
+<button type="button" id="global_play_'+id+'" data="'+encodeURIComponent(JSON.stringify(obj))+'" class="closePopup play_global_torrent btn btn-success"> \
+  <span class="glyphicon glyphicon-play-circle"><span class="fbxMsg_glyphText">'+_("Start playing")+'</span></span> \
+</button>  \
+<button type="button" class="closePopup download_global_torrentFile downloadText btn btn-info" href="'+obj.torrent+'" id="global_downlink_'+obj.id+'" data="'+encodeURIComponent(JSON.stringify(obj))+'" title="'+ _("Download")+'">  \
+  <span class="glyphicon glyphicon-download"><span class="fbxMsg_glyphText">'+_("Download")+'</span>  \
+  </span>  \
+</button>';
+
+if(freeboxAvailable) {
+html += '<button type="button"  href="'+obj.torrent+'" class="closePopup download_global_torrentFile_fbx downloadText btn btn-info" id="global_downlinkFbx_'+obj.id+'" data="'+encodeURIComponent(JSON.stringify(obj))+'" title="'+ _("Download")+'"><span class="glyphicon glyphicon-download-alt"><span class="fbxMsg_glyphText">'+_("Télécharger avec freebox")+'</span></span></button>';
+}
+html += '<br/><br/><div><label>'+_("Keep torrent file after downloading ?")+'</label><input style="position:relative;left:10px;" type="checkbox" class="saveTorrentCheck" name="saveTorrentCheck"></input></div></div>';
+// show
+showPopup(html,'body')
+});
+
+$(document).off('click','.play_global_torrent');
+$(document).on('click','.play_global_torrent',function(e){
+e.preventDefault();
+var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+if(obj.provider === "Rarbg") {
+  getTorrent(obj.magnet,obj.cover, obj.id)
+  $('#playerToggle')[0].click();
+} else {
+  if(obj.provider === "Torrent9") {
+    obj.link = obj.link.replace(/get_torrent\/\d{1,8}/,'get_torrent')
+  }
+engine.downloadTorrent(obj).then(res =>  { let torrent =new Buffer(res); getTorrent(torrent,obj.cover, obj.id)} )
+itemTitle = obj.title;
+$('#playerToggle')[0].click();
+}
+});
+
+$(document).off('click','.download_global_torrentFile');
+$(document).on('click','.download_global_torrentFile',function(e){
+e.preventDefault();
+var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+console.log(obj)
+engine.downloadTorrent(obj).then(res =>  { let torrent =new Buffer(res); getTorrent(torrent,obj.cover, obj.id)} )
+});
+
+$(document).off('click','.download_global_torrentFile_fbx');
+$(document).on('click','.download_global_torrentFile_fbx',function(e){
+e.preventDefault();
+var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+engine.downloadTorrent(obj).then(res =>  { let torrent =new Buffer(res); getTorrent(torrent,obj.cover, obj.id)} )
+});
+
+$(document).off('click','.addToFavorites');
+$(document).on('click','.addToFavorites',function(e){
+e.preventDefault();
+$(this).removeClass('addToFavorites');
+$(this).attr('title',_("Already in your favorites"));
+$(this).find('i').css('color','#F8963F');
+var title = $(this).attr("data");
+$('#favoritesToggle')[0].click()
+addSerieToDb(title);
+});
+
 
 function updateScroller() {
   if (activeTab == 1) {
     try {
       $(".nano").nanoScroller();
       try {
-        var pos = $('.nano-pane').height() - ($('.nano-slider').position().top + $('.nano-slider').height());
+        var pos = $('.nano-pane').height() - Math.round($('.nano-slider').position().top + $('.nano-slider').height())
         if (engine) {
           if (activeTab == 1 && ($('.nano-pane').height() > $('.nano-slider').height()) && pos == 0 && !engine.pageLoading || $("#items_container ul li").length !== 0 && !$('.nano-slider').is(':visible') && !engine.pageLoading) {
-            if ($("#items_container ul li").length < engine.totalItems) {
+            if (!pageLoading) {
               console.log("load more")
-              engine.loadMore();
-              $(".nano").nanoScroller();
+              pageLoading=true
+              engine.loadMore()
             }
           }
         } else {
@@ -1544,11 +1700,10 @@ function updatePickers() {
   return;
 }
 
-function changePage() {
+function changePage(cb) {
   console.log('changepage')
   if (activeTab == 1) {
-    startSearch(current_search);
-    $(".nano").nanoScroller();
+    startSearch(current_search,cb);
   }
 }
 
@@ -1594,8 +1749,82 @@ function update_searchOptions() {
   searchOptions.category = $("#categories_select a.active").attr('data-value');
   engine.search_type_changed();
 }
+
+function appendVideo(video) {
+  console.log(video)
+  try{
+video.id = ((Math.random() * 1e6) | 0);
+if(video.title.length > 45){
+  text = video.title.substring(0,45)+'...';
+} else {
+  text = video.title;
+}
+var html = `<li id="${video.id}" class="list-row">
+<span class="optionsTop" style="display:none;"></span>
+<div id="optionsTopInfos" style="display:none;">
+<span style="${video.css}" title="${video.viewedTitle}"><i class="glyphicon glyphicon-eye-open"></i></span>
+<span><i class="glyphicon glyphicon-cloud-upload"></i>${video.seeds}</span>
+<span style="float:right;"><i class="glyphicon glyphicon-hdd"></i>${video.size}</span>
+</div>
+<div class="mvthumb">
+<img class="globalthumb" style="float:left;"  onerror="this.src='../images/movie.png'"/>
+</div>
+<div>
+  <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="coverPlayImg preload_globalPlay_torrent" style="display:none;" data="" />
+</div>
+<span class="optionsBottom" style="display:none;"></span>
+<div id="optionsBottomInfos" style="display:none;">
+  <span><i class="glyphicon ${video.quality}"></i>${video.hd}</span>
+  <span style="text-align: center;background: ${video.providerColor};border-radius: 4px; padding: 1px 2px 2px 2px;font-size: 10px;">${video.provider || ''}</span>
+  <span style="float:right;"><a href="#" class="preload_global_torrent" data=""><i class="glyphicon glyphicon-info-sign"></i></a></span>
+  ${video.toggle}
+</div>
+<div>
+  <p class="coverInfosTitle" title="${video.title}">${text}</p>
+</div>
+</li>`;
+$("#global_cont").append(html);
+  } catch(err) {
+
+    console.log(err)
+  }
+
+if(video.cover.indexOf('profile-load.svg') !== -1) {
+  video.cover = "../images/movie.png"
+}
+// cloudscraper.get(video.link, function(error, response, res) {
+//   var img = $(".movie-img img",res).attr('src');
+//   //store img
+//   video.cover = img;
+//   //store description and torrent link
+  video.torrent = video.link;
+//   var r = $('.movie-information',res)
+//   r.find('strong').remove()
+video.synopsis = ''
+$('#'+video.id+' .preload_global_torrent').attr('data',encodeURIComponent(JSON.stringify(video)));
+$('#'+video.id+' .coverPlayImg').attr('data',encodeURIComponent(JSON.stringify(video)));
+$('#'+video.id+' .globalthumb').attr('src',video.cover || '../images/movie.png');
+//   //save in data
+//   $('#'+video.id+' .preload_global_torrent').attr('data',encodeURIComponent(JSON.stringify(video)));
+//   $('#'+video.id+' .coverPlayImg').attr('data',encodeURIComponent(JSON.stringify(video)));
+
+//   if($('#items_container .globalthumb:visible').length === itemsCount) {
+//     pageLoading = false;
+//     searchComplete()
+//   }
+// });
+}
+
+async function checkDb(video) {
+	try {
+		await sdb.find({"title":video.title});
+	} catch(err) {
+		return err;
+	}
+}
+
 //search
-function startSearch(query) {
+async function startSearch(query, cb) {
   $("#search p").empty().append(' ');
   $('#loading p').empty().append(_("Loading..."));
   if ((query === '') && (browse === false) || (query === '') && engine && engine.searchType && engine.searchType == "search" || query === '' && search_engine == 'dailymotion') {
@@ -1625,10 +1854,65 @@ function startSearch(query) {
     searchOptions.searchFilter = $("#searchFilters_select a.active").attr('data-value');
     searchOptions.category = $("#categories_select a.active").attr('data-value');
     searchOptions.currentPage = current_page;
-    engine.search(query, searchOptions, win.window);
+    if(search_engine === "global") {
+      engine.engine_name = "global"
+      $('#items_container').empty().append('<ul id="global_cont" class="list"></ul>').show();
+      engine.search(query, 'Videos',0,current_search_page - 1).then(async torrents => {
+        var favMainList = sdb.find();
+        var favList = [];
+        Iterator.iterate(favMainList).forEach(function (item,index) {
+          if(item.hasOwnProperty('serieName')) {
+            favList.push(item);
+          }
+        });
+        const resEngines = {}
+        const colors = ['#8BC34A','#FF4081','#faa123','#00BCD4','#7B1FA2']
+        let colorCount = 0;
+        resEngines.total = {name:"total",count:0}
+        resEngines.total.color = "#0288D1"
+        try {
+          const list = torrents.filter(function(e){ 
+            if(e) {
+              let color = colors[colorCount];
+              if(!resEngines[e.provider]) {
+                resEngines[e.provider] = {name:e.provider,count:1, color };
+                e.providerColor = color;
+                colorCount += 1;
+              } else {
+                resEngines[e.provider].count += 1;
+                e.providerColor = resEngines[e.provider].color;
+              }
+              resEngines.total.count += 1;
+              return e;
+            } 
+          });
+        for( let torrent of list) {
+            if(torrent.provider === 'Rarbg'){
+              torrent.cover = '../images/movie.png';
+              await parseScrappedData(torrent, null, favList)
+            } else {
+            engine.getTorrentDetails(torrent).then(async (infos) => {
+              await parseScrappedData(torrent, infos, favList)
+            })
+          }
+        }
+        $('#loading').hide();
+        $('#search_results').empty().append('<p>'+_("Search results by engine:")+'</p><span id="engineStats"></span>')
+        $('#search').show();
+        console.log('resnegines', resEngines)
+        __.each(resEngines,function(v,k) {
+          $('#engineStats').append('<span style="margin-right:20px;">'+k+':<span style="background:'+v.color+';border-radius: 4px;margin-left:5px; font-size:12px;padding: 1px 5px;">'+v.count+'</span></span>').show()
+        })
+        $('#items_container').show()
+        } catch(err)  {
+          console.log(err)
+        }
+      });
+    } else {
+      engine.search(query, searchOptions, win.window, cb);
+    }
   } catch (err) {
     console.log(err)
-    pageLoading = true;
     if (search_engine === 'dailymotion') {
       if (searchTypes_select === 'videos') {
         dailymotion.searchVideos(query, current_page, searchFilters, search_order, function(datas) {
@@ -1679,8 +1963,41 @@ function startSearch(query) {
           getVideosDetails(datas, 'youtube', false);
         });
       }
-      $(".nano").nanoScroller();
     }
+  }
+}
+
+async function parseScrappedData(torrent, infos, favList) {
+  torrent.cover = torrent.cover || $($('img',infos)[0]).attr('src');
+  torrent.quality = torrent.title.match(/720|1080/) !== null ? 'glyphicon-hd-video' : 'glyphicon-sd-video';
+  torrent.hd = torrent.title.match(/720/) !== null ? '720p' : torrent.title.match(/1080/) !== null ? '1080p' : '';
+  var c = await checkDb(torrent).length;
+  torrent.css = c > 0 ? 'color:red;float: left;margin-top: 1px;display:block' : 'display:none;';
+  torrent.viewedTitle = c > 0 ? _("Already watched") : '';
+  torrent.isSerie = torrent.title.toLowerCase().match(/(.*)(s\d{1,3}e\d{1,3}|s\d{1,3}|saison \d{1,3})/) !== null ? true : false;
+  torrent.isFavorite = false;
+  torrent.favId = null;
+  if(torrent.isSerie) {
+        torrent.serieName = torrent.title.toLowerCase().match(/(.*)(s\d{1,3}|saison \d{1,3})/)[1].replace(/\(.*\)/,'').replace('-','').trim();
+    Iterator.iterate(favList).forEach(function (item,index) {
+      var re = new RegExp(item.query, 'g');
+      var re2 = new RegExp(item.serieName, 'g');
+      if(item.serieName == torrent.serieName || torrent.serieName == item.query || torrent.serieName.match(re) || torrent.serieName.match(re2)) {
+        torrent.isFavorite = true;
+        torrent.favId = item.id;
+      }
+    });
+    if(torrent.isFavorite) {
+      torrent.background = 'background: url('+confDir+'/images/'+torrent.favId+'-fanart.jpg) no-repeat no-repeat scroll 0% 0% / 100% 100% padding-box border-box';
+      torrent.toggle = '<span style="float:right;"><a href="#" data=""><i class="glyphicon glyphicon-star" style="color:#F8963F" title="'+_('Already in your favorites')+'"></i></span></a>';
+    } else {
+      torrent.background = '';
+      torrent.toggle = '<span style="float:right;"><a href="#" style="cursor:pointer;" class="addToFavorites" data="'+torrent.serieName+'" title="'+_('Add to favorites')+'"><i class="glyphicon glyphicon-star"></i></span></a>';
+    }
+    appendVideo(torrent)
+  } else {
+    torrent.toggle = '';
+    appendVideo(torrent)
   }
 }
 
@@ -1718,3 +2035,6 @@ function activeItem(item) {
     } catch(err) {}
   }
 }
+
+// todo
+// fix biggest file not always select with magnets links

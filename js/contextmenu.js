@@ -18,6 +18,7 @@ var clipboard = gui.Clipboard.get();
 var activElement = null;
 
 $(document).ready(function() {
+	//return
 	$.event.special.rightclick = {
 		bindType: "contextmenu",
 		delegateType: "contextmenu"

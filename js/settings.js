@@ -19,6 +19,8 @@ var gui = require('nw.gui');
 console.log(gui)
 var win = gui.Window.get();
  var nodeip = require('ip')
+const torrentSearch = require('torrent-search-api');
+const torrentEngine = new torrentSearch();
 // create default settings or load from localstorage
 if (localStorage.StdSettings === undefined) {
 	settings.ipaddress = nodeip.address();
@@ -37,6 +39,7 @@ if (localStorage.StdSettings === undefined) {
 	settings.defaultWidth = Math.round(window.screen.availWidth * 0.8);
 	settings.defaultHeight = Math.round(window.screen.availHeight * 0.8);
 	settings.StreamStudioPlayer = {"name":"StreamStudio","path":""};
+	settings.torrentEnginesEnabled = false;
 	localStorage.StdSettings = JSON.stringify(settings);
 }
 
@@ -47,8 +50,39 @@ selected_resolution = settings.resolution;
 download_dir = settings.download_dir;
 locale = settings.locale;
 
+// check torrentSearchApi
+if(!settings.hasOwnProperty('torrentEngines')) {
+	settings.torrentEnginesEnabled = false;
+	settings.torrentEngines = {
+		"Torrent9" : {
+			public: true,
+			enabled: false
+		},
+		"Yggtorrent" : {
+			public: false,
+			enabled: false,
+			login: "",
+			password: "",
+			initialized: false
+		},
+		"Torrentz2" : {
+			public: true,
+			enabled: false
+		},
+		"1337x" : {
+			public: true,
+			enabled: false
+		},
+		"Rarbg" : {
+			public: true,
+			enabled: false
+		}
+	}
+	saveSettings()
+}
+
 // check transcoding
-if(settings.transcoding && settings.transcoding == true) {
+if(settings.transcoding) {
 	transcoderEnabled = true;
 } else {
 	transcoderEnabled = false;

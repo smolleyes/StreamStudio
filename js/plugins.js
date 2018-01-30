@@ -1,7 +1,58 @@
 var engines = [];
+const tp = require('torrent-search-api')
 var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza','thepiratebay','cpasbien','t411'];
 var pluginsDir;
-var pluginsList = ['twitch','songza','cpasbien','thepiratebay','torrent-project','mp3stream','torrent9'];
+var pluginsList = ['twitch','songza','cpasbien','thepiratebay','torrent-project','mp3stream','torrent9','global'];
+
+$(document).on('change','.pluginGlobalCheckBox',function(e){
+    console.log(this.name + ' ' + this.value + ' ' + this.checked);
+    let engine = settings.torrentEngines[this.name];
+    if (this.checked) {
+        if (!torrentEngine.isProviderActive(this.name)) {
+            enableProvider(engine, this.name)
+            saveSettings();
+            if(!engine.public && engine.password && engine.login) {
+                $('#'+this.name+'Login').val(engine.login || '')
+                $('#'+this.name+'Password').val(engine.password || '')
+            }
+        }
+    } else {
+        torrentEngine.disableProvider(this.name)
+        engine.enabled = false;
+        saveSettings();
+        if(!engine.public) {
+            $('#'+this.name+'LoginContainer').hide()
+        }
+    }
+})
+
+// when ? engine password keyup, restart engine
+$(document).on('keyup','.torrentEnginePassword',function(e){
+    let provider = $(e.target).attr('data-provider');
+    console.log(provider)
+    enableProvider(settings.torrentEngines[provider], provider)
+    saveSettings();
+});
+
+function enableProvider(engine, name, fromInit) {
+    console.log("in enableProvider", engine, name)
+    if (engine.public) {
+        torrentEngine.enableProvider(name)
+        engine.enabled = true;
+        if(!engine.public) {
+            $('#'+name+'LoginContainer').show()
+        }
+    } else {
+        console.log("in enableProvider with credential")
+        if(engine.login && engine.password) {
+            torrentEngine.enableProvider(name, engine.login, engine.password)
+            engine.enabled = true;
+            engine.initialized = true;
+        }
+        $('#'+name+'LoginContainer').show()
+        $('#'+name+'Login')
+    }
+}
 
 function initPlugins() {
     pluginsDir = confDir + '/plugins/streamstudio-plugins-master/';
@@ -19,6 +70,13 @@ function initPlugins() {
             checkRev();
         }
     });
+}
+
+function loadTorrentEngines(cb) {
+    if (settings.torrentEnginesEnabled) {
+        loadGlobalSearchEngines();
+        cb({success:true})
+    } 
 }
 
 function checkRev() {
@@ -48,6 +106,32 @@ function checkRev() {
           main()
         });
     });
+}
+
+function loadGlobalSearchEngines(fromInit) {
+    $('#GlobalSearchSettings').empty()
+    const supportedEngines = ["Yggtorrent","1337x","Torrent9","Rarbg","torrentz2"]
+    if(settings.torrentEnginesEnabled) {
+        $('#globalSearchSettingsContainer').show();
+        for(let engine of torrentEngine.getProviders()) {
+            if(supportedEngines.includes(engine.name)) {
+                let enabled = settings.torrentEngines[engine.name].enabled ? 'checked' : '';
+                $('#GlobalSearchSettings').append(`
+                    <div class="ItemCheckbox left"> \
+                    <label for="${engine.name}">${engine.name}</label> \
+                    <input class="pluginGlobalCheckBox" data-public="${engine.public}" type="checkbox" id="${engine.name}" name="${engine.name}" ${enabled}> \
+                    </div>
+                `).show()
+                if(enabled) {
+                    console.log(settings)
+                    enableProvider(settings.torrentEngines[engine.name], engine.name, fromInit)
+                }
+            }
+        }
+    } else {
+        $('#GlobalSearchSettings').empty().hide();
+        $('#globalSearchSettingsContainer').hide();
+    }
 }
 
 function loadApp() {
@@ -195,6 +279,7 @@ function reloadPlugins() {
             });
         } catch (err) {}
     });
+    $('#engines_select li:eq(0)').before('<li><a href="#" data-value="global">'+_('Global')+'</li>');
 }
 
 function writeRevFile(lastRev) {
