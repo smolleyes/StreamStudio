@@ -254,7 +254,7 @@ var showText = _('Show/Hide Playlist');
         nxt.addClass('played');
         nxt.click()
       } else {
-        getNext();
+       initPlayer()
       }
     },
     playPrevTrack: function() {

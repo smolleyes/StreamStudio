@@ -63,10 +63,17 @@ $(document).on('ready', function() {
         }
     });
 
-    $(document).on('keyup', '#YggtorrentLogin,#YggtorrentPassword', function(e) {
+    $(document).on('click', '#validateYggtorrentCredential', function(e) {
+        e.preventDefault()
         settings.torrentEngines['Yggtorrent'].login = $('#YggtorrentLogin').val();
         settings.torrentEngines['Yggtorrent'].password = $('#YggtorrentPassword').val();
-        saveSettings()
+        settings.torrentEngines['Yggtorrent'].passwordconfirm = $('#YggtorrentPasswordConfirm').val();
+        if(settings.torrentEngines['Yggtorrent'].passwordconfirm !== settings.torrentEngines['Yggtorrent'].password)  {
+            swal(_("Error!"), _('Your passwords do not match, please verify!'), "error");
+        } else {
+            saveSettings()
+            swal(_("Success!"), _("Vos identifiants ont bien été enregistrés !"), "success")
+        }
     });
 
     $(document).on('click', '#aboutStreamStudio', function(e) {

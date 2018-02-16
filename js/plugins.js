@@ -121,7 +121,7 @@ function loadGlobalSearchEngines(fromInit) {
                     <label for="${engine.name}">${engine.name}</label> \
                     <input class="pluginGlobalCheckBox" data-public="${engine.public}" type="checkbox" id="${engine.name}" name="${engine.name}" ${enabled}> \
                     </div>
-                `).show()
+                `).show();
                 if(enabled) {
                     console.log(settings)
                     enableProvider(settings.torrentEngines[engine.name], engine.name, fromInit)

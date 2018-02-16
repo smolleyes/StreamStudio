@@ -507,7 +507,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
             var obj = JSON.parse(settings.ht5Player);
             var carray = ['mp3','opus','wav','flac','m4a','wma','ape'];
-            if(obj.name == 'StreamStudio' && carray.indexOf(currentMedia.title.split('.').pop()) !== -1 || playFromIcecast) {
+            if(obj.name == 'StreamStudio' && carray.indexOf(currentMedia.title.split('.').pop()) !== -1 || playFromIcecast || link.indexOf('musicmp3.ru') !== -1) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"

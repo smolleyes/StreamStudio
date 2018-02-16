@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 @font-face {
 	font-family: Gravity;
 	src: url('../fonts/Gravity-Regular.ttf');
+	-webkit-font-smoothing: subpixel-antialiased !important;
 }
 
 .preload_dailymotion_live {
@@ -2266,8 +2267,15 @@ outline: 0;
 background: rgba(190, 190, 190, 0.11) !important;
 }*/
 
-.btn-success:hover, .btn-warning:hover, .btn-info:hover, .btn-danger:hover {
+/*.btn-success:hover, .btn-warning:hover, .btn-info:hover, .btn-danger:hover {
 	border-top: 2px solid black !important;
+}*/
+
+#ValidateYggtorrentCredential {
+	position: relative;
+    top: -3px;
+    height: 23px;
+    border-radius: 0px 3px !important;
 }
 
 .youtube_item li a:hover {

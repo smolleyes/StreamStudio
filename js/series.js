@@ -1,6 +1,6 @@
 var Iterator = require('iterator').Iterator;
 var pt = require('parse-torrent');
-var subEngine = require('popcorn-opensubtitles');
+//var subEngine = require('popcorn-opensubtitles');
 var cloudscraper = require('cloudscraper')
 
 $(document).off('mouseenter', '#seriesContainer .serieItem');
@@ -117,25 +117,25 @@ $(document).on('click', '.openTorrent', function(e) {
         <div id="peerStats"></div></div>');
         $('#preloadProgress').empty().append(_('Downloading subtitles, please wait...'));
         cleanSubTitles();
-        subEngine.searchEpisode(query, 'OSTestUserAgent')
-            .then(function(data) {
-                var i = 1;
-                Object.keys(data).forEach(function (prop) {
-                    if(prop == settings.subLanguage)  {
-                        var link = data[settings.subLanguage].url
-                        var target = execDir+'/subtitles/'+settings.subLanguage+'.srt';
-                        download(target,link,function(err,data){
-                            console.log('subtitle for '+settings.subLanguage+' downloaded')
-                        })
-                    }
-                    if(i == Object.keys(data).length) {
-                        getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
-                    }
-                    i++;
-                });
-            }).fail(function(error) {
-                getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
-        });
+        // subEngine.searchEpisode(query, 'OSTestUserAgent')
+        //     .then(function(data) {
+        //         var i = 1;
+        //         Object.keys(data).forEach(function (prop) {
+        //             if(prop == settings.subLanguage)  {
+        //                 var link = data[settings.subLanguage].url
+        //                 var target = execDir+'/subtitles/'+settings.subLanguage+'.srt';
+        //                 download(target,link,function(err,data){
+        //                     console.log('subtitle for '+settings.subLanguage+' downloaded')
+        //                 })
+        //             }
+        //             if(i == Object.keys(data).length) {
+        //                 getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
+        //             }
+        //             i++;
+        //         });
+        //     }).fail(function(error) {
+        //         getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
+        // });
     } else {
         getAuthTorrent(obj.torrentLink, true, false, obj.cover);
         currentMedia.torrentLink = obj.torrentLink;

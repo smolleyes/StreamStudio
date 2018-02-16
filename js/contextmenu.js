@@ -32,6 +32,8 @@ $(document).ready(function() {
         $('#custom-menu ol').empty();
         if (text.indexOf('mega.nz') !== -1) {
             $('#custom-menu ol').empty().append('<li><a id="mega_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open mega link")+'</a></li>');
+		} else if (path.extname(text).toLowerCase() == '.m3u' || text.toLowerCase().includes('m3u')){
+            $('#custom-menu ol').empty().append('<li><a id="m3uFileOpen" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open M3U playlist")+'</a></li>');
         } else if (text.indexOf('torrent') !== -1 && text.indexOf('magnet:?xt') === -1){
             $('#custom-menu ol').empty().append('<li><a id="torrent_link" href="#" alt="'+text+'" class="btn btn-default ">'+_("Open Torrent")+'</a></li>');
         } else if (text.indexOf('magnet:?xt') !== -1){
@@ -197,6 +199,15 @@ $(document).ready(function() {
 		media.link = 'http://'+ipaddress+':8887/?file='+vlink+'&external';
 		media.title = vlink.split('/').pop();
 		startPlay(media);
+		$('#custom-menu').slideUp();
+	});
+
+	// open M3u
+	$(document).on('click','#m3uFileOpen',function(e) {
+		e.preventDefault();
+		clipboard.clear();
+		var text = $(this).attr('alt');
+		parseM3uFile(text)
 		$('#custom-menu').slideUp();
 	});
 

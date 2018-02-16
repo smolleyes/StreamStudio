@@ -50,7 +50,7 @@ selected_resolution = settings.resolution;
 download_dir = settings.download_dir;
 locale = settings.locale;
 
-// check torrentSearchApi
+// check torrentSearchApi object
 if(!settings.hasOwnProperty('torrentEngines')) {
 	settings.torrentEnginesEnabled = false;
 	settings.torrentEngines = {
