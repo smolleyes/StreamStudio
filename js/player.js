@@ -255,8 +255,10 @@ $(document).ready(function() {
 		mediaCurrentTime = newTime;
 		seekAsked = true;
 		if(transcoderEnabled || upnpTranscoding || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+			doNotSwitch = true;
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
+			currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
 			if(playFromFile) {
 				m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 			} else if(playFromHttp) {
@@ -266,12 +268,11 @@ $(document).ready(function() {
 			} else if (playFromUpnp) {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
 			} else if (playFromYoutube) {
-				doNotSwitch = true;
-				currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
 				m.link = l.split('?file=')[1].trim()+'&start='+mejs.Utility.secondsToTimeCode(newTime).trim();
 			}
 			m.title = currentMedia.title;
 			m.cover = currentMedia.cover;
+			currentMedia = m;
 			console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
 			initPlay(m);
 			//player.media.setCurrentTime(newTime);
@@ -686,7 +687,7 @@ function launchPlay() {
 
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	var carray = ['.mp3','.mp4','.m4a','.opus','.wav','.flac','.mkv','.avi','.mpeg','.mpg','.ogg','.webm','.ogv','.aac'];
+	var carray = ['.mov'];
 	var aArray = ['.wma'];
 	//['.mp3','.opus','.wav','.flac','.m4a','.wma','.aac'];
 	var needTranscoding = ['hls','m3u8','manifest']
@@ -715,17 +716,17 @@ function launchPlay() {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
+	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1 || currentMedia.title.toLowerCase().match(/(dts|x265|hevc)/) !== null) {
 		transcoderEnabled = true;
 		// force by extension
-	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
+	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.includes(path.extname(currentMedia.title)) || needTranscoding.indexOf(currentMedia.link) !== -1 ) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
 	}
 
 	// check avi et dts on engines with possibles avi
-	if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
+	if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi")) {
 		console.log('CHECK FFMPEG FORMAT')
 		needFFmpegCheck = true;
 	}
@@ -1123,9 +1124,10 @@ function updateProgressBar() {
 			$('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(duree))
 			var total = $('.mejs-time-total').width()
 			var newWidth = Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)
-			if(total > newWidth) {
-				$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
-			}
+			// if(total > newWidth) {
+			// 	$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
+			// }
+			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
 		  $('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
 			$('#subPlayer-img').attr('src',currentMedia.cover);
 			if(upnpTranscoding && percentage == 0) {
@@ -1138,6 +1140,7 @@ function updateProgressBar() {
 		try {
 			if(transcoderEnabled) {
 				var percentage = ((100 / duree) * (current+mediaCurrentTime));
+				$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (current+mediaCurrentTime) / mediaDuration)+'px');
 				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
 			} else {
 				var percentage = ((100 / duree) * current);

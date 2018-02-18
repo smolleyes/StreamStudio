@@ -774,7 +774,7 @@ function main() {
   });
   $(document).on('click', '.open_folder', function (e) {
     e.preventDefault();
-    gui.Shell.showItemInFolder(settings.download_dir + '/StreamStudio');
+    gui.Shell.openItem(settings.download_dir);
   });
 
   $("#playlistBtn").bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified DOMCharacterDataModified', function () {

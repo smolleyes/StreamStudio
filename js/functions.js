@@ -292,9 +292,10 @@ function loadchildrens(childs, parent, close) {
         $.each(childs.reverse(), function(index, child) {
             if (child.type === "file") {
                 var id = Math.floor(Math.random() * 1000000);
-                var ext = child.name.split('.').pop().toLowerCase();
-                if (ext === 'webm' || ext === 'aac' ||  ext == '3gp' || ext === 'm4a' || ext === 'mp4' || ext === 'flac' || ext === 'wav' || ext === 'mpg' || ext === 'opus' || ext === 'avi' || ext === 'mpeg' || ext === 'mkv' || ext === 'mp3' || ext === 'ogg' || ext === 'mov') {
-                    var obj = {
+                var ext = child.name.split('.').pop().toLowerCase().replace('.','');
+                const codecsArr = ['mp3','ogv','aiff','ra','mka','webm','aac','m4a','wma','mp4','flac','wav','mpeg','opus','avi','flv','wmv','mkv','ogg','mov','mkv'];
+					if (codecsArr.includes(ext)) {
+                        var obj = {
                         "attr": {
                             "id": id
                         },
