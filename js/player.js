@@ -1147,8 +1147,8 @@ function updateProgressBar() {
 
 		} catch(err) { console.log(err)}
 	} else {
-		var duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
-		var current = player.media.currentTime;
+		var duree = state.playing.duration || player.media.duration;
+		var current = state.playing.currentTime || player.media.currenttime;
 		try {
 			if(transcoderEnabled) {
 				duree = state.playing.duration
