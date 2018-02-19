@@ -673,7 +673,8 @@ div,form,a,select {
 
 #subPlayer-title-container p {
 	position: relative;
-  top: 28px;
+    top: -5px;
+    left: 40px;
 }
 
 #subPlayer-controls {

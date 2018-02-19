@@ -3,11 +3,13 @@ function getUpnpPosition() {
 			if (position) {
 				mediaRenderer.getDuration(function(err, duration) {
 	         if(duration && duration !== 0) {
-            	var pct = (position * 100 / duration).toFixed(2);
+				var pct = (position * 100 / duration).toFixed(2);
+				consol.log('in upnp update', pct)
 							$('.mejs-time-current').css({width: pct+'%', maxWidth: '100%'})
 							$('span.mejs-currenttime').text(secondstotime(position));
 							$('span.mejs-duration').text(secondstotime(duration));
 							mediaDuration = duration;
+							state.playing.currentPct = pct;
 							if(upnpMediaPlaying) {
 								mediaCurrentTime = position;
 								player.media.currentTime = position

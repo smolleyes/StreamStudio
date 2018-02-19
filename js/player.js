@@ -77,9 +77,9 @@ $(document).ready(function() {
 	$(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
 		if(upnpToggleOn){
 			try{
-				mediaRenderer.stop()
 				clearInterval(castStatusInterval)
 				castStatusInterval = null;
+				mediaRenderer.stop()
 			} catch(err) {
 				initPlayer()
 				player.media.stop()
@@ -87,11 +87,15 @@ $(document).ready(function() {
 		}
 		updateMiniPlayer()
 		try {
-			upnpMediaPlaying = false;
-			continueTransition = false;
-			upnpContinuePlay = false;
-			upnpStoppedAsked = true;
-			fromPlayList = false;
+			stopIceTimer();
+			setTimeout(function() {
+				upnpMediaPlaying = false;
+				continueTransition = false;
+				upnpContinuePlay = false;
+				upnpStoppedAsked = true;
+				fromPlayList = false;
+				playFromIcecast = false;
+			}, 1000)
 		} catch(err) {}
 		if (win.isFullscreen === true) {
 			win.toggleFullscreen();
@@ -168,7 +172,7 @@ $(document).ready(function() {
 	});
 
 	player.media.addEventListener('timeupdate', function(e) {
-
+		updateProgressBar()
 	});
 
 	// player.media.addEventListener('pause', function() {
@@ -359,7 +363,6 @@ function playPausePLayer() {
 }
 
 function initPlayer(stopTorrent) {
-	// clean subtitles
 	$('.soloTorrent').remove();
 	player.durationD.html(mejs.Utility.secondsToTimeCode(0));
 	player.currenttime.html(mejs.Utility.secondsToTimeCode(0))
@@ -819,6 +822,10 @@ function launchPlay() {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
 	}
+	if(currentMedia.link.indexOf('shoutcast') !== -1) {
+		clearInterval(iceCastTimer);
+		iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
+	}
 }
 
 function checkFFmpegFormat() {
@@ -1117,31 +1124,37 @@ function updateProgressBar() {
 	if(upnpToggleOn){
 		duree = state.playing.duration;
 		player.media.duration = state.playing.duration
-		mediaDuration = mediaDuration == 0 ? state.playing.duration : mediaDuration
+		mediaDuration = state.playing.duration
 		try {
 			var percentage = ((100 / duree) * (state.playing.currentTime));
-			progressBar.value = percentage;
-			$('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(duree))
-			var total = $('.mejs-time-total').width()
-			var newWidth = Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)
-			// if(total > newWidth) {
-			// 	$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
-			// }
-			$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
-		  $('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
-			$('#subPlayer-img').attr('src',currentMedia.cover);
+			state.playing.currentPct = percentage;
+			try {
+				progressBar.value = percentage;
+				$('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(duree))
+				var total = $('.mejs-time-total').width()
+				var newWidth = Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)
+
+				$('.mejs-time-current').width(state.playing.currentPct+'%');
+				$('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
+			} catch(err) {
+				progressBar.value = 0;
+			}
+
 			if(upnpTranscoding && percentage == 0) {
 				$('.mejs-currenttime, .mejs-currenttime-sub').text('Live')
 			}
+			$('#subPlayer-img').attr('src',currentMedia.cover);
+
 		} catch(err) { console.log(err)}
 	} else {
 		var duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
 		var current = player.media.currentTime;
 		try {
 			if(transcoderEnabled) {
-				var percentage = ((100 / duree) * (current+mediaCurrentTime));
-				$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (current+mediaCurrentTime) / mediaDuration)+'px');
-				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
+				duree = state.playing.duration
+				var percentage = ((100 / duree) * (current));
+				$('.mejs-time-current').width(state.playing.currentPct+'%');
+								//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
 			} else {
 				var percentage = ((100 / duree) * current);
 				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))
@@ -1184,6 +1197,7 @@ function getIcecastTitle() {
 			}
 			currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title;
 			$('.song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+			$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 		}
 	});
 }

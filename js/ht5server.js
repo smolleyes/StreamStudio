@@ -157,7 +157,10 @@ function startStreaming(req, res, width, height) {
                 res.end();
             });
             ffmpeg.stdout.pipe(res);
-        } else if(playFromIcecast) {
+        } else if(playFromIcecast || link.indexOf('&shoutcast') !== -1) {
+            playFromIcecast = true;
+            link = link.replace('/&shoutcast','')
+            iceCastLink = link;
             console.log('play icecast/shoutcast live ', iceCastLink)
             ffmpegLive = true;
             var ffmpeg = spawnFfmpeg(iceCastLink, device, '', '256k', 0, function(code) { // exit
@@ -516,12 +519,12 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
-                args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'', '-b:a','256k','-threads', '0','-f', 'matroska','pipe:1'];
+                args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
                 if(search_engine !== 'dailymotion') {
                     let freebox = false;
                     if(link.indexOf('fbxtv') !== -1) {
-                        args = ['-hwaccel', 'dxva2', '-threads','1','-i', ''+link+'','-sn','-max_delay', '500000','-preset', 'ultrafast','-c:v', 'libx264', '-c:a','aac','-f', 'matroska','pipe:1'];
+                        args = ['-hwaccel', 'dxva2', '-threads','1','-i', ''+link+'','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a','aac','-f', 'matroska','pipe:1'];
                         freebox = true;
                     } else {
                         if(transcodeAudioOnly || link.toLowerCase().match(/.ra$/) !== null) {
@@ -529,10 +532,10 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                         args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast','-map', '0:0', '-c:v', 'copy', '-c:a:0', 'aac','-threads', '0','-f', 'matroska','pipe:1'];
                         } else if (transcodeVideoOnly) {
                         console.log('Transcoding video only!')
-                        args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-analyzeduration','2147483647','-probesize', '2147483647','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
+                        args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
                         } else {
                         console.log('Transcoding video and audio')
-                        args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-analyzeduration','2147483647','-probesize', '2147483647','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', audio,'-threads', '0','-f', 'matroska','pipe:1'];
+                        args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', audio,'-threads', '0','-f', 'matroska','pipe:1'];
                         }
                     }
                 } else  {
@@ -546,7 +549,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
             } catch(err) {}
             if(alink && alink.indexOf('videoplayback') !== -1) {
-                args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+vlink+'', '-hwaccel', 'dxva2', '-threads','1','-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
+                args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+vlink+'','-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
             } else {
                 args = ['-hwaccel', 'dxva2', '-threads','1','-ss' , start,'-re','-i', ''+vlink+'', '-c:v', 'copy','-c:a', 'libopus','-threads', '0','-f','matroska', 'pipe:1'];
             }
@@ -591,26 +594,21 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
 
             if (data.toString().substr(0,5) == 'frame') {
                 var time = data.toString().match(/time=(\d\d:\d\d:\d\d)/)[1];
-                var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2));
+                var seconds = parseInt(time.substr(0,2))*3600 + parseInt(time.substr(3,2))*60 + parseInt(time.substr(6,2)) + seekToSeconds;
                 var pct = (seconds / total_time) * 100;
-                var total = pct+mediaCurrentPct;
+                var total = pct;
                 if (parseInt(total) >= 100) {
                     return;
-                } else if (playFromYoutube || upnpTranscoding) {
+                } else if (playFromYoutube || upnpTranscoding || transcoderEnabled) {
                    //$('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
-                   if(upnpToggleOn && upnpTranscoding) {
-                     $('.mejs-time-current').css('width', pct+'%');
-                     if(seekTo) {
-                       state.playing.currentTime = seconds + hmsToSecondsOnly(seekTo)
-                       player.media.currentTime = seconds + hmsToSecondsOnly(seekTo)
-                     } else {
-                       state.playing.currentTime = seconds
-                     }
+                    $('.mejs-time-current').css('width', pct+'%');
+                    state.playing.currentTime = seconds
+                    state.playing.currentPct = pct
+
                      state.playing.duration = mediaDuration
                      updateMiniPlayer()
                      updateProgressBar()
                      state.playing.state = "PLAYING"
-                   }
                 }
             }
 

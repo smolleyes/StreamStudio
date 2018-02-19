@@ -3335,7 +3335,7 @@ if (typeof jQuery != 'undefined') {
 							x = width + offset.left;
 						}
 						pos = x - offset.left;
-					  percentage = (pos / width);
+					  	percentage = (pos / width);
 						var duree;
 						if(upnpTranscoding) {
 							duree = mediaDuration;
@@ -3367,6 +3367,7 @@ if (typeof jQuery != 'undefined') {
 								m.title = currentMedia.title;
 								m.cover = currentMedia.cover;
 								currentMedia = m;
+								state.media = m
 								console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
 								initPlay(m);
 								//player.media.setCurrentTime(newTime);
@@ -3466,6 +3467,9 @@ if (typeof jQuery != 'undefined') {
 			t.handle = handle;
 		},
 		setProgressRail: function(e) {
+			if(transcoderEnabled) {
+				return
+			}
 			var
 				t = this;
 				if(t.media.duration && t.media.duration !== Infinity) {
@@ -3503,7 +3507,9 @@ if (typeof jQuery != 'undefined') {
 					}
 				}
 			} else {
-				return;
+				if(transcoderEnabled) {
+					return
+				}
 				try {
 					var target = (e != undefined) ? e.target : t.media,
 					percent = null;
@@ -3539,6 +3545,9 @@ if (typeof jQuery != 'undefined') {
 			}
 		},
 		setCurrentRail: function() {
+			if(transcoderEnabled) {
+				return
+			}
 			var t = this;
 		    if(t.media.duration == Infinity) {
 				if (t.media.currentTime != undefined && mediaDuration) {
@@ -3557,9 +3566,6 @@ if (typeof jQuery != 'undefined') {
 			} else {
 				if (t.media.currentTime != undefined && t.media.duration) {
 					// update bar and handle
-					if(transcoderEnabled) {
-						return
-					}
 					if (t.total && t.handle) {
 						var
 							newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
