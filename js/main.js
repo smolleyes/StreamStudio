@@ -503,6 +503,9 @@ try {
         });
         initPlayer();
       } else {
+        if (error.match(/Non-whitespace|ECONNRESET|ECONNREFUSED|sandboxed|socket hang up/)) {
+          return;
+        }
         console.log(error)
       }
     } catch (err) {
@@ -932,7 +935,11 @@ function main() {
       if (upnpMediaPlaying === true) {
         upnpMediaPlaying = false;
         continueTransition = false;
-        mediaRenderer.stop();
+        mediaRenderer.stop(function(e,d) {
+          clearInterval(castStatusInterval)
+          castStatusInterval = null;
+          initPlayer()
+        });
         setTimeout(function () {
           startPlay(stream);
         }, 3000);
@@ -1686,7 +1693,11 @@ function updateScroller() {
             if (!pageLoading) {
               console.log("load more")
               pageLoading = true
-              engine.loadMore(searchComplete)
+              try{
+                engine.loadMore(searchComplete)
+              } catch(err) {
+                return;
+              }
             }
           }
         } else {
@@ -1751,10 +1762,10 @@ function onKeyPress(key) {
       $('#subPlayer-pause').hide();
       player.pause();
     }
-  } else if (key.key === 'd' && document.activeElement.localName === "body") {
+  } else if (key.key === 'F10') {
     key.preventDefault();
     win.showDevTools();
-  }
+  } 
 }
 
 function update_searchOptions() {

@@ -381,7 +381,9 @@ app.updateStats = function(streamInfo) {
             }
             if (parseInt(downloadedPct) >= 100) {
                 var t = _('(%s%% downloaded)', 100);
-                $('.mejs-time-loaded').width('100%')
+                if(transcoderEnabled){
+                    $('.mejs-time-loaded').width(downloadedPct+'%')
+                }
                 $('#preloadTorrent').remove();
                 $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
                 if (saveTorrent && !torrentSaved) {
@@ -394,6 +396,9 @@ app.updateStats = function(streamInfo) {
                 statsUpdater = null;
             } else {
                 $('#downloadStats').empty().html('<span style="margin:0 5px;">' + _("Speed:") + '</span><i class="arrow down"></i>' + this.downloadSpeed + ' <i class="arrow up"></i>' + this.uploadSpeed + '<span style="padding:5px;">| ' + _("Connected peers: ") + this.active_peers + ' / ' + this.total_peers + '</span>');
+                if(transcoderEnabled){
+                    $('.mejs-time-loaded').width(downloadedPct+'%')
+                }
                 var t = _('(%s%% downloaded)', downloadedPct);
                 if (player.media.paused) {
                     totalBuffered = swarm.downloaded;
@@ -621,10 +626,12 @@ function loadTable(files) {
     }
 
     var list = ___.sortBy(files, function(obj) {
-        if(obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/)) {
-            return obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/);
+        if(obj.name.toLowerCase().match(/s\d{1,2}e\d{1,3}/)) {
+            return obj.name.toLowerCase().trim().match(/s\d{1,2}e\d{1,3}/);
+        } else if (obj.name.toLowerCase().trim().match(/^\d{1,4}/)) {
+            return parseInt(obj.name.toLowerCase().trim().match(/^\d{1,4}/));
         } else {
-            return obj.name.toLowerCase().match(/\d{1,2}/);
+            return obj.name.toLowerCase().trim()
         }
     });
     var tclass="soloTorrent"

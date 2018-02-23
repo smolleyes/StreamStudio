@@ -18,9 +18,11 @@
 var gui = require('nw.gui');
 console.log(gui)
 var win = gui.Window.get();
- var nodeip = require('ip')
+var nodeip = require('ip')
+var path = require('path');
 const torrentSearch = require('torrent-search-api');
 const torrentEngine = new torrentSearch();
+process.execPath = path.dirname(process.mainModule.filename);
 // create default settings or load from localstorage
 if (localStorage.StdSettings === undefined) {
 	settings.ipaddress = nodeip.address();

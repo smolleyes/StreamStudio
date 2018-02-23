@@ -77,15 +77,12 @@ $(document).ready(function() {
 	$(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
 		if(upnpToggleOn){
 			try{
-				clearInterval(castStatusInterval)
-				castStatusInterval = null;
-				mediaRenderer.stop()
+				upnpStoppedAsked = true;
 			} catch(err) {
 				initPlayer()
 				player.media.stop()
 			}
 		}
-		updateMiniPlayer()
 		try {
 			stopIceTimer();
 			setTimeout(function() {
@@ -173,6 +170,7 @@ $(document).ready(function() {
 
 	player.media.addEventListener('timeupdate', function(e) {
 		updateProgressBar()
+		updateMiniPlayer();
 	});
 
 	// player.media.addEventListener('pause', function() {
@@ -382,6 +380,7 @@ function initPlayer(stopTorrent) {
 	state.media = {}
 	state.playing.duration = 0
 	state.playing.currentTime = 0
+	state.playing.currentPct = 0
 	state.playing.state = 'STOPPED'
 	try {
 		$('.mejs-captions-button').remove();
@@ -719,20 +718,21 @@ function launchPlay() {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1 || currentMedia.title.toLowerCase().match(/(dts|x265|hevc)/) !== null) {
-		transcoderEnabled = true;
+	} //else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1 || currentMedia.title.toLowerCase().match(/(.avi$|dts|x265|hevc|ac3)/) !== null) {
+	//	transcoderEnabled = true;
 		// force by extension
-	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.includes(path.extname(currentMedia.title)) || needTranscoding.indexOf(currentMedia.link) !== -1 ) {
+	//} 
+	else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.includes(path.extname(currentMedia.title)) || needTranscoding.indexOf(currentMedia.link) !== -1 ) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
 	}
 
 	// check avi et dts on engines with possibles avi
-	if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi")) {
-		console.log('CHECK FFMPEG FORMAT')
-		needFFmpegCheck = true;
-	}
+	// if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi")) {
+	// 	console.log('CHECK FFMPEG FORMAT')
+	// 	needFFmpegCheck = true;
+	// }
 
 	//final check
 	if((transcoderEnabled || upnpTranscoding) && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
@@ -1120,6 +1120,28 @@ function on_media_finished(){
 }
 
 function updateProgressBar() {
+	var audioExt = ['.ogg','.wav','.mp3','.flac']
+	if(state.playing.location === "local" && player.media.currentTime > 1 && !transcoderEnabled && !audioExt.includes(path.extname(currentMedia.link) || path.extname(currentMedia.title))) {
+		if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount === 0) {
+			transcoderEnabled = true;
+		} else if(player.media.webkitAudioDecodedByteCount > 0 && player.media.webkitVideoDecodedByteCount === 0) {
+			//console.log('DECODE PAS LA VIDEOOOOO')
+			transcoderEnabled = true;
+			transcodeVideoOnly = true;
+		} else if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount > 0) {
+			//console.log('DECODE PAS L\'AUDIO')
+			transcoderEnabled = true;
+			transcodeAudioOnly = true;
+		}
+	}
+	// check if we need transcoding after first seconds
+	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
+			currentMedia.link = link;
+			player.setSrc(currentMedia.link);
+			player.play();
+	}
+
 	var progressBar = document.getElementById('progress-bar');
 	if(upnpToggleOn){
 		duree = state.playing.duration;
@@ -1148,7 +1170,7 @@ function updateProgressBar() {
 		} catch(err) { console.log(err)}
 	} else {
 		var duree = state.playing.duration || player.media.duration;
-		var current = state.playing.currentTime || player.media.currenttime;
+		var current = state.playing.currentTime || player.media.currentTime;
 		try {
 			if(transcoderEnabled) {
 				duree = state.playing.duration

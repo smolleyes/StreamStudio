@@ -72,6 +72,7 @@
   opacity:0.5;
   background: rgba(6, 6, 6, 0.39);
   /* font-size: 13px; */
+  z-index: 100000;
 }
 .mejs-playlist ul {
   margin: 0;

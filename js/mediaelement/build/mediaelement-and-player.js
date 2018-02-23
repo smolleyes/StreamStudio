@@ -3295,7 +3295,7 @@ if (typeof jQuery != 'undefined') {
 								seekAsked = true;
 								var m = {};
 								var l = currentMedia.link.replace(/&start=(.*)/,'')
-								currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+								//currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
 								if(playFromFile) {
 									m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 								} else if(playFromHttp) {
@@ -3310,6 +3310,7 @@ if (typeof jQuery != 'undefined') {
 								m.title = currentMedia.title;
 								m.cover = currentMedia.cover;
 								currentMedia = m;
+								state.media = m
 								console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
 								initPlay(m);
 							} else {
@@ -3352,7 +3353,8 @@ if (typeof jQuery != 'undefined') {
 								//
 								var m = {};
 								var l = currentMedia.link.replace(/&start=(.*)/,'')
-								currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+								//currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+								$('.mejs-overlay,.mejs-overlay-loading').show();
 								if(playFromFile) {
 									m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 								} else if(playFromHttp) {

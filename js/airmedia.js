@@ -32,22 +32,22 @@ function startStatusInterval () {
   try {
   castStatusInterval = setInterval(function () {
     if(upnpStoppedAsked && state.playing.state !== 'STOPPED') {
-      console.log('stop asked in airmedia')
-      state.playing.state = "STOPPED"
+      console.log('stop asked in airmedia');
       $('#fbxMsg').empty()
       clearInterval(castStatusInterval)
       castStatusInterval = null;
       upnpStoppedAsked = false;
       if(!upnpTransitionning) {
-          initPlayer()
-          upnpTransitionning = true;
+        mediaRenderer.stop(function(e,d) {
+            initPlayer()
+        });
+        upnpTransitionning = true;
       } else {
         mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
             startStatusInterval()
             upnpLoading = false
         })
       }
-      return;
     } else {
       upnpStoppedAsked = false;
     }
@@ -88,7 +88,7 @@ function startStatusInterval () {
       } else {
         mediaRenderer.status(function(err,res) {
           //console.log(err,res)
-          if(state.playing.duration !== 0 && res.position && res.position.currentTime && res.position.currentTime+1 > state.playing.duration) {
+          if(!res|| state.playing.duration !== 0 && res.position && res.position.currentTime && res.position.currentTime+1 > state.playing.duration) {
              on_media_finished()
              return;
           }
@@ -148,13 +148,26 @@ function startStatusInterval () {
               }
           }
         } catch(err) {
-          console.log(err)
+            clearInterval(castStatusInterval)
+              castStatusInterval = null;
+              if(!upnpTransitionning){
+                 upnpTransitionning = true;
+                 console.log('before on media finished in airmedia')
+                 on_media_finished()
+              }
         }
         })
       }
     }
   }, 1000)
 } catch(err) {
+    clearInterval(castStatusInterval)
+              castStatusInterval = null;
+              if(!upnpTransitionning){
+                 upnpTransitionning = true;
+                 console.log('before on media finished in airmedia')
+                 on_media_finished()
+              }
   console.log(err)
 }
 }
