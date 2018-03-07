@@ -499,6 +499,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     var start = '00:00:00.00'
     var seekToSeconds = 0;
     var args;
+    var hwaccel = "";
     if(playFromFile) {
         link = link.replace('file://','')
     }
@@ -523,27 +524,27 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
-                args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                args = ['-ss' , start,'-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
                 if(search_engine !== 'dailymotion') {
                     let freebox = false;
                     if(link.indexOf('fbxtv') !== -1) {
-                        args = ['-hwaccel', 'd3d11va', '-threads','1','-i', ''+link+'','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a','aac','-f', 'matroska','pipe:1'];
+                        args = ['-i', ''+link+'','-sn','-preset', 'ultrafast','-c:v', 'libx264', '-c:a','aac','-f', 'matroska','pipe:1'];
                         freebox = true;
                     } else {
                         if(transcodeAudioOnly || link.toLowerCase().match(/.ra$/) !== null) {
                         console.log('Transcoding audio only!')
-                        args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast', '-c:v', 'copy', '-c:a', 'aac','-threads', '0','-f', 'matroska','pipe:1'];
+                        args = ['-ss' , start,'-re','-i', ''+link+'','-preset', 'ultrafast', '-c:v', 'copy', '-c:a', 'aac','-threads', '0','-f', 'matroska','pipe:1'];
                         } else if (transcodeVideoOnly) {
                         console.log('Transcoding video only!')
-                        args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
+                        args = ['-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
                         } else {
                         console.log('Transcoding video and audio')
-                        args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', audio,'-threads', '0','-f', 'matroska','pipe:1'];
+                        args = ['-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', audio,'-threads', '0','-f', 'matroska','pipe:1'];
                         }
                     }
                 } else  {
-                    args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset','ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                    args = ['-ss' , start,'-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset','ultrafast','-c:v', 'libx264', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
                 }
             }
         } else {
@@ -553,21 +554,25 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 alink = decodeURIComponent(link).split('::')[1].trim().replace('%20','');
             } catch(err) {}
             if(alink && alink.indexOf('videoplayback') !== -1) {
-                args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-re','-i', ''+vlink+'','-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
+                args = ['-ss' , start,'-re','-i', ''+vlink+'','-ss', start,'-re','-i', alink,'-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
             } else {
-                args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-re','-i', ''+vlink+'', '-c:v', 'copy','-c:a', 'libopus','-threads', '0','-f','matroska', 'pipe:1'];
+                args = ['-ss' , start,'-re','-i', ''+vlink+'', '-c:v', 'copy','-c:a', 'libopus','-threads', '0','-f','matroska', 'pipe:1'];
             }
         }
     } else {
         if(playFromWat) {
-            args = ['-hwaccel', 'd3d11va', '-threads','1','-re','-i','pipe:0','-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
+            args = ['-re','-i','pipe:0','-c:v', 'copy','-c:a', 'copy','-threads', '0','-f','matroska', 'pipe:1'];
         } else if (playFromIcecast) {
-            args = ['-hwaccel', 'd3d11va', '-threads','1','-ss' , start,'-probesize', '32','-re','-i','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'', '-b:a',''+bitrate+'','-threads', '0','-f', 'matroska','pipe:1'];
+            args = ['-ss' , start,'-probesize', '32','-re','-i','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'', '-b:a',''+bitrate+'','-threads', '0','-f', 'matroska','pipe:1'];
         } else if (playFromTwitch) {
-            args = ['-hwaccel', 'd3d11va', '-threads','1','-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'matroska', 'pipe:1'];
+            args = ['-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'matroska', 'pipe:1'];
         } else {
-            args = ['-hwaccel', 'd3d11va', '-threads','1','-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'mpegts', 'pipe:1'];
+            args = ['-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'mpegts', 'pipe:1'];
         }
+    }
+
+    if (process.platform === "win32") {
+        args = ['-hwaccel', 'd3d11va', '-threads','1'].concat(args)
     }
     console.log("spawn : " + args)
     ffmpeg = spawn(ffmpegPath, args);
@@ -606,7 +611,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 } else if (playFromYoutube || upnpTranscoding || transcoderEnabled) {
                    //$('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
                     $('.mejs-time-current').css('width', pct+'%');
-                    state.playing.currentTime = seconds
+                    state.playing.currentTime = state.playing.currentTime || seconds;
                     state.playing.currentPct = pct
 
                      state.playing.duration = mediaDuration

@@ -23,6 +23,7 @@ var path = require('path');
 const torrentSearch = require('torrent-search-api');
 const torrentEngine = new torrentSearch();
 process.execPath = path.dirname(process.mainModule.filename);
+
 // create default settings or load from localstorage
 if (localStorage.StdSettings === undefined) {
 	settings.ipaddress = nodeip.address();

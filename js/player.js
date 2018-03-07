@@ -1120,11 +1120,10 @@ function on_media_finished(){
 }
 
 function updateProgressBar() {
-	var audioExt = ['.ogg','.wav','.mp3','.flac']
-	if(state.playing.location === "local" && player.media.currentTime > 1 && !transcoderEnabled && !audioExt.includes(path.extname(currentMedia.link) || path.extname(currentMedia.title))) {
+	if(state.playing.location === "local" && player.media.currentTime > 1 && !transcoderEnabled) {
 		if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount === 0) {
 			transcoderEnabled = true;
-		} else if(player.media.webkitAudioDecodedByteCount > 0 && player.media.webkitVideoDecodedByteCount === 0) {
+		} else if(player.media.webkitAudioDecodedByteCount > 0 && player.media.webkitVideoDecodedByteCount && player.media.webkitVideoDecodedByteCount === 0) {
 			//console.log('DECODE PAS LA VIDEOOOOO')
 			transcoderEnabled = true;
 			transcodeVideoOnly = true;
@@ -1144,9 +1143,9 @@ function updateProgressBar() {
 
 	var progressBar = document.getElementById('progress-bar');
 	if(upnpToggleOn){
-		duree = state.playing.duration;
 		player.media.duration = state.playing.duration
-		mediaDuration = state.playing.duration
+		mediaDuration = state.playing.duration;
+		duree = mediaDuration
 		try {
 			var percentage = ((100 / duree) * (state.playing.currentTime));
 			state.playing.currentPct = percentage;

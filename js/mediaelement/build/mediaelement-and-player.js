@@ -3651,9 +3651,12 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		updateCurrent:  function() {
+			if(upnpToggleOn || transcoderEnabled) {
+				return;
+			}
 			var t = this;
 			if(t.media.duration == Infinity || upnpToggleOn || transcoderEnabled) {
-				//t.options.duration = mediaDuration;
+				t.options.duration = mediaDuration ? mediaDuration : t.options.duration;
 				if (t.currenttime) {
 					t.currenttime.html(mejs.Utility.secondsToTimeCode(mediaCurrentTime+t.media.currentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 					$('.mejs-currenttime-sub').html(mejs.Utility.secondsToTimeCode(mediaCurrentTime+t.media.currentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
@@ -3668,6 +3671,9 @@ if (typeof jQuery != 'undefined') {
 
 		updateDuration: function() {
 			var t = this;
+			if(upnpToggleOn || transcoderEnabled) {
+				return;
+			}
 			if(t.media.duration == Infinity || upnpToggleOn || transcoderEnabled) {
 				t.options.duration = mediaDuration;
 				//Toggle the long video class if the video is longer than an hour.
