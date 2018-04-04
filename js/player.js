@@ -1175,7 +1175,7 @@ function updateProgressBar() {
 				duree = state.playing.duration
 				var percentage = ((100 / duree) * (current));
 				$('.mejs-time-current').width(state.playing.currentPct+'%');
-								//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
+				$('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
 			} else {
 				var percentage = ((100 / duree) * current);
 				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))

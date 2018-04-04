@@ -499,7 +499,8 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
     var start = '00:00:00.00'
     var seekToSeconds = 0;
     var args;
-    var hwaccel = "";
+    let hwaccel = '';
+
     if(playFromFile) {
         link = link.replace('file://','')
     }
@@ -524,7 +525,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
-                args = ['-ss' , start,'-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
                 if(search_engine !== 'dailymotion') {
                     let freebox = false;
@@ -571,9 +572,10 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         }
     }
 
-    if (process.platform === "win32") {
-        args = ['-hwaccel', 'd3d11va', '-threads','1'].concat(args)
+    if (settings.os === "win32") {
+        args = ['-hwaccel', 'd3d11va', '-threads','1'].concat(args);
     }
+
     console.log("spawn : " + args)
     ffmpeg = spawn(ffmpegPath, args);
     ffar.push(ffmpeg);
@@ -610,8 +612,9 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                     return;
                 } else if (playFromYoutube || upnpTranscoding || transcoderEnabled) {
                    //$('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
+                    $('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(mediaDuration))
                     $('.mejs-time-current').css('width', pct+'%');
-                    state.playing.currentTime = state.playing.currentTime || seconds;
+                    state.playing.currentTime = seconds
                     state.playing.currentPct = pct
 
                      state.playing.duration = mediaDuration
