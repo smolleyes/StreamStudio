@@ -916,9 +916,7 @@ function getUserHome() {
 function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
     $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     var obj = JSON.parse(settings.ht5Player);
-        if ((activeTab == 1 || activeTab == 2) && (search_engine === 'dailymotion' || search_engine === 'youtube' ||  engine.type == "video") && obj.name === "StreamStudio") {
-            $('#playerToggle').click();
-        }
+        
         $('#preloadTorrent').remove();
         $('.mejs-container').append('<div id="preloadTorrent" \
           style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
@@ -968,7 +966,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
             }
         } else {
             if (toFbx) {
-                addFreeboxDownload(url);
+                upToFreebox(url);
             } else {
                 gui.Shell.openItem(url);
             }
@@ -1000,11 +998,8 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                                 form.append('download_file', fs.createReadStream(p));
                                 form.submit({
                                     host: 'mafreebox.freebox.fr',
-                                    path: '/api/v3/downloads/add',
+                                    path: '/api/v4/downloads/add',
                                     headers: {
-                                        'Content-Type': 'multipart/form-data;' + form.getBoundary(),
-                                        'Content-Length': blob.size,
-                                        'X-Requested-With': 'XMLHttpRequest',
                                         'X-Fbx-App-Auth': session_token
                                     }
                                 }, function(err, res) {
@@ -1026,7 +1021,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                                             cls: 'red',
                                             icon: '&#59256;',
                                             timeout: 0,
-                                            content: _("Impossible d'ajouter le téléchargement... !"),
+                                            content: _("humm Impossible d'ajouter le téléchargement... !"),
                                             btnId: '',
                                             btnTitle: '',
                                             btnColor: '',
@@ -1034,6 +1029,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                                             updateDisplay: 'none'
                                         });
                                     }
+                                    res.resume();
                                 });
                             } else {
                                 gui.Shell.openItem(p);

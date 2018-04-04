@@ -53,6 +53,9 @@ selected_resolution = settings.resolution;
 download_dir = settings.download_dir;
 locale = settings.locale;
 
+settings.airMediatoken = settings.airMediatoken ? settings.airMediatoken : ''; 
+session_token = settings.airMediaToken;
+
 // check torrentSearchApi object
 if(!settings.hasOwnProperty('torrentEngines')) {
 	settings.torrentEnginesEnabled = false;
