@@ -1253,10 +1253,13 @@ function main() {
             if (obj.provider === "Torrent9") {
               obj.link = obj.link.replace(/get_torrent\/\d{1,8}/, 'get_torrent')
             }
+            if(obj.provider && obj.provider === "Yggtorrent") {
+              obj.link = 'https://yggtorrent.is/engine/download_torrent?id='+obj.torrentId;
+            }
             engine.downloadTorrent(obj).then(res => {
-              console.log("Download global torrent result:", res);
+              console.log("Download global torrent result:", obj.link, res);
               let torrent = new Buffer(res);
-              getTorrent(torrent, obj.cover, obj.id)
+              getTorrent(res, obj.cover, obj.id)
             })
             itemTitle = obj.title;
             $('#playerToggle')[0].click();
@@ -1268,20 +1271,46 @@ function main() {
           e.preventDefault();
           var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
           console.log(obj)
-          engine.downloadTorrent(obj).then(res => {
-            let torrent = new Buffer(res);
-            getTorrent(torrent, obj.cover, obj.id)
-          })
+          var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+          if (obj.provider === "Rarbg") {
+            getTorrent(obj.magnet, obj.cover, obj.id)
+            $('#playerToggle')[0].click();
+          } else {
+            if (obj.provider === "Torrent9") {
+              obj.link = obj.link.replace(/get_torrent\/\d{1,8}/, 'get_torrent')
+            }
+            if(obj.provider && obj.provider === "Yggtorrent") {
+              obj.link = 'https://yggtorrent.is/engine/download_torrent?id='+obj.torrentId;
+            }
+            engine.downloadTorrent(obj).then(res => {
+              console.log("Download global torrent result:", obj.link, res);
+              let torrent = new Buffer(res);
+              getTorrent(res, obj.cover, obj.id)
+            })
+          }
         });
 
         $(document).off('click', '.download_global_torrentFile_fbx');
         $(document).on('click', '.download_global_torrentFile_fbx', function (e) {
           e.preventDefault();
           var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
-          engine.downloadTorrent(obj).then(res => {
-            let torrent = new Buffer(res);
-            getTorrent(torrent, obj.cover, obj.id)
-          })
+          var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
+          if (obj.provider === "Rarbg") {
+            getTorrent(obj.magnet, obj.cover, obj.id)
+            $('#playerToggle')[0].click();
+          } else {
+            if (obj.provider === "Torrent9") {
+              obj.link = obj.link.replace(/get_torrent\/\d{1,8}/, 'get_torrent')
+            }
+            if(obj.provider && obj.provider === "Yggtorrent") {
+              obj.link = 'https://yggtorrent.is/engine/download_torrent?id='+obj.torrentId;
+            }
+            engine.downloadTorrent(obj).then(res => {
+              console.log("Download global torrent result for :", obj.link, res);
+              let torrent = new Buffer(res);
+              getTorrent(res, obj.cover, obj.id)
+            })
+          }
         });
 
         $(document).off('click', '.addToFavorites');
@@ -1530,6 +1559,7 @@ function main() {
   });
 
   // rotate image
+  let draggedFile = null;
   $('#file_update').click(function (e) {
     e.preventDefault();
     AnimateRotate(1080);
@@ -1558,10 +1588,12 @@ function main() {
   var holder = document.getElementById('mainContainer');
   holder.ondrop = function (e) {
     e.preventDefault();
+    draggedFile = null;
     console.log('on drop file')
     var file = e.dataTransfer.files[0],
       reader = new FileReader();
     reader.onload = function (event) { };
+    console.log('try to open file', file)
     if (file.type === "application/x-bittorrent" || path.extname(file.name).toLowerCase() == '.torrent') {
       saveTorrent = false;
       torrentSaved = false;
@@ -1580,6 +1612,7 @@ function main() {
       html += '<br/><br/><div><label>' + _("Keep torrent file after downloading ?") + '</label><input style="position:relative;left:10px;" type="checkbox" class="saveTorrentCheck" name="saveTorrentCheck"></input></div></div>';
       // show
       showPopup(html, 'body')
+      draggedFile = file
     } else if (file.type == 'audio/x-mpegurl' || path.extname(file.name).toLowerCase() == '.m3u') {
       parseM3uFile(file)
     }
@@ -1587,9 +1620,7 @@ function main() {
   };
 
   $(document).on("click", ".dragTorrent_play", function () {
-    var obj = JSON.parse(decodeURIComponent($(this).attr("data")));
-    console.log(obj)
-    getTorrent(obj.path);
+    getTorrent(draggedFile.path);
     $('#playerToggle')[0].click();
   })
 
@@ -1778,7 +1809,6 @@ function update_searchOptions() {
 }
 
 function appendVideo(video) {
-  console.log(video)
   try {
     video.id = ((Math.random() * 1e6) | 0);
     if (video.title.length > 45) {
@@ -1929,6 +1959,7 @@ async function startSearch(query, cb) {
               await parseScrappedData(torrent, null, favList)
             } else {
               engine.getTorrentDetails(torrent).then(async (infos) => {
+                console.log('infos ygg:', infos)
                 await parseScrappedData(torrent, infos, favList)
               })
             }
@@ -2005,6 +2036,7 @@ async function startSearch(query, cb) {
 }
 
 async function parseScrappedData(torrent, infos, favList) {
+  console.log(torrent, infos)
   torrent.cover = torrent.cover || $($('img', infos)[0]).attr('src') || '../images/movie.png';
   torrent.quality = torrent.title.match(/720|1080/) !== null ? 'glyphicon-hd-video' : 'glyphicon-sd-video';
   torrent.hd = torrent.title.match(/720/) !== null ? '720p' : torrent.title.match(/1080/) !== null ? '1080p' : '';

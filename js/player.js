@@ -493,7 +493,7 @@ function startPlay(media) {
 
 function initPlay(media) {
 	player.media.stop()
-	if(transcoderEnabled && seekAsked) {
+	if(forceTranscoding || transcoderEnabled && seekAsked) {
 		currentMedia = media;
 		cleanffar(true)
 		seekAsked = false;
@@ -1123,22 +1123,22 @@ function updateProgressBar() {
 	if(state.playing.location === "local" && player.media.currentTime > 1 && !transcoderEnabled) {
 		if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount === 0) {
 			transcoderEnabled = true;
-		} else if(player.media.webkitAudioDecodedByteCount > 0 && player.media.webkitVideoDecodedByteCount && player.media.webkitVideoDecodedByteCount === 0) {
-			//console.log('DECODE PAS LA VIDEOOOOO')
-			transcoderEnabled = true;
-			transcodeVideoOnly = true;
 		} else if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount > 0) {
 			//console.log('DECODE PAS L\'AUDIO')
 			transcoderEnabled = true;
 			transcodeAudioOnly = true;
-		}
+		} else if(player.media.webkitAudioDecodedByteCount > 0 && player.media.webkitVideoDecodedByteCount === 0) {
+			//console.log('DECODE PAS LA VIDEOOOOO')
+			transcoderEnabled = true;
+			transcodeVideoOnly = true;
+		} 
 	}
 	// check if we need transcoding after first seconds
 	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
 			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 			currentMedia.link = link;
-			player.setSrc(currentMedia.link);
-			player.play();
+			forceTranscoding = true;
+			initPlay(currentMedia);
 	}
 
 	var progressBar = document.getElementById('progress-bar');
