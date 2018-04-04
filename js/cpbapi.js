@@ -18,7 +18,6 @@ function initCpbSearch(results,cb) {
 						try {
 							results.totalResults = parseInt($($('small',datas)[0]).text().match(/\d{1,5}/)[0]);
 							results.basePath = path.dirname($($('.pagination li',datas).not(".active")[0]).find('a').attr('href'))
-							console.log("ERRRRRRRRRRRRRRRRRRRRRR", results)
 						} catch(err) {
 							results.totalResults = mlist.length
 						}
