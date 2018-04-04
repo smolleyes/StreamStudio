@@ -612,7 +612,11 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                     return;
                 } else if (playFromYoutube || upnpTranscoding || transcoderEnabled) {
                    //$('.mejs-time-loaded').css('width', (pct+mediaCurrentPct)+'%').show();
-                    $('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(mediaDuration))
+                   if(!mediaDuration) {
+                    $('.mejs-duration, .mejs-duration-sub').text('LIVE')
+                   } else {
+                    $('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(mediaDuration).indexOf('NaN') !== -1 ? 'LIVE': mejs.Utility.secondsToTimeCode(mediaDuration))
+                   }
                     $('.mejs-time-current').css('width', pct+'%');
                     state.playing.currentTime = seconds
                     state.playing.currentPct = pct
