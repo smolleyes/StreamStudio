@@ -1,0 +1,6 @@
+src/__tests__
+.vscode
+examples
+examples
+*.sock
+coverage

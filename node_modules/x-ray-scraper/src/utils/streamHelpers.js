@@ -1,0 +1,56 @@
+/**
+ * Streaming array helper
+ *
+ * @param {Stream} data (optional)
+ */
+function array(stream) {
+  if (!stream) return function () { }
+  var first = true
+
+  return function _stream_array(data, end) {
+    var json = JSON.stringify(data, true, 2)
+
+    if (first) {
+      stream.write('[\n')
+      first = false
+    }
+
+    if (Array.isArray(data)) {
+      json = json.slice(1, -1)
+    }
+
+    if (end) {
+      stream.end(json + ']')
+    } else {
+      stream.write(json + ',')
+    }
+  }
+}
+
+/**
+ * Streaming object helper
+ *
+ * @param {Stream} data (optional)
+ * @return {Function}
+ */
+function object(stream) {
+  if (!stream) return function () { }
+
+  return function _stream_object(data, end) {
+    var json = JSON.stringify(data, true, 2)
+
+    if (end) {
+      stream.end(json)
+    } else {
+      stream.write(json)
+    }
+  }
+}
+
+function getSendToStreamFn(arrayHandling, stream) {
+  return arrayHandling ? array(stream) : object(stream);
+}
+
+module.exports = {
+  getSendToStreamFn
+}
