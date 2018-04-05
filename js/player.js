@@ -1177,7 +1177,7 @@ function updateProgressBar() {
 	} else {
 		var duree = state.playing.duration || player.media.duration;
 		var current = state.playing.currentTime || player.media.currentTime;
-		if(!transcoderEnabled && internalMute & current) {
+		if(internalMute & current) {
 			player.setMuted(false)
 			internalMute = false
 		}
