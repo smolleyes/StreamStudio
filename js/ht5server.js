@@ -521,11 +521,11 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         if(!playFromYoutube && link.indexOf('videoplayback?') == -1) {
             var obj = JSON.parse(settings.ht5Player);
             var carray = ['.mp3','.opus','.wav','.flac','.m4a','.wma','.ape','.ogg'];
-            if(obj.name == 'StreamStudio' && carray.includes(path.extname(link).toLowerCase()) || playFromIcecast || link.indexOf('musicmp3.ru') !== -1) {
+            if(obj.name == 'StreamStudio' && carray.includes(path.extname(link).toLowerCase()) || carray.includes(path.extname(currentMedia.title).toLowerCase()) || playFromIcecast || link.indexOf('musicmp3.ru') !== -1) {
                 //"[0:a]showwaves=mode=cline:rate=25,format=yuv420p[vid]"
                 // "ebur128=video=1:meter=18"
                 // "[0:a]showcqt=fps=30:count=5:fullhd=0,format=yuv420p[vid]"
-                args = ['-ss' , start,'-probesize', '32','-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
+                args = ['-ss' , start,'-re','-i', ''+link+'','-filter_complex', "[0:a]showfreqs=ascale=sqrt:colors=orange|red|white,format=yuv420p[vid]", '-map', "[vid]", '-map', '0:a', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', ''+audio+'','-threads', '0','-f', 'matroska','pipe:1'];
             } else {
                 if(search_engine !== 'dailymotion') {
                     let freebox = false;

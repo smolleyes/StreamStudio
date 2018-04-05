@@ -34,6 +34,7 @@ var chromeCastplaying = false;
 var playFromWat = false;
 var playFromIcecast = false;
 var iceCastTimer = null;
+var internalMute = false;
 var https = require('https')
 var Cast = require('casts')
 
@@ -493,6 +494,7 @@ function startPlay(media) {
 
 function initPlay(media) {
 	player.media.stop()
+	player.setMuted(false)
 	if(forceTranscoding || transcoderEnabled && seekAsked) {
 		currentMedia = media;
 		cleanffar(true)
@@ -808,6 +810,10 @@ function launchPlay() {
 			if(needFFmpegCheck) {
 				checkFFmpegFormat();
 			} else {
+				if(!transcoderEnabled) {
+					internalMute = true
+					player.setMuted(true)
+				}
 				player.setSrc(currentMedia.link);
 				player.play();
 				if(player.tracks.length > 0) {
@@ -865,7 +871,8 @@ function checkFFmpegFormat() {
 			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 			currentMedia.link = link;
 		}
-
+		internalMute = true
+		player.setMuted(true)
 		player.setSrc(currentMedia.link);
 		player.play();
 		if(player.tracks.length > 0) {
@@ -1120,7 +1127,7 @@ function on_media_finished(){
 }
 
 function updateProgressBar() {
-	if(state.playing.location === "local" && player.media.currentTime > 1 && !transcoderEnabled) {
+	if(state.playing.location === "local" && player.media.currentTime && !transcoderEnabled) {
 		if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount === 0) {
 			transcoderEnabled = true;
 		} else if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount > 0) {
@@ -1170,10 +1177,14 @@ function updateProgressBar() {
 	} else {
 		var duree = state.playing.duration || player.media.duration;
 		var current = state.playing.currentTime || player.media.currentTime;
+		if(!transcoderEnabled && internalMute & current) {
+			player.setMuted(false)
+			internalMute = false
+		}
 		try {
 			if(transcoderEnabled) {
 				duree = state.playing.duration
-				if(duree.indexOf('NaN') == -1) {
+				if(duree.toString().indexOf('NaN') == -1) {
 					var percentage = ((100 / duree) * (current));
 					$('.mejs-time-current').width(state.playing.currentPct+'%');	
 				}
@@ -1184,6 +1195,7 @@ function updateProgressBar() {
 			}
 			progressBar.value = percentage;
 		} catch(err) {
+			console.log(err)
 		}
 	}
 }
