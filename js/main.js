@@ -801,7 +801,7 @@ function main() {
   });
 
   // LOAD CLOUDFLARE ENGINE
-  gui.Window.open('http://www.torrent9.biz', {
+  gui.Window.open('http://www.torrent9.ec', {
     show: false
   })
 

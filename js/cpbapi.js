@@ -6,9 +6,9 @@ function initCpbSearch(results,cb) {
 	console.log('SEARCH FOR', results)
 	// LOAD CLOUDFLARE ENGINE
 	if(results.page == 0) {
-				cloudscraper.get('http://www.torrent9.red/search_torrent/'+encodeURIComponent(results.query)+'/page-0',function(e,r,datas){
-					console.log(datas)
-					if(e) {
+		cloudscraper.post('http://www.torrent9.ec/search_torrent/', {champ_recherche: encodeURIComponent(results.query)}, function(e,r,datas) { 
+		console.log(e,r,datas)			
+		if(e) {
 						results.success = false;
 						results.error = "Can't get results for " + results.query;
 						cb(results);
@@ -55,7 +55,7 @@ function parseDatas(data, results,cb) {
 		Iterator.iterate(mlist).forEach(function (item,i) {
 			//try {
 				var video = {};
-				video.torrentLink = 'http://www.torrent9.red/get_torrent/'+path.basename($(item).find('a').attr('href')+'.torrent');
+				video.torrentLink = 'http://www.torrent9.ec'+$(item).find('a')[0].href.replace(/.*?torrent/,'/torrent')
 				video.seeders = $($(item).find('td')[2]).text();
 				video.leechers = $($(item).find('td')[3]).text();
 				video.title = $($(item).find('a')[0]).text();

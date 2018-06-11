@@ -38,6 +38,7 @@ function analyseCpbDatas(results,cb) {
 	});
 	// if french list is 0 parse vostfr
 	console.log(fr,vost)
+	var datas = results.list;
 	if(fr.length == 0 && vost.length == 0) {
 		verifySerie(datas,cb)
 	} else {
