@@ -1251,18 +1251,28 @@ function main() {
             $('#playerToggle')[0].click();
           } else {
             if (obj.provider === "Torrent9") {
-              obj.link = obj.link.replace(/get_torrent\/\d{1,8}/, 'get_torrent')
+              torrentEngine.downloadTorrent(obj).then(function(res) {
+                obj.link = res;
+                engine.downloadTorrent(obj).then(res => {
+                  console.log("Download global torrent result:", obj.link, res);
+                  let torrent = new Buffer(res);
+                  getTorrent(res, obj.cover, obj.id)
+                })
+                itemTitle = obj.title;
+                $('#playerToggle')[0].click();
+              })
+            } else {
+              if(obj.provider && obj.provider === "Yggtorrent") {
+                obj.link = 'https://yggtorrent.is/engine/download_torrent?id='+obj.torrentId;
+              }
+              engine.downloadTorrent(obj).then(res => {
+                console.log("Download global torrent result:", obj.link, res);
+                let torrent = new Buffer(res);
+                getTorrent(res, obj.cover, obj.id)
+              })
+              itemTitle = obj.title;
+              $('#playerToggle')[0].click();
             }
-            if(obj.provider && obj.provider === "Yggtorrent") {
-              obj.link = 'https://yggtorrent.is/engine/download_torrent?id='+obj.torrentId;
-            }
-            engine.downloadTorrent(obj).then(res => {
-              console.log("Download global torrent result:", obj.link, res);
-              let torrent = new Buffer(res);
-              getTorrent(res, obj.cover, obj.id)
-            })
-            itemTitle = obj.title;
-            $('#playerToggle')[0].click();
           }
         });
 
