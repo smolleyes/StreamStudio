@@ -1,4 +1,4 @@
-var VERSION = "4.2";
+var VERSION = "4.3";
 
 var TORRENT9_URL = 'https://www.torrent9.blue';
 
