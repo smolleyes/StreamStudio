@@ -1,4 +1,7 @@
 var VERSION = "4.2";
+
+var TORRENT9_URL = 'https://www.torrent9.blue';
+
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');

@@ -138,7 +138,7 @@ $(document).on('click', '.openTorrent', function(e) {
         // });
     } else {
         cloudscraper.get(obj.torrentLink, function(error, response, res) {
-            var torrent = 'http://www.torrent9.ec'+$($('.download-btn a',res)[0]).attr('href')
+            var torrent = TORRENT9_URL+$($('.download-btn a',res)[0]).attr('href')
             console.log('torrent link:', torrent)
             getAuthTorrent(torrent, true, false, null);
             currentMedia.torrentLink = torrent;
@@ -165,7 +165,7 @@ $(document).on('keyup', '#searchSerieByName', function(e) {
 $(document).on('click', '#refreshSeries', function(e) {
     $("#mySeries").empty();
     $("#seriesContainer p").empty().append('<p>' + _("Searching updates for your series, please wait ... !") + '</p>');
-    cloudscraper.get('http://www.torrent9.ec',function(error, response, datas) {
+    cloudscraper.get(TORRENT9_URL,function(error, response, datas) {
         checkSeriesUpdates(function(data) {
             console.log('END REFRESH', data)
             if (data.success) {
