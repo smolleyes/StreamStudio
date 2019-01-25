@@ -1,3 +1,4 @@
+return;
 var subs = require('popcorn-opensubtitles');
 
 function getSubTitles(id,season,ep,name,cb) {

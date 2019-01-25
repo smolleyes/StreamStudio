@@ -1,0 +1,16 @@
+const debug = require('debug')('x-ray');
+
+function Request(crawler) {
+  return function request(url) {
+    return new Promise((resolve, reject) => {
+      debug('fetching %s', url);
+      crawler(url, (err, ctx) => {
+        if (err) return reject(err);
+        debug('got response for %s with status code: %s', url, ctx.status);
+        resolve(ctx.body);
+      });
+    });
+  };
+}
+
+module.exports = Request;

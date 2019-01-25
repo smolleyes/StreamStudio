@@ -292,9 +292,10 @@ function loadchildrens(childs, parent, close) {
         $.each(childs.reverse(), function(index, child) {
             if (child.type === "file") {
                 var id = Math.floor(Math.random() * 1000000);
-                var ext = child.name.split('.').pop().toLowerCase();
-                if (ext === 'webm' || ext === 'aac' ||  ext == '3gp' || ext === 'm4a' || ext === 'mp4' || ext === 'flac' || ext === 'wav' || ext === 'mpg' || ext === 'opus' || ext === 'avi' || ext === 'mpeg' || ext === 'mkv' || ext === 'mp3' || ext === 'ogg' || ext === 'mov') {
-                    var obj = {
+                var ext = child.name.split('.').pop().toLowerCase().replace('.','');
+                const codecsArr = ['mp3','ogv','aiff','ra','mka','webm','aac','m4a','wma','mp4','flac','wav','mpeg','opus','avi','flv','wmv','mkv','ogg','mov','mkv'];
+					if (codecsArr.includes(ext)) {
+                        var obj = {
                         "attr": {
                             "id": id
                         },
@@ -915,9 +916,7 @@ function getUserHome() {
 function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
     $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     var obj = JSON.parse(settings.ht5Player);
-        if ((activeTab == 1 || activeTab == 2) && (search_engine === 'dailymotion' || search_engine === 'youtube' ||  engine.type == "video") && obj.name === "StreamStudio") {
-            $('#playerToggle').click();
-        }
+        
         $('#preloadTorrent').remove();
         $('.mejs-container').append('<div id="preloadTorrent" \
           style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
@@ -967,7 +966,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
             }
         } else {
             if (toFbx) {
-                addFreeboxDownload(url);
+                upToFreebox(url);
             } else {
                 gui.Shell.openItem(url);
             }
@@ -999,11 +998,8 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                                 form.append('download_file', fs.createReadStream(p));
                                 form.submit({
                                     host: 'mafreebox.freebox.fr',
-                                    path: '/api/v3/downloads/add',
+                                    path: '/api/v4/downloads/add',
                                     headers: {
-                                        'Content-Type': 'multipart/form-data;' + form.getBoundary(),
-                                        'Content-Length': blob.size,
-                                        'X-Requested-With': 'XMLHttpRequest',
                                         'X-Fbx-App-Auth': session_token
                                     }
                                 }, function(err, res) {
@@ -1025,7 +1021,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                                             cls: 'red',
                                             icon: '&#59256;',
                                             timeout: 0,
-                                            content: _("Impossible d'ajouter le téléchargement... !"),
+                                            content: _("humm Impossible d'ajouter le téléchargement... !"),
                                             btnId: '',
                                             btnTitle: '',
                                             btnColor: '',
@@ -1033,6 +1029,7 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
                                             updateDisplay: 'none'
                                         });
                                     }
+                                    res.resume();
                                 });
                             } else {
                                 gui.Shell.openItem(p);
@@ -1050,19 +1047,32 @@ function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
 }
 
 function parseM3uFile(file) {
-    var dirname = path.dirname(file.path);
-    console.log(file,dirname)
+    let stream;
+    console.log(typeof(file))
+    if(typeof(file) === 'string' && file.includes('http')) {
+        fetch(file)
+        .then(res => res.text())
+        .then(text => openM3U(text))
+    } else {
+        stream = fs.readFileSync(file.path, { encoding: "utf8" })
+        openM3U(stream)
+    }
+}
+
+function openM3U(stream) {
     var parsers = require("playlist-parser");
     var M3U = parsers.M3U;
-    var playlist = M3U.parse(fs.readFileSync(file.path, { encoding: "utf8" }));
+    var playlist = M3U.parse(stream);
     console.log(playlist)
     if(playlist && playlist.length > 0) {
         __.each(playlist,function(media) {
             var f = {}
-            f.title = media.title;
+            f.title = media.title.replace(/.*(-1\,.*?)\|/,'').replace('-1,','');
             f.link = media.file;
             player.addTrack(f, true)
         })
+        $('#playerToggle').click();
+        player.playlistToggleClick()
     } else {
         swal(_("error!"), _("Can't read your playlist file or playlist empty !"), "error")
     }

@@ -367,7 +367,7 @@
 	height: 17px;
 	border: solid 1px #333;
 	top: -26px;
-	margin-left: -18px;
+	margin-left: -22px;
 	text-align: center;
 	color: white;
 	background:black;
@@ -393,7 +393,7 @@
 	-moz-border-radius: 0;
 	border-radius: 0;
 	top: 15px;
-	left: 13px;
+	left: 18px;
 }
 
 .mejs-long-video .mejs-controls .mejs-time-rail .mejs-time-float {

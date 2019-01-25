@@ -34,6 +34,7 @@ var chromeCastplaying = false;
 var playFromWat = false;
 var playFromIcecast = false;
 var iceCastTimer = null;
+var internalMute = false;
 var https = require('https')
 var Cast = require('casts')
 
@@ -77,21 +78,22 @@ $(document).ready(function() {
 	$(document).on('click', '#stopBtn, #subPlayer-stop', function(e) {
 		if(upnpToggleOn){
 			try{
-				mediaRenderer.stop()
-				clearInterval(castStatusInterval)
-				castStatusInterval = null;
+				upnpStoppedAsked = true;
 			} catch(err) {
 				initPlayer()
 				player.media.stop()
 			}
 		}
-		updateMiniPlayer()
 		try {
-			upnpMediaPlaying = false;
-			continueTransition = false;
-			upnpContinuePlay = false;
-			upnpStoppedAsked = true;
-			fromPlayList = false;
+			stopIceTimer();
+			setTimeout(function() {
+				upnpMediaPlaying = false;
+				continueTransition = false;
+				upnpContinuePlay = false;
+				upnpStoppedAsked = true;
+				fromPlayList = false;
+				playFromIcecast = false;
+			}, 1000)
 		} catch(err) {}
 		if (win.isFullscreen === true) {
 			win.toggleFullscreen();
@@ -168,7 +170,8 @@ $(document).ready(function() {
 	});
 
 	player.media.addEventListener('timeupdate', function(e) {
-
+		updateProgressBar()
+		updateMiniPlayer();
 	});
 
 	// player.media.addEventListener('pause', function() {
@@ -255,8 +258,10 @@ $(document).ready(function() {
 		mediaCurrentTime = newTime;
 		seekAsked = true;
 		if(transcoderEnabled || upnpTranscoding || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+			doNotSwitch = true;
 			var m = {};
 			var l = currentMedia.link.replace(/&start=(.*)/,'')
+			currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
 			if(playFromFile) {
 				m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 			} else if(playFromHttp) {
@@ -266,12 +271,11 @@ $(document).ready(function() {
 			} else if (playFromUpnp) {
 				m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
 			} else if (playFromYoutube) {
-				doNotSwitch = true;
-				currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
 				m.link = l.split('?file=')[1].trim()+'&start='+mejs.Utility.secondsToTimeCode(newTime).trim();
 			}
 			m.title = currentMedia.title;
 			m.cover = currentMedia.cover;
+			currentMedia = m;
 			console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
 			initPlay(m);
 			//player.media.setCurrentTime(newTime);
@@ -358,7 +362,6 @@ function playPausePLayer() {
 }
 
 function initPlayer(stopTorrent) {
-	// clean subtitles
 	$('.soloTorrent').remove();
 	player.durationD.html(mejs.Utility.secondsToTimeCode(0));
 	player.currenttime.html(mejs.Utility.secondsToTimeCode(0))
@@ -378,6 +381,7 @@ function initPlayer(stopTorrent) {
 	state.media = {}
 	state.playing.duration = 0
 	state.playing.currentTime = 0
+	state.playing.currentPct = 0
 	state.playing.state = 'STOPPED'
 	try {
 		$('.mejs-captions-button').remove();
@@ -490,7 +494,8 @@ function startPlay(media) {
 
 function initPlay(media) {
 	player.media.stop()
-	if(transcoderEnabled && seekAsked) {
+	player.setMuted(false)
+	if(forceTranscoding || transcoderEnabled && seekAsked) {
 		currentMedia = media;
 		cleanffar(true)
 		seekAsked = false;
@@ -686,7 +691,7 @@ function launchPlay() {
 
 	// transcoding by default
 	// && currentMedia.title.indexOf('.avi') !== -1
-	var carray = ['.mp3','.mp4','.m4a','.opus','.wav','.flac','.mkv','.avi','.mpeg','.mpg','.ogg','.webm','.ogv','.aac'];
+	var carray = ['.mov'];
 	var aArray = ['.wma'];
 	//['.mp3','.opus','.wav','.flac','.m4a','.wma','.aac'];
 	var needTranscoding = ['hls','m3u8','manifest']
@@ -715,20 +720,21 @@ function launchPlay() {
 				currentMedia.type = currentMedia.mime || 'video/mp4'
 			}
 		}
-	} else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1) {
-		transcoderEnabled = true;
+	} //else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1 || currentMedia.title.toLowerCase().match(/(.avi$|dts|x265|hevc|ac3)/) !== null) {
+	//	transcoderEnabled = true;
 		// force by extension
-	} else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && (carray.indexOf(path.extname(currentMedia.title)) == -1 || needTranscoding.indexOf(currentMedia.link) !== -1 )) {
+	//} 
+	else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.includes(path.extname(currentMedia.title)) || needTranscoding.indexOf(currentMedia.link) !== -1 ) {
 		transcoderEnabled = true;
 	} else {
 		transcoderEnabled = false;
 	}
 
 	// check avi et dts on engines with possibles avi
-	if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi" || currentMedia.title.toLowerCase().indexOf('dts') !== -1)) {
-		console.log('CHECK FFMPEG FORMAT')
-		needFFmpegCheck = true;
-	}
+	// if((engine || torrentPlaying) && obj.name == 'StreamStudio' && (engineWithFFmpegCheck.indexOf(engine_name) !== -1 || path.extname(currentMedia.title.toLowerCase()) == ".avi")) {
+	// 	console.log('CHECK FFMPEG FORMAT')
+	// 	needFFmpegCheck = true;
+	// }
 
 	//final check
 	if((transcoderEnabled || upnpTranscoding) && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
@@ -804,6 +810,10 @@ function launchPlay() {
 			if(needFFmpegCheck) {
 				checkFFmpegFormat();
 			} else {
+				if(!transcoderEnabled) {
+					internalMute = true
+					player.setMuted(true)
+				}
 				player.setSrc(currentMedia.link);
 				player.play();
 				if(player.tracks.length > 0) {
@@ -817,6 +827,10 @@ function launchPlay() {
 		try {
 			$('#items_container').scrollTop($('#items_container').scrollTop() + ('#items_container .well').position().top);
 		} catch(err) {}
+	}
+	if(currentMedia.link.indexOf('shoutcast') !== -1) {
+		clearInterval(iceCastTimer);
+		iceCastTimer = setInterval(function(){ iceTimer() }, 10000);
 	}
 }
 
@@ -857,7 +871,8 @@ function checkFFmpegFormat() {
 			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
 			currentMedia.link = link;
 		}
-
+		internalMute = true
+		player.setMuted(true)
 		player.setSrc(currentMedia.link);
 		player.play();
 		if(player.tracks.length > 0) {
@@ -1112,39 +1127,75 @@ function on_media_finished(){
 }
 
 function updateProgressBar() {
+	if(state.playing.location === "local" && player.media.currentTime && !transcoderEnabled) {
+		if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount === 0) {
+			transcoderEnabled = true;
+		} else if(player.media.webkitAudioDecodedByteCount === 0 && player.media.webkitVideoDecodedByteCount > 0) {
+			//console.log('DECODE PAS L\'AUDIO')
+			transcoderEnabled = true;
+			transcodeAudioOnly = true;
+		} else if(player.media.webkitAudioDecodedByteCount > 0 && player.media.webkitVideoDecodedByteCount === 0) {
+			//console.log('DECODE PAS LA VIDEOOOOO')
+			transcoderEnabled = true;
+			transcodeVideoOnly = true;
+		} 
+	}
+	// check if we need transcoding after first seconds
+	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
+			var link = 'http://'+ipaddress+':8887/?file='+currentMedia.link.trim()
+			currentMedia.link = link;
+			forceTranscoding = true;
+			initPlay(currentMedia);
+	}
+
 	var progressBar = document.getElementById('progress-bar');
 	if(upnpToggleOn){
-		duree = state.playing.duration;
 		player.media.duration = state.playing.duration
-		mediaDuration = mediaDuration == 0 ? state.playing.duration : mediaDuration
+		mediaDuration = state.playing.duration;
+		duree = mediaDuration
 		try {
 			var percentage = ((100 / duree) * (state.playing.currentTime));
-			progressBar.value = percentage;
-			$('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(duree))
-			var total = $('.mejs-time-total').width()
-			var newWidth = Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)
-			if(total > newWidth) {
-				$('.mejs-time-current').width(Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)+'px');
+			state.playing.currentPct = percentage;
+			try {
+				progressBar.value = percentage;
+				$('.mejs-duration, .mejs-duration-sub').text(mejs.Utility.secondsToTimeCode(duree))
+				var total = $('.mejs-time-total').width()
+				var newWidth = Math.round($('.mejs-time-total').width() * (state.playing.currentTime) / duree)
+
+				$('.mejs-time-current').width(state.playing.currentPct+'%');
+				$('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
+			} catch(err) {
+				progressBar.value = 0;
 			}
-		  $('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
-			$('#subPlayer-img').attr('src',currentMedia.cover);
+
 			if(upnpTranscoding && percentage == 0) {
 				$('.mejs-currenttime, .mejs-currenttime-sub').text('Live')
 			}
+			$('#subPlayer-img').attr('src',currentMedia.cover);
+
 		} catch(err) { console.log(err)}
 	} else {
-		var duree = (player.media.duration == Infinity || isNaN(player.media.duration)) ? mediaDuration : player.media.duration;
-		var current = player.media.currentTime;
+		var duree = state.playing.duration || player.media.duration;
+		var current = state.playing.currentTime || player.media.currentTime;
+		if(internalMute & current) {
+			player.setMuted(false)
+			internalMute = false
+		}
 		try {
 			if(transcoderEnabled) {
-				var percentage = ((100 / duree) * (current+mediaCurrentTime));
-				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current+mediaCurrentTime))
+				duree = state.playing.duration
+				if(duree.toString().indexOf('NaN') == -1) {
+					var percentage = ((100 / duree) * (current));
+					$('.mejs-time-current').width(state.playing.currentPct+'%');	
+				}
+				$('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))	
 			} else {
 				var percentage = ((100 / duree) * current);
 				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))
 			}
 			progressBar.value = percentage;
 		} catch(err) {
+			console.log(err)
 		}
 	}
 }
@@ -1181,6 +1232,7 @@ function getIcecastTitle() {
 			}
 			currentMedia.title = currentMedia.title.replace(/\s+/,'') == '' ? iceCastStation : currentMedia.title;
 			$('.song-title').empty().append(_('Playing: ') + decodeURIComponent(currentMedia.title));
+			$('#subPlayer-title').empty().append('<p>'+currentMedia.title+'</p>');
 		}
 	});
 }

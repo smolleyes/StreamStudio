@@ -1,0 +1,25 @@
+const filter_parser = require('format-parser');
+
+const rselector = /^([^@]*)(?:@\s*([\w-_:]+))?$/;
+const rfilters = /\s*\|(?!=)\s*/;
+
+/**
+ * Initialize `parse`
+ *
+ * @param {String}
+ * @return {Object}
+ */
+
+ function parse(str) {
+  const filters = str.split(rfilters);
+  const z = filters.shift();
+  const m = z.match(rselector) || [];
+
+  return {
+    selector: m[1] ? m[1].trim() : m[1],
+    attribute: m[2],
+    filters: filters.length ? filter_parser(filters.join('|')) : []
+  }
+}
+
+module.exports = parse;

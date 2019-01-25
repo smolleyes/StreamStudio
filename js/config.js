@@ -28,10 +28,10 @@ $(document).on('ready', function() {
                 if(!settings.twitchToken) {
                   getTwitchToken()
                 }
-            } else if(this.name === "t411") {
-                $('#t411Login').show();
-                if(!settings.t411Username || !settings.t411Password) {
-                    $('#t411LoginUsername').attr('placeholder', '').focus()
+            } else if(this.name === "global") {
+                settings.torrentEnginesEnabled = true;
+                if(settings.torrentEnginesEnabled) {
+                    loadGlobalSearchEngines();
                 }
             }
             settings.plugins.push(this.name);
@@ -39,6 +39,10 @@ $(document).on('ready', function() {
         } else {
             if(this.name === "t411") {
                  $('#t411Login').hide();
+            } else if (this.name ==="global") {
+                settings.torrentEnginesEnabled = false;
+                $('#GlobalSearchSettings').empty().hide();
+                $('#globalSearchSettingsContainer').hide()
             }
             settings.plugins.splice(settings.plugins.indexOf(this.name), 1);
             saveSettings();
@@ -59,9 +63,17 @@ $(document).on('ready', function() {
         }
     });
 
-    $(document).on('keyup', '#t411LoginUsername,#t411LoginPassword', function(e) {
-        settings.t411Username = $('#t411LoginUsername').val();
-        settings.t411Password = $('#t411LoginPassword').val();
+    $(document).on('click', '#validateYggtorrentCredential', function(e) {
+        e.preventDefault()
+        settings.torrentEngines['Yggtorrent'].login = $('#YggtorrentLogin').val();
+        settings.torrentEngines['Yggtorrent'].password = $('#YggtorrentPassword').val();
+        settings.torrentEngines['Yggtorrent'].passwordconfirm = $('#YggtorrentPasswordConfirm').val();
+        if(settings.torrentEngines['Yggtorrent'].passwordconfirm !== settings.torrentEngines['Yggtorrent'].password)  {
+            swal(_("Error!"), _('Your passwords do not match, please verify!'), "error");
+        } else {
+            saveSettings()
+            swal(_("Success!"), _("Vos identifiants ont bien été enregistrés !"), "success")
+        }
     });
 
     $(document).on('click', '#aboutStreamStudio', function(e) {
@@ -103,6 +115,7 @@ function getTwitchToken() {
 }
 
 function loadConfig() {
+    
     $('#config_title').empty().append(_("StreamStudio configuration:"));
     // start flags
     $('#download_path').val(settings.download_dir);
@@ -129,6 +142,9 @@ function loadConfig() {
         }
         saveSettings();
         saveConf();
+        if(settings.torrentEnginesEnabled) {
+            loadGlobalSearchEngines();
+        }
     });
     //sub select
     $(document).on("click", "#sub_countries li a", function() {
@@ -150,7 +166,7 @@ function loadConfig() {
         settings.resolution = $(this).attr('data-value');
         saveSettings();
     });
-    var selected_resolution = settings.resolution || "en";
+    var selected_resolution = settings.resolution || "720p";
     $("#resolutions_select [data-value='" + selected_resolution + "']").click();
     // checkbox changes
     $('.pluginCheckBox:checkbox').change(function() {
@@ -286,6 +302,7 @@ without notice.");
 
     loadPlayers();
     updateScroller();
+    loadGlobalSearchEngines(true)
 }
 
 function chooseDownloadDir(confDir) {

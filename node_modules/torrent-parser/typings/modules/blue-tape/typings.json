@@ -1,0 +1,24 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/types/npm-blue-tape/61297708cdff2c892a53474cd5cb77ea3a500205/typings.json",
+    "raw": "registry:npm/blue-tape#0.2.0+20160723033700",
+    "main": "index.d.ts",
+    "version": "0.2.0",
+    "dependencies": {
+      "es6-promise": {
+        "src": "https://raw.githubusercontent.com/typed-typings/npm-es6-promise/fb04188767acfec1defd054fc8024fafa5cd4de7/typings.json",
+        "raw": "registry:npm/es6-promise#3.0.0+20160211003958",
+        "main": "dist/es6-promise.d.ts",
+        "name": "es6-promise"
+      },
+      "tape": {
+        "src": "https://raw.githubusercontent.com/typed-typings/npm-tape/9746a421d7928ddc84ebcb9d5c3b2a77c38c0b33/typings.json",
+        "raw": "registry:npm/tape#4.0.0+20160622192935",
+        "main": "index.d.ts",
+        "name": "tape"
+      }
+    },
+    "name": "blue-tape"
+  }
+}

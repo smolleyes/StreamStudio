@@ -1,7 +1,7 @@
 var freeboxAvailable = false;
 
 // settings
-var token_string = settings.airMediaToken;
+var session_token = settings.airMediaToken;
 
 var APP_NAME       = 'streamstudio';
 var APP_VERSION    = '0.3';
@@ -15,6 +15,10 @@ var LOGIN_AUTH     = 'login/authorize/';
 var LOGIN_SESSION  = 'login/session/';
 
 var AIRMEDIA_RECEIVERS = 'airmedia/receivers/';
+
+var FBX_API_URL = '';
+var FBX_DOMAIN = 'mafreebox.freebox.fr';
+var FBX_PORT = 0;
 
 var API = {};
 var BASE_URL = '';
@@ -32,22 +36,22 @@ function startStatusInterval () {
   try {
   castStatusInterval = setInterval(function () {
     if(upnpStoppedAsked && state.playing.state !== 'STOPPED') {
-      console.log('stop asked in airmedia')
-      state.playing.state = "STOPPED"
+      console.log('stop asked in airmedia');
       $('#fbxMsg').empty()
       clearInterval(castStatusInterval)
       castStatusInterval = null;
       upnpStoppedAsked = false;
       if(!upnpTransitionning) {
-          initPlayer()
-          upnpTransitionning = true;
+        mediaRenderer.stop(function(e,d) {
+            initPlayer()
+        });
+        upnpTransitionning = true;
       } else {
         mediaRenderer.play(currentMedia.link,currentMedia,function(cb) {
             startStatusInterval()
             upnpLoading = false
         })
       }
-      return;
     } else {
       upnpStoppedAsked = false;
     }
@@ -88,7 +92,7 @@ function startStatusInterval () {
       } else {
         mediaRenderer.status(function(err,res) {
           //console.log(err,res)
-          if(state.playing.duration !== 0 && res.position.currentTime && res.position.currentTime+1 > state.playing.duration) {
+          if(!res|| state.playing.duration !== 0 && res.position && res.position.currentTime && res.position.currentTime+1 > state.playing.duration) {
              on_media_finished()
              return;
           }
@@ -148,23 +152,38 @@ function startStatusInterval () {
               }
           }
         } catch(err) {
-          console.log(err)
+            clearInterval(castStatusInterval)
+              castStatusInterval = null;
+              if(!upnpTransitionning){
+                 upnpTransitionning = true;
+                 console.log('before on media finished in airmedia')
+                 on_media_finished()
+              }
         }
         })
       }
     }
   }, 1000)
 } catch(err) {
+    clearInterval(castStatusInterval)
+              castStatusInterval = null;
+              if(!upnpTransitionning){
+                 upnpTransitionning = true;
+                 console.log('before on media finished in airmedia')
+                 on_media_finished()
+              }
   console.log(err)
 }
 }
 
 function checkFreebox() {
     try {
-        $.get('http://mafreebox.freebox.fr').done(function(res) {
+        $.get('http://mafreebox.freebox.fr/api_version').done(function(res) {
           console.log('freebox available, airplay enabled');
           //$('#airplayContainer').show();
           freeboxAvailable = true;
+          FBX_PORT = 80;
+          FBX_API_URL = 'http://'+FBX_DOMAIN+':'+FBX_PORT+'/api/v4';
         }).fail(function(err){
           //show gui
           console.log('no freebox available, airplay disabled');
@@ -184,16 +203,17 @@ function checkFreebox() {
         });
         res.on('end',function(){
             var data = datas.join('');
+            console.log(data)
             var obj = JSON.parse(data);
             API.version = obj.api_version.split('.')[0];
             API.device_name = obj.device_name;
-            BASE_URL = FREEBOX_URL+API_BASE_URL+'v'+API.version+'/';
-            if ((token_string === undefined) || (token_string === '')) {
+            BASE_URL = FBX_API_URL
+            if (!settings.airMediaToken) {
                 console.log("Token undefined or empty, need authorisation");
                 $.notif({title: 'Activation airplay:',img: 'images/authorize.png', timeout: 0,content:"Veuillez accepter l'autorisation qui s'affiche actuellement SUR VOTRE FREEBOX à la place de l'heure pour activer airplay...!",btnId:'notifOk',btnTitle:'Valider',btnColor: 'green',btnDisplay:'block',updateDisplay:'none'});
                 ask_authorization();
             } else {
-                console.log('airmedia already registered, token string : '+token_string);
+                console.log('airmedia already registered, token string : '+settings.airMediaToken);
                 login();
             }
         });
@@ -210,27 +230,30 @@ function ask_authorization() {
     };
 
     var options = {
-        host: 'mafreebox.freebox.fr',
-        port: 80,
-        path: '/api/v'+API.version+'/'+LOGIN_AUTH,
+       host: FBX_DOMAIN,
+        port: FBX_PORT,
+        path: '/api/v4/'+LOGIN_AUTH,
         method: 'POST',
-        headers: headers
+         headers: headers,
+         data       : param
     };
 
     // Setup the request.  The options parameter is
     // the object we defined above.
+    console.log('ask authorization with:', options)
     var req = http.request(options, function(res) {
         res.setEncoding('utf-8');
-        var responseString = '';
+        var responseString = [];
         res.on('data', function(data) {
-            responseString += data;
+            responseString.push(data);
         });
         res.on('end', function() {
-            var resultObject = JSON.parse(responseString);
+            console.log(responseString)
+            var resultObject = JSON.parse(responseString.join(''));
             // check response
             if (resultObject.success === true) {
                 var track_id = resultObject.result["track_id"];
-                token_string = resultObject.result["app_token"];
+                session_token = resultObject.result["app_token"];
                 wait_user_auth(track_id);
             } else {
                 return;
@@ -242,7 +265,7 @@ function ask_authorization() {
 }
 
 function wait_user_auth(track_id) {
-    http.get('http://mafreebox.freebox.fr/api/v1/login/authorize/'+track_id+'',function(res){
+    http.get(FBX_API_URL+'/login/authorize/'+track_id+'',function(res){
         var datas = '';
         res.on('data',function(data){
             datas+=data;
@@ -255,7 +278,7 @@ function wait_user_auth(track_id) {
                     console.log('waiting for user authorization...');
                     setTimeout("wait_user_auth("+track_id+")",5000);
                 } else if (statut === 'granted') {
-                    console.log('authorization validated by user, token : '+token_string);
+                    console.log('authorization validated by user, token : '+session_token);
                     $("#notification").hide();
                     saveToken();
                 } else if (statut === 'timeout') {
@@ -277,7 +300,7 @@ function wait_user_auth(track_id) {
 }
 
 function login(cb,params) {
-    http.get('http://mafreebox.freebox.fr/api/v1/login/',function(res){
+    http.get('http://mafreebox.freebox.fr/api/v4/login',function(res){
         var datas = '';
         res.on('data',function(data){
             datas+=data;
@@ -288,7 +311,7 @@ function login(cb,params) {
                 var challenge = obj.result["challenge"];
                 var crypto = require('crypto')
                   , text = challenge
-                  , key = token_string
+                  , key = settings.airMediaToken
                   , hash
                 hash = crypto.createHmac('sha1', key).update(text).digest('hex');
                 getSession(hash,cb,params);
@@ -310,11 +333,12 @@ function getSession(passwd,cb,params) {
     };
 
     var options = {
-        host: 'mafreebox.freebox.fr',
-        port: 80,
-        path: '/api/v'+API.version+'/'+LOGIN_SESSION,
+        host: FBX_DOMAIN,
+        port: FBX_PORT,
+        path: '/api/v4/'+LOGIN_SESSION,
         method: 'POST',
-        headers: headers
+         headers: headers,
+         data       : param
     };
 
     // Setup the request.  The options parameter is
@@ -326,9 +350,11 @@ function getSession(passwd,cb,params) {
             responseString += data;
         });
         res.on('end', function() {
+            console.log(responseString)
             var resultObject = JSON.parse(responseString);
             // check response
             if (resultObject.success === true) {
+                console.log('SESSION TOKEN:', resultObject)
                 session_token = resultObject.result['session_token'];
                 console.log('session ok!, token : '+session_token);
                 if (cb) {
@@ -352,11 +378,12 @@ function getAirMediaReceivers() {
     };
 
     var options = {
-        host: 'mafreebox.freebox.fr',
-        port: 80,
-        path: '/api/v'+API.version+'/'+AIRMEDIA_RECEIVERS,
+        host: FBX_DOMAIN,
+        port: FBX_PORT,
+        path: '/api/v4/'+AIRMEDIA_RECEIVERS,
         method: 'GET',
-        headers: headers
+         headers: headers,
+         data       : param
     };
 
     var req = http.request(options, function(res) {
@@ -482,11 +509,12 @@ function play_on_fbx(url) {
     };
 
     var options = {
-        host: 'mafreebox.freebox.fr',
-        port: 80,
-        path: '/api/v1/airmedia/receivers/'+airMediaDevice+'/',
+        host: FBX_DOMAIN,
+        port: FBX_PORT,
+        path: '/api/v4/airmedia/receivers/'+airMediaDevice+'/',
         method: 'POST',
-        headers: headers
+         headers: headers,
+         data       : param
     };
 
     var req = http.request(options, function(res) {
@@ -526,11 +554,12 @@ function stop_on_fbx() {
     };
 
     var options = {
-        host: 'mafreebox.freebox.fr',
-        port: 80,
-        path: '/api/v1/airmedia/receivers/'+airMediaDevice+'/',
+        host: FBX_DOMAIN,
+        port: FBX_PORT,
+        path: '/api/v4/airmedia/receivers/'+airMediaDevice+'/',
         method: 'POST',
-        headers: headers
+         headers: headers,
+         data       : param
     };
 
     var req = http.request(options, function(res) {
@@ -558,7 +587,7 @@ function stop_on_fbx() {
 }
 
 function saveToken() {
-    settings.airMediaToken = token_string;
+    settings.airMediaToken = session_token;
     saveSettings();
     console.log('token successfully saved to config file...');
     login();
@@ -567,6 +596,7 @@ function saveToken() {
 // add new download
 function addFreeboxDownload(link) {
   var l = encodeURIComponent(link);
+  console.log(link)
   var param = {"download_url": link};
   var paramString = JSON.stringify(param);
 
@@ -578,7 +608,7 @@ function addFreeboxDownload(link) {
 
   $.ajax({
     type       : "POST",
-    url        : 'http://mafreebox.freebox.fr/api/v1/downloads/add',
+    url        : FBX_API_URL+'/downloads/add',
     headers    : headers,
     data       : param,
     crossDomain: true,
@@ -608,7 +638,7 @@ function upToFreebox(form) {
 
   $.ajax({
     type       : "POST",
-    url        : 'http://mafreebox.freebox.fr/api/v3/downloads/add',
+    url        : 'http://mafreebox.freebox.fr/api/v4/downloads/add',
     headers    : headers,
     data       : form._streams[0],
     crossDomain: true,
@@ -621,7 +651,7 @@ function upToFreebox(form) {
       if (response.success === true) {
 		  $.notif({title: 'StreamStudio:',cls:'green',icon: '&#10003;',content:_("Téléchargement ajouté avec succès sur la freebox!"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: 'none',updateDisplay:'none'});
       } else {
-        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("Impossible d'ajouter le téléchargement... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: '',updateDisplay:'none'});
+        $.notif({title: 'StreamStudio:',cls:'red',icon: '&#59256;',timeout:0,content:_("oueeeeImpossible d'ajouter le téléchargement... !"),btnId:'',btnTitle:'',btnColor:'',btnDisplay: '',updateDisplay:'none'});
       }
     },
     error: function(response) {

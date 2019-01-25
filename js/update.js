@@ -1,5 +1,5 @@
 
-var https = require('follow-redirects').https;
+var http = require('follow-redirects').http;
 function checkUpdates() {
 	if(VERSION.indexOf('testing') !== -1) {
 		return;
@@ -20,16 +20,15 @@ function checkUpdates() {
 			  }
 			});
 		} else {
-			https.get('https://download.streamstudio.cc/update.html',function(res,err){
+			http.get('http://163.172.88.44/streamstudio/update.json',function(res,err){
 				var datas = [];
 				res.on('data',function(chunk){
-					datas.push(chunk);
+					datas += chunk;
 				});
 				res.on('end',function(){
-					console.log("Checking for updates....");
-					var data = datas.join('');
-					var txt = $('p',data).prevObject[1].innerHTML;
-					online_version = txt
+					console.log("Checking for updates...."), data;
+					var data = JSON.parse(datas.trim());
+					online_version = data.version
 					try {
 						console.log("online version : "+online_version+', current version : '+ settings.version);
 					} catch(err){
@@ -62,15 +61,15 @@ $(document).on('click','#updateBtn',function(e) {
 	var link = '';
 	if(isOSWin64() && !['darwin','linux'].includes(process.platform)) {
 		file = 'streamstudio-setup.exe';
-		link = 'https://download.streamstudio.cc/windows-64/'+file;
+		link = 'http://163.172.88.44/streamstudio/windows-64/'+file;
 		return downloadUpdate(link,file);
 	} else if (process.platform === 'win32') {
 		file = 'streamstudio-setup.exe';
-		link = 'https://download.streamstudio.cc/windows/'+file;
+		link = 'http://163.172.88.44/streamstudio/windows/'+file;
 		return downloadUpdate(link,file);
 	} else if (process.platform === 'darwin') {
 		 file = 'streamstudio-osx.zip';
-		 link = 'https://download.streamstudio.cc/osx/'+file;
+		 link = 'http://163.172.88.44/streamstudio/osx/'+file;
 		 return downloadUpdate(link,file);
 	} else {
 		if(execDir.indexOf('/opt') !== -1) {
@@ -103,7 +102,7 @@ $(document).on('click','#updateBtn',function(e) {
 				console.log('linux 64 bits detected...');
 				file = 'streamstudio-64.zip';
 			}
-			link = 'https://download.streamstudio.cc/'+file;
+			link = 'http://163.172.88.44/streamstudio/'+file;
 			return downloadUpdate(link,file);
 		}
 	}
@@ -129,7 +128,7 @@ function downloadUpdate(link,filename) {
     var val = $('#updateProgress progress').attr('value');
     var currentTime;
     var startTime = (new Date()).getTime();
-    current_download = https.request(link,
+    current_download = http.request(link,
     function (response) {
 	var contentLength = response.headers["content-length"];
     if (parseInt(contentLength) === 0) {

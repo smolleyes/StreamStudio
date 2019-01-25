@@ -1,0 +1,3 @@
+const Xray = require('./src/Xray');
+
+module.exports = Xray();

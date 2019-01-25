@@ -1,4 +1,7 @@
-var VERSION = "3.9.6";
+var VERSION = "4.3";
+
+var TORRENT9_URL = 'https://www.torrent9.blue';
+
 process.setMaxListeners(0);
 var path = require('path');
 var fs = require('fs');
@@ -48,6 +51,7 @@ var dlnaPlayers = []
 var castNoResponseCount = 0;
 var forceTranscoding = false;
 var currentTorrentFilePath = ''
+var searchResults = []
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
@@ -97,7 +101,7 @@ var current_channel_engine = '';
 var channelPagination = false;
 var searchDate = 'today';
 var searchDuration = '';
-var videoArray = ["avi", "webm", "mp4", "flv", "mkv", "mpeg", "mp3", "mpg", "wmv", "wma", "mov", "wav", "ogg", "flac", "opus","m4a","wma","m4v","ogv"];
+const videoArray = ['aiff','ra','mka','webm','aac','wma','mp4','flac','wav','mpeg','opus','avi','flv','wmv','ogg','mov','mkv','ogv','mp3','ts'];
 current_search='';
 var exec_path = execDir;
 var pagination_init = false;

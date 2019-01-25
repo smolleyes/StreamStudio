@@ -88,7 +88,6 @@ function waitLoading(stream) {
 }
 
 function getTorrent(link, cover, fallback,retried,id) {
-    console.log(torObj,link, cover, fallback,retried,id)
     torObj.link = link;
     torObj.cover = cover;
     torObj.fallback = fallback;
@@ -97,7 +96,6 @@ function getTorrent(link, cover, fallback,retried,id) {
     if(!torObj.retried) {
      player.cleanTracks();
     }
-    if (link.toString().indexOf('magnet:?') !== -1) {
         if (cover) {
             mediaCover = cover;
         } else {
@@ -127,16 +125,8 @@ function getTorrent(link, cover, fallback,retried,id) {
 		<div id="coaster"></div>  \
 	    </div> \
 	      <div id="peerStats"></div></div>');
-        magnetToTorrent.getLink(link)
-            .then(function(torrentLink) {
-                getTorrent(torrentLink, cover || '')
-            })
-            .fail(function(error) {
-                loadTorrent(link, cover || '') // couldn't get a valid link
-            });
-    } else {
-        loadTorrent(link, cover || '')
-    }
+        
+          loadTorrent(link, cover)
 }
 
 function loadTorrent(link, cover,id, torrInfo) {
@@ -148,11 +138,9 @@ function loadTorrent(link, cover,id, torrInfo) {
         initPlayer(true)
         torrentInfo = torrInfo;
     }
-    if (cover) {
-        mediaCover = cover;
-    } else {
-        mediaCover = '';
-    }
+
+    mediaCover = cover || '';
+
     $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     var obj = JSON.parse(settings.ht5Player);
     if ((activeTab == 1 || activeTab == 2) && (search_engine === 'dailymotion' || search_engine === 'youtube' ||  engine.type == "video") && obj.name === "StreamStudio") {
@@ -188,8 +176,19 @@ function loadTorrent(link, cover,id, torrInfo) {
     playStarted = false;
     downloadedPct = 0;
     startLoading();
+
+    console.log(link)
     if(id) {
-        handleTorrent(torrentInfo, stateModel,id);
+        handleTorrent(torrentInfo, stateModel,id, false);
+    } else if(link.toString().indexOf('magnet:?') !== -1) {
+            let infos = rTorrent(link, function(err, torrent, raw) {
+                title = torrent.name;
+                    torrentInfo = {
+                        info: raw,
+                        title: title
+                    };
+                handleTorrent(torrentInfo, stateModel, null, true);
+            })
     } else {
         setTimeout(function() {
             rTorrent(link, function(err, torrent, raw) {
@@ -204,6 +203,7 @@ function loadTorrent(link, cover,id, torrInfo) {
                         title: title
                     };
                     try {
+                        console.log(torrent)
                         if (torrent.files.length > 1) {
                             analyseTorrent(torrent.files);
                         } else {
@@ -221,12 +221,14 @@ function loadTorrent(link, cover,id, torrInfo) {
 
 function analyseTorrent(list) {
     var files = [];
-    $.each(list, function(i, file) {
+    //list = __.sortBy(list, (item) => item.name);
+    console.log("in analysetorrent:", list)
+    __.each(list, function(file,i) {
+        console.log(file, i)
         if (videoArray.indexOf(file.name.split('.').pop()) == -1) {
             if (i + 1 == list.length) {
                 loadTable(files)
             }
-            return true;
         } else {
             file.index = i;
             files.push(file);
@@ -262,6 +264,7 @@ var watchState = function(stateModel) {
 
 
 app.updateStats = function(streamInfo) {
+
     $(".mejs-overlay-button").hide();
     var active = function(wire) {
         return !wire.peerChoking;
@@ -313,6 +316,9 @@ app.updateStats = function(streamInfo) {
                 increment(this.percent);
                 $('#preloadProgress').empty().append(_('Downloading %s%% done at %s', this.percent, this.downloadSpeed));
                 $('#peerStats').empty().append(_('%s / %s connected peers', this.active_peers, this.total_peers));
+            }
+            if(!videoStreamer.analysed && videoStreamer.torrent && videoStreamer.torrent.files) {
+                analyseTorrent(videoStreamer.torrent.files);
             }
         }
     } else {
@@ -375,7 +381,9 @@ app.updateStats = function(streamInfo) {
             }
             if (parseInt(downloadedPct) >= 100) {
                 var t = _('(%s%% downloaded)', 100);
-                $('.mejs-time-loaded').width('100%')
+                if(upnpToggleOn || transcoderEnabled){
+                    $('.mejs-time-loaded').width(downloadedPct+'%')
+                }
                 $('#preloadTorrent').remove();
                 $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
                 if (saveTorrent && !torrentSaved) {
@@ -388,6 +396,9 @@ app.updateStats = function(streamInfo) {
                 statsUpdater = null;
             } else {
                 $('#downloadStats').empty().html('<span style="margin:0 5px;">' + _("Speed:") + '</span><i class="arrow down"></i>' + this.downloadSpeed + ' <i class="arrow up"></i>' + this.uploadSpeed + '<span style="padding:5px;">| ' + _("Connected peers: ") + this.active_peers + ' / ' + this.total_peers + '</span>');
+                if(upnpToggleOn || transcoderEnabled){
+                    $('.mejs-time-loaded').width(downloadedPct+'%')
+                }
                 var t = _('(%s%% downloaded)', downloadedPct);
                 if (player.media.paused) {
                     totalBuffered = swarm.downloaded;
@@ -396,8 +407,9 @@ app.updateStats = function(streamInfo) {
                     totalBuffered = 0;
                     totalBytes = 0;
                 }
-                $('.mejs-time-loaded').width(downloadedPct + '%')
+                //$('.mejs-time-loaded').width(downloadedPct + '%')
                 $(".song-title").empty().text(_('Playing: ') + torrentName + " " + t);
+                videoStreamer.analysed = true
             }
         }
     }
@@ -487,7 +499,7 @@ function saveToDisk(src, name) {
     }
 }
 
-function handleTorrent(torrent, stateModel, id) {
+function handleTorrent(torrent, stateModel, id, isMagnet) {
     $('#preloadTorrent').remove();
     $('.mejs-container').append('<div id="preloadTorrent" \
           style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 400px;right: 50%;left: -200px;"> \
@@ -514,17 +526,18 @@ function handleTorrent(torrent, stateModel, id) {
         } else {
             tmpFolder = path;
         }
-        if (typeof id !== "undefined") {
+        if (id) {
             torObj.id = id;
-            videoStreamer = peerflix(torrent.info, {
+            videoStreamer = peerflix(torrent.info || torrent, {
                 connections: 150,
                 path: tmpFolder,
                 index: parseInt(id),
                 analysed: true
             });
+            
         } else {
             //player.cleanTracks();
-            videoStreamer = peerflix(torrent.info, {
+            videoStreamer = peerflix(torrent.info || torrent, {
                 connections: 150,
                 path: tmpFolder,
                 gui: win.window,
@@ -532,9 +545,16 @@ function handleTorrent(torrent, stateModel, id) {
             });
         }
 
+        if(isMagnet) {
+            videoStreamer.analysed = false;
+        } else {
+            videoStreamer.analysed = true;
+        }
+
         streamInfo = new app.updateStats(videoStreamer);
         statsUpdater = setInterval(___.bind(app.updateStats, streamInfo, videoStreamer), 1000);
         stateModel.streamInfo = streamInfo;
+        
         watchState(stateModel);
 
         var checkReady = function() {
@@ -545,6 +565,7 @@ function handleTorrent(torrent, stateModel, id) {
                 try {
                     stateModel.destroy();
                 } catch (err) {}
+
             }
         };
 
@@ -566,7 +587,17 @@ function handleTorrent(torrent, stateModel, id) {
         });
 
         // not used anymore
-        videoStreamer.on('ready', function() {});
+        videoStreamer.on('ready', function() {
+            console.log("READYYYYYYYYYYYYYY", videoStreamer,streamInfo)    
+            // if(!videoStreamer.analysed && videoStreamer.torrent && videoStreamer.torrent.files){
+            //     try {
+            //         analyseTorrent(videoStreamer.torrent.files);
+            //         return;
+            //     } catch(err) {
+                    
+            //     }
+            // }
+        });
 
         videoStreamer.on('uninterested', function() {
             if (videoStreamer) {
@@ -595,10 +626,12 @@ function loadTable(files) {
     }
 
     var list = ___.sortBy(files, function(obj) {
-        if(obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/)) {
-            return obj.name.toLowerCase().match(/s\d{1,2}e\d{1,2}/);
+        if(obj.name.toLowerCase().match(/s\d{1,2}e\d{1,3}/)) {
+            return obj.name.toLowerCase().trim().match(/s\d{1,2}e\d{1,3}/);
+        } else if (obj.name.toLowerCase().trim().match(/^\d{1,4}/)) {
+            return parseInt(obj.name.toLowerCase().trim().match(/^\d{1,4}/));
         } else {
-            return obj.name.toLowerCase().match(/\d{1,2}/);
+            return obj.name.toLowerCase().trim()
         }
     });
     var tclass="soloTorrent"

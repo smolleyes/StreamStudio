@@ -1,0 +1,3 @@
+# CREDITS
+
+* Big thanks to [Matthew Mueller](https://github.com/matthewmueller) and all the contibutors of the original [module](https://github.com/matthewmueller/x-ray).

@@ -603,6 +603,7 @@ mejs.PluginMediaElement.prototype = {
 
 	},
 	setCurrentTime: function (time) {
+		
 		if (this.pluginApi != null) {
 			if (this.pluginType == 'youtube') {
 				this.pluginApi.seekTo(time);
@@ -3287,14 +3288,43 @@ if (typeof jQuery != 'undefined') {
 
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
-							media.setCurrentTime(newTime);
+							if(transcoderEnabled || upnpTranscoding || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+								mediaCurrentPct = percentage;
+								mediaCurrentTime = newTime;
+								//doNotSwitch = true;
+								seekAsked = true;
+								var m = {};
+								var l = currentMedia.link.replace(/&start=(.*)/,'')
+								//currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+								if(playFromFile) {
+									m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
+								} else if(playFromHttp) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&external';
+								} else if (torrentPlaying) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&torrent';
+								} else if (playFromUpnp) {
+									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
+								} else if (playFromYoutube) {
+									m.link = l.split('?file=')[1].trim()+'&start='+mejs.Utility.secondsToTimeCode(newTime).trim();
+								}
+								m.title = currentMedia.title;
+								m.cover = currentMedia.cover;
+								currentMedia = m;
+								state.media = m
+								console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
+								initPlay(m);
+							} else {
+								media.setCurrentTime(newTime);
+							}
 						}
-
+						
 						// position floating time box
 						if (!mejs.MediaFeatures.hasTouch) {
-								timefloat.css('left', pos);
+							timefloat.css('left', pos);
 								timefloatcurrent.html( mejs.Utility.secondsToTimeCode(newTime) );
-								timefloat.show();
+								if (timefloatcurrent.text().match(/NaN/) === null && timefloatcurrent.text() !== "00:00:00") {
+									timefloat.show();
+								}
 						}
 					} else {
 						if(playFromMegaUser || playFromMega || engine && engine.engine_name == "Shoutcast") {
@@ -3306,7 +3336,7 @@ if (typeof jQuery != 'undefined') {
 							x = width + offset.left;
 						}
 						pos = x - offset.left;
-					  percentage = (pos / width);
+					  	percentage = (pos / width);
 						var duree;
 						if(upnpTranscoding) {
 							duree = mediaDuration;
@@ -3320,8 +3350,11 @@ if (typeof jQuery != 'undefined') {
 							seekAsked = true;
 							mouseIsDown =false;
 							if(transcoderEnabled || upnpTranscoding || playFromYoutube && videoResolution !== '720p' && videoResolution !== '360p') {
+								//
 								var m = {};
 								var l = currentMedia.link.replace(/&start=(.*)/,'')
+								//currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
+								$('.mejs-overlay,.mejs-overlay-loading').show();
 								if(playFromFile) {
 									m.link = l.replace('?file=/','?file=file:///')+'&start='+mejs.Utility.secondsToTimeCode(newTime);
 								} else if(playFromHttp) {
@@ -3331,12 +3364,12 @@ if (typeof jQuery != 'undefined') {
 								} else if (playFromUpnp) {
 									m.link = l.split('?file=')[1]+'&start='+mejs.Utility.secondsToTimeCode(newTime)+'&upnp';
 								} else if (playFromYoutube) {
-									doNotSwitch = true;
-									currentMedia.link=l+mejs.Utility.secondsToTimeCode(newTime).trim();
 									m.link = l.split('?file=')[1].trim()+'&start='+mejs.Utility.secondsToTimeCode(newTime).trim();
 								}
 								m.title = currentMedia.title;
 								m.cover = currentMedia.cover;
+								currentMedia = m;
+								state.media = m
 								console.log("INITPLAY", m, mejs.Utility.secondsToTimeCode(newTime))
 								initPlay(m);
 								//player.media.setCurrentTime(newTime);
@@ -3355,7 +3388,9 @@ if (typeof jQuery != 'undefined') {
 										}
 									}
 								} else {
-									console.log(newTime)
+									if(!newTime || isNaN(newTime)){
+										return;
+									}
 									media.setCurrentTime(newTime);
 								}
 							}
@@ -3364,7 +3399,9 @@ if (typeof jQuery != 'undefined') {
 						if (!mejs.MediaFeatures.hasTouch) {
 								timefloat.css('left', pos);
 								timefloatcurrent.html( mejs.Utility.secondsToTimeCode(newTime) );
-								timefloat.show();
+								if (timefloatcurrent.text().match(/NaN/) === null && timefloatcurrent.text() !== "00:00:00") {
+									timefloat.show();
+								}
 						}
 					}
 				},
@@ -3395,6 +3432,11 @@ if (typeof jQuery != 'undefined') {
 					t.globalBind('mousemove.dur', function(e) {
 						handleMouseMove(e);
 					});
+				
+					if (timefloatcurrent.text().match(/NaN/) !== null || timefloatcurrent.text() === "00:00:00") {
+						return;
+					}
+
 					if (!mejs.MediaFeatures.hasTouch) {
 						timefloat.show();
 					}
@@ -3427,6 +3469,9 @@ if (typeof jQuery != 'undefined') {
 			t.handle = handle;
 		},
 		setProgressRail: function(e) {
+			if(transcoderEnabled) {
+				return
+			}
 			var
 				t = this;
 				if(t.media.duration && t.media.duration !== Infinity) {
@@ -3464,7 +3509,9 @@ if (typeof jQuery != 'undefined') {
 					}
 				}
 			} else {
-				return;
+				if(transcoderEnabled) {
+					return
+				}
 				try {
 					var target = (e != undefined) ? e.target : t.media,
 					percent = null;
@@ -3500,6 +3547,9 @@ if (typeof jQuery != 'undefined') {
 			}
 		},
 		setCurrentRail: function() {
+			if(transcoderEnabled) {
+				return
+			}
 			var t = this;
 		    if(t.media.duration == Infinity) {
 				if (t.media.currentTime != undefined && mediaDuration) {
@@ -3601,12 +3651,15 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		updateCurrent:  function() {
+			if(upnpToggleOn || transcoderEnabled) {
+				return;
+			}
 			var t = this;
 			if(t.media.duration == Infinity || upnpToggleOn || transcoderEnabled) {
-				//t.options.duration = mediaDuration;
+				t.options.duration = mediaDuration ? mediaDuration : t.options.duration;
 				if (t.currenttime) {
-					t.currenttime.html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
-					$('.mejs-currenttime-sub').html(mejs.Utility.secondsToTimeCode(t.media.currentTime+mediaCurrentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					t.currenttime.html(mejs.Utility.secondsToTimeCode(mediaCurrentTime+t.media.currentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
+					$('.mejs-currenttime-sub').html(mejs.Utility.secondsToTimeCode(mediaCurrentTime+t.media.currentTime, t.options.alwaysShowHours || mediaDuration > 3600, t.options.showTimecodeFrameCount,  t.options.framesPerSecond || 25));
 				}
 			} else {
 				if (t.currenttime) {
@@ -3618,6 +3671,9 @@ if (typeof jQuery != 'undefined') {
 
 		updateDuration: function() {
 			var t = this;
+			if(upnpToggleOn || transcoderEnabled) {
+				return;
+			}
 			if(t.media.duration == Infinity || upnpToggleOn || transcoderEnabled) {
 				t.options.duration = mediaDuration;
 				//Toggle the long video class if the video is longer than an hour.
