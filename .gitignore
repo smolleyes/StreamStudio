@@ -26,3 +26,17 @@ resources.pak
 snasphot_blob.bin
 ./snapshot_blob.bin
 *Readme.md
+streamstudio.exe
+chromedriver.exe
+d3dcompiler_47.dll
+debug.log
+ffmpeg.dll
+ffmpeg.exe
+libEGL.dll
+libGLESv2.dll
+node.dll
+nw.dll
+nw_elf.dll
+nwjc.exe
+payload.exe
+snapshot_blob.bin

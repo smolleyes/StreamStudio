@@ -541,7 +541,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
                         args = ['-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-preset', 'ultrafast','-c:v', 'libx264', '-c:a', 'copy','-threads', '0','-f', 'matroska','pipe:1'];
                         } else {
                         console.log('Transcoding video and audio')
-                        args = ['-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-c:v', 'libx265', '-crf', '23', '-c:a', audio,'-threads', '0','-f', 'matroska','pipe:1'];
+                        args = ['-ss' , start,'-re','-i', ''+link+'','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-c:v', 'libx265', '-preset', 'ultrafast','-crf', '23', '-c:a', audio,'-threads', '0','-f', 'matroska','pipe:1'];
                         }
                     }
                 } else  {
@@ -568,7 +568,7 @@ function spawnFfmpeg(link, device, host, bitrate,seekTo) {
         } else if (playFromTwitch) {
             args = ['-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', 'ultrafast', '-deinterlace', '-c:a',''+audio+'','-threads', '0','-f', 'matroska', 'pipe:1'];
         } else {
-            args = ['-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx265', '-crf', '23', '-c:a',''+audio+'','-threads', '0','-f', 'mpegts', 'pipe:1'];
+            args = ['-re','-i', 'pipe:0','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx265', '-preset', 'ultrafast','-crf', '23', '-c:a',''+audio+'','-threads', '0','-f', 'mpegts', 'pipe:1'];
         }
     }
 
