@@ -1,0 +1,40 @@
+{
+  "name": "magnet-uri",
+  "description": "Parse a magnet URI and return an object of keys/values",
+  "version": "5.2.4",
+  "author": {
+    "name": "WebTorrent, LLC",
+    "email": "feross@webtorrent.io",
+    "url": "https://webtorrent.io"
+  },
+  "bugs": {
+    "url": "https://github.com/webtorrent/magnet-uri/issues"
+  },
+  "dependencies": {
+    "thirty-two": "^1.0.1",
+    "uniq": "^1.0.1"
+  },
+  "devDependencies": {
+    "standard": "*",
+    "tape": "^4.0.0"
+  },
+  "keywords": [
+    "bittorrent",
+    "cryptolinks",
+    "magnet",
+    "p2p",
+    "peer-to-peer",
+    "uri",
+    "urn",
+    "webtorrent"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/webtorrent/magnet-uri.git"
+  },
+  "scripts": {
+    "test": "standard && tape test/*.js"
+  }
+}

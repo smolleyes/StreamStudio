@@ -1266,9 +1266,9 @@ function main() {
                 obj.link = 'https://yggtorrent.is/engine/download_torrent?id='+obj.torrentId;
               }
               engine.downloadTorrent(obj).then(res => {
-                console.log("Download global torrent result:", obj.link, res);
                 let torrent = new Buffer(res);
-                getTorrent(res, obj.cover, obj.id)
+                console.log("Download global torrent result:", obj.link, torrent.toString());
+                getTorrent(torrent, obj.cover, obj.id)
               })
               itemTitle = obj.title;
               $('#playerToggle')[0].click();

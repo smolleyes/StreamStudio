@@ -17,7 +17,7 @@
   "dependencies": {
     "async-request": "^1.2.0",
     "cfget": "^1.0.1",
-    "cloudscraper": "^1.4.1",
+    "cloudscraper": "^1.5.1",
     "deep-diff": "^0.3.8",
     "follow-redirects": "^1.2.5",
     "fs-temp": "^1.1.2",

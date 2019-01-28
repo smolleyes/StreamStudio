@@ -1,6 +1,6 @@
 var VERSION = "4.3";
 
-var TORRENT9_URL = 'https://www.torrent9.blue';
+var TORRENT9_URL = 'https://wvw.torrent9.uno/';
 
 process.setMaxListeners(0);
 var path = require('path');
