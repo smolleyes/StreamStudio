@@ -24,5 +24,5 @@ nwjc
 payload
 resources.pak
 snasphot_blob.bin
-*.dll
-*.exe
+./snapshot_blob.bin
+*Readme.md
