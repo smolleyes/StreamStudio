@@ -6,8 +6,8 @@ function initCpbSearch(results,cb) {
 	console.log('SEARCH FOR', results)
 	// LOAD CLOUDFLARE ENGINE
 	if(results.page == 0) {
-		cloudscraper.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: encodeURIComponent(results.query)}, function(e,r,datas) { 
-		console.log(e,r,datas)			
+		$.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: encodeURIComponent(results.query)}, function(e,r,datas) {
+		console.log(e,r,datas)
 		if(e) {
 						results.success = false;
 						results.error = "Can't get results for " + results.query;
@@ -27,7 +27,7 @@ function initCpbSearch(results,cb) {
 				});
 	} else {
 		console.log(results.basePath+'/page-'+results.page)
-				cloudscraper.get(results.basePath+'/page-'+results.page,function(e,r,datas){
+				$.get(results.basePath+'/page-'+results.page,function(e,r,datas){
 					if(e) {
 						results.success = false;
 						results.error = "Can't get results for " + results.query;
