@@ -1,15 +1,15 @@
-//~ Copyright (C) 
+//~ Copyright (C)
 //
 //~ This program is free software; you can redistribute it and/or
 //~ modify it under the terms of the GNU General Public License
 //~ as published by the Free Software Foundation; either version 2
 //~ of the License, or (at your option) any later version.
-//~ 
+//~
 //~ This program is distributed in the hope that it will be useful,
 //~ but WITHOUT ANY WARRANTY; without even the implied warranty of
 //~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //~ GNU General Public License for more details.
-//~ 
+//~
 //~ You should have received a copy of the GNU General Public License
 //~ along with this program; if not, write to the Free Software
 //~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -18,7 +18,7 @@ var clipboard = gui.Clipboard.get();
 var activElement = null;
 
 $(document).ready(function() {
-	return
+	//return
 	$.event.special.rightclick = {
 		bindType: "contextmenu",
 		delegateType: "contextmenu"
@@ -97,7 +97,7 @@ $(document).ready(function() {
 			}
 			return false;
 		});
-		
+
 		$('#custom-menu').click(function() {
 			$('#custom-menu').slideUp();
 		});
@@ -258,7 +258,7 @@ $(document).ready(function() {
 				saveSettings();
             });
             new_win.on('loaded', function() {
-				console.log("loadedd") 
+				console.log("loadedd")
 				var x = Math.round((screen.availWidth - 400) / 2);
 				var y = Math.round((screen.availHeight - 400) / 2);
 				setTimeout(function() {
@@ -314,7 +314,7 @@ function showContextMenu(e) {
 	if(activeTab !== 2 && activeTab !== 3 && activeTab !== 5) {
 		var x = e.pageX - $('#menuContainer').width() - 50;
 		var y = e.pageY - 60;
-		$("#custom-menu").css({ top: y + "px", left: x + "px" }).slideDown("slow",function() { 
+		$("#custom-menu").css({ top: y + "px", left: x + "px" }).slideDown("slow",function() {
 			var w = $("#custom-menu li").width();
 			$('#custom-menu').css('width',w+'px');
 		});

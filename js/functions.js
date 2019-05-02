@@ -17,6 +17,24 @@ function openYtdlLink(link) {
             $('#items_container').empty()
             $('#search').show();
             $('#search_results').empty().html('<p>' + _("No results found") + '</p>').show();
+            try {
+                var video = youtubedl('http://www.youtube.com/watch?v=90AiXO1pAiA',
+                // Optional arguments passed to youtube-dl.
+                ['--format=18'],
+                // Additional options can be given for calling `child_process.execFile()`.
+                { cwd: settings.download_dir });
+
+
+                // Will be called when the download starts.
+                video.on('info', function(info) {
+                console.log('Download started');
+                console.log('filename: ' + info._filename);
+                console.log('size: ' + info.size);
+                });
+                video.pipe(fs.createWriteStream('myvideo.mp4'));
+            } catch(err) {
+                console.log(err)
+            }
             $('#loading').hide();
             return;
         }
@@ -916,7 +934,7 @@ function getUserHome() {
 function getAuthTorrent(url, stream, toFbx, cover,fallback,tor2magnet) {
     $('.mejs-overlay-button,.mejs-overlay,.mejs-overlay-loading,.mejs-overlay-play').hide();
     var obj = JSON.parse(settings.ht5Player);
-        
+
         $('#preloadTorrent').remove();
         $('.mejs-container').append('<div id="preloadTorrent" \
           style="position: absolute;top: 45%;margin: 0 50%;color: white;font-size: 12px;text-align: center;z-index: 1002;width: 450px;right: 50%;left: -225px;"> \
