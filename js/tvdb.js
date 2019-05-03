@@ -155,7 +155,7 @@ function searchTVdbAllById(id, cb, query,fromSearch,engine,eztvId) {
             }
         })
         .catch(function(error) {
-          console.log(error)
+          console.log("ERRUER SERIEJS", error)
             serie.success = false;
             serie.error = error;
             cb(serie);
@@ -350,7 +350,7 @@ function downloadImages(link,target,cb) {
 		url: 'https://www.thetvdb.com/banners/'+link,
 		dest: target        // Save to /path/to/dest/photo.jpg
 	  }
-	   
+
 	  download.image(options)
 		.then(({ filename, image }) => {
 		  console.log('File saved to', filename)

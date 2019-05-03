@@ -232,6 +232,7 @@ function searchSerie() {
             } else {
                 $("#mySeries").empty();
                 searchTVdb(query, function(data) {
+                    console.log("RESULTTTTTTTTTTTT", data.page, data.success)
                     if (!data.success) {
                         swal(_("Error!"), _("Can't find results for %s !", query), "error");
                         reloadSeries();

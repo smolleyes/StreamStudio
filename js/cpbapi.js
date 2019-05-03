@@ -5,14 +5,9 @@ var cloudscraper = require('cloudscraper');
 function initCpbSearch(results,cb) {
 	console.log('SEARCH FOR', results)
 	// LOAD CLOUDFLARE ENGINE
-	if(results.page == 0) {
-		$.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: encodeURIComponent(results.query)}, function(e,r,datas) {
-		console.log(e,r,datas)
-		if(e) {
-						results.success = false;
-						results.error = "Can't get results for " + results.query;
-						cb(results);
-					}
+	if(results.page === 0) {
+		results.totalParsed = 0;
+		$.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: encodeURIComponent(results.query)}).done(function(datas) {
 					try {
 						var mlist=$('.cust-table tr',datas).get()
 						try {
@@ -21,19 +16,24 @@ function initCpbSearch(results,cb) {
 						} catch(err) {
 							results.totalResults = mlist.length
 						}
-						return parseDatas(datas, results,cb);
-		      } catch (err) {}
-					return parseDatas(datas, results,cb);
-				});
-	} else {
-		console.log(results.basePath+'/page-'+results.page)
-				$.get(results.basePath+'/page-'+results.page,function(e,r,datas){
-					if(e) {
+						return parseDatas(mlist, results,cb);
+					} catch (err) {}
+					//return parseDatas(mlist, results,cb);
+				}).fail(function(e){
 						results.success = false;
 						results.error = "Can't get results for " + results.query;
 						cb(results);
-					}
-					return parseDatas(datas, results, cb);
+				});
+	} else {
+		console.log(results.basePath+'/page-'+results.page)
+				$.get(results.basePath+'/page-'+results.page).done(function(datas){
+					var mlist=$('.cust-table tr',datas).get()
+					console.log(mlist)
+					return parseDatas(mlist, results, cb);
+				}).fail(function(e){
+					results.success = false;
+					results.error = "Can't get results for " + results.query;
+					cb(results);
 				})
 	}
 }
@@ -49,27 +49,27 @@ function hasHeader(header, headers) {
   return false
 }
 
-function parseDatas(data, results,cb) {
-	var mlist=$('.cust-table tr',data).get()
+function parseDatas(list, results,cb) {
+
 	try {
-		Iterator.iterate(mlist).forEach(function (item,i) {
-			//try {
+		Iterator.iterate(list).forEach(function (item,i) {
+			try {
 				var video = {};
-				video.torrentLink = TORRENT9_URL+$(item).find('a')[0].href.replace(/.*?torrent/,'/torrent')
+				video.torrentLink = TORRENT9_URL+$(item).find('a')[0].href.replace(/.*?\/torrent/,'torrent')
 				video.seeders = $($(item).find('td')[2]).text();
 				video.leechers = $($(item).find('td')[3]).text();
 				video.title = $($(item).find('a')[0]).text();
 				video.torrentTitle = video.title;
 				video.size = $($(item).find('td')[1]).text();
-				results.list.push(video)
-			//} catch(err) {
-				//console.log("parseData error:", err)
-			//}
+				results.totalParsed += 1;
+				results.list.push(video);
+			} catch(err) {
+				console.log("parseData error:", err)
+			}
 		});
-		console.log(results.list.length, results.totalResults)
-		if(results.list.length !== results.totalResults) {
+		console.log(results.totalParsed, results.totalResults, results.totalParsed)
+		if(results.totalParsed < results.totalResults) {
 			results.page+=1;
-			console.log(results);
 			return initCpbSearch(results,cb)
 		} else {
 			return analyseCpbDatas(results,cb);
