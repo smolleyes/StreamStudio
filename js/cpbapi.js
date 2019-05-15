@@ -7,8 +7,9 @@ function initCpbSearch(results,cb) {
 	// LOAD CLOUDFLARE ENGINE
 	if(results.page === 0) {
 		results.totalParsed = 0;
-		$.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: encodeURIComponent(results.query)}).done(function(datas) {
-					try {
+		$.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: results.query}).done(function(datas) {
+				console.log(datas)
+				try {
 						var mlist=$('.cust-table tr',datas).get()
 						try {
 							results.totalResults = parseInt($($('small',datas)[0]).text().match(/\d{1,5}/)[0]);

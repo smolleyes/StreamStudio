@@ -1,6 +1,6 @@
 var VERSION = "4.3";
 
-var TORRENT9_URL = 'https://wvw.torrent9.uno/';
+var TORRENT9_URL = 'https://ww1.torrent9.nz/';
 
 process.setMaxListeners(0);
 var path = require('path');
@@ -55,7 +55,7 @@ var searchResults = []
 // set custom events
 var updateTimer = new EventEmitter();
 updateTimer.on("timeupdate", function () {
-    updateProgressBar()
+  updateProgressBar()
 });
 
 var state = {}
