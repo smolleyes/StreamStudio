@@ -1,6 +1,6 @@
 var VERSION = "4.3";
 
-var TORRENT9_URL = 'https://ww1.torrent9.nz/';
+var TORRENT9_URL = 'https://www.torrent9.nz/';
 
 process.setMaxListeners(0);
 var path = require('path');

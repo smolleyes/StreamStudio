@@ -138,7 +138,7 @@ $(document).on('click', '.openTorrent', function(e) {
         // });
     } else {
         $.get(obj.torrentLink).done(function(res) {
-            var torrent = TORRENT9_URL+$($('.download-btn a',res)[0]).attr('href')
+            var torrent = TORRENT9_URL+$($('.download-btn a',res)[1]).attr('href')
             console.log('torrent link:', torrent)
             getAuthTorrent(torrent, true, false, null);
             currentMedia.torrentLink = torrent;
