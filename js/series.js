@@ -137,7 +137,7 @@ $(document).on('click', '.openTorrent', function(e) {
         //         getAuthTorrent(obj.torrents['480p']['url'], true, false, obj.cover);
         // });
     } else {
-        $.get(obj.torrentLink, function(res) {
+        $.get(obj.torrentLink).done(function(res) {
             var torrent = TORRENT9_URL+$($('.download-btn a',res)[0]).attr('href')
             console.log('torrent link:', torrent)
             getAuthTorrent(torrent, true, false, null);
