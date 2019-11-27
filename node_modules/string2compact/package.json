@@ -1,0 +1,43 @@
+{
+  "name": "string2compact",
+  "description": "Convert 'hostname:port' strings to BitTorrent's compact ip/host binary returned by Trackers",
+  "version": "1.3.0",
+  "author": {
+    "name": "WebTorrent, LLC",
+    "email": "feross@webtorrent.io",
+    "url": "https://webtorrent.io"
+  },
+  "bugs": {
+    "url": "https://github.com/webtorrent/string2compact/issues"
+  },
+  "dependencies": {
+    "addr-to-ip-port": "^1.0.1",
+    "ipaddr.js": "^1.0.1"
+  },
+  "devDependencies": {
+    "compact2string": "^1.4.0",
+    "standard": "*",
+    "tape": "^4.0.0"
+  },
+  "keywords": [
+    "binary",
+    "bittorrent",
+    "compact",
+    "convert",
+    "hostname",
+    "peer-to-peer",
+    "port",
+    "torrent",
+    "tracker",
+    "webtorrent"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/webtorrent/string2compact.git"
+  },
+  "scripts": {
+    "test": "standard && tape test/*.js"
+  }
+}

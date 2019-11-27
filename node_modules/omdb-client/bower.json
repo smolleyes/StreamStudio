@@ -1,0 +1,27 @@
+{
+  "name": "omdb-client",
+  "main": "dist/omdb-client.min.js",
+  "version": "1.0.6",
+  "homepage": "https://github.com/bbraithwaite/omdb-client",
+  "authors": [
+    "bbraithwaite <https://github.com/bbraithwaite>"
+  ],
+  "keywords": [
+    "omdbapi",
+    "client",
+    "api"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "client",
+    "lib",
+    "index.js",
+    "Gruntfile.js",
+    "package.json"
+  ]
+}

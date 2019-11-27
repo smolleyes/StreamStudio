@@ -1,0 +1,40 @@
+{
+  "name": "addr-to-ip-port",
+  "description": "Convert an 'address:port' string to an array [address:string, port:number]",
+  "version": "1.5.1",
+  "author": {
+    "name": "WebTorrent, LLC",
+    "email": "feross@webtorrent.io",
+    "url": "https://webtorrent.io"
+  },
+  "bugs": {
+    "url": "https://github.com/webtorrent/addr-to-ip-port/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "benchmark": "^2.1.4",
+    "tape": "^4.0.0"
+  },
+  "homepage": "https://github.com/webtorrent/addr-to-ip-port",
+  "keywords": [
+    "convert",
+    "address",
+    "port",
+    "cache",
+    "string",
+    "array",
+    "ip",
+    "addr to ip port",
+    "webtorrent"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/webtorrent/addr-to-ip-port.git"
+  },
+  "scripts": {
+    "test": "tape test/*.js",
+    "perf": "node perf/basic.js"
+  }
+}

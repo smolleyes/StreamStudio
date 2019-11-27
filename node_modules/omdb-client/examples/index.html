@@ -1,0 +1,57 @@
+<html>
+<head>
+	<title>Movie Data Example</title>
+</head>
+<body>
+	<h1>Movie Data</h1>
+	<h3>Search</h3>
+	<div id="search"></div>
+	<h3>Get</h3>
+	<div id="get"></div>
+	<h3>Timeout</h3>
+	<div id="timeout"></div>
+	<script type="text/javascript" src="../dist/omdb-client.min.js"></script>
+	<script>
+		this.omdb.search({
+			query: 'Terminator',
+			year: 1984
+		}, function handleResponse(err, data) { 
+			var el = document.getElementById('search');
+			if (err) {
+				el.innerHTML = err;
+			} else {
+				el.innerHTML = JSON.stringify(data);
+			}
+		});
+
+		this.omdb.get({
+			id: 'tt0276751',
+		}, function handleResponse(err, data) { 
+			var el = document.getElementById('get');
+			if (err) {
+				el.innerHTML = err.type;
+			} else {
+				el.innerHTML = JSON.stringify(data);
+			}
+		});
+
+		// example to show timeout functionality
+		this.omdb.get({
+			id: 'tt0276751',
+			timeout: 10
+		}, function handleResponse(err, data) { 
+			var el = document.getElementById('timeout');
+			if (err) {
+				if (err.type === 'timeout') {
+					el.innerHTML = 'There was a timeout!';
+				} else {
+					el.innerHTML = err.type;
+				}
+			} else {
+				el.innerHTML = JSON.stringify(data);
+			}
+		});
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+--ui bdd
+--compilers coffee-script:coffee
+--reporter list

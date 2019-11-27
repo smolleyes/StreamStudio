@@ -1,0 +1,26 @@
+{
+  "name": "peer-wire-protocol",
+  "version": "0.7.1",
+  "description": "Stream implementing the peer wire protocol used in bittorrent",
+  "author": "Mathias Buus Madsen <mathiasbuus@gmail.com>",
+  "repository": "git://github.com/mafintosh/peer-wire-protocol.git",
+  "keywords": [
+    "bittorrent",
+    "torrent",
+    "protocol",
+    "stream",
+    "peer",
+    "wire"
+  ],
+  "scripts": {
+    "test": "node tests"
+  },
+  "dependencies": {
+    "bitfield": "^0.1.0",
+    "bncode": "^0.2.3",
+    "buffer-alloc": "^1.1.0",
+    "buffer-from": "^1.0.0",
+    "readable-stream": "^1.0.2",
+    "speedometer": "^0.1.2"
+  }
+}

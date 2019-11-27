@@ -1,0 +1,35 @@
+{
+  "name": "moviedb",
+  "description": "Library for interacting with themoviedb.com API",
+  "version": "0.2.10",
+  "scripts": {
+    "test": "clear; make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/impronunciable/moviedb.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "themoviedb",
+    "api",
+    "tmdb"
+  ],
+  "bugs": {
+    "url": "https://github.com/impronunciable/moviedb/issues"
+  },
+  "homepage": "https://github.com/impronunciable/moviedb#readme",
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "index.js",
+  "author": "Dan Zajdband <dan.zajdband@gmail.com>",
+  "dependencies": {
+    "superagent": "^2.3.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "colors": "^1.1.2",
+    "mocha": "^3.1.2"
+  }
+}
