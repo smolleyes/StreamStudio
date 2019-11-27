@@ -7,7 +7,11 @@ function initCpbSearch(results,cb) {
 	// LOAD CLOUDFLARE ENGINE
 	if(results.page === 0) {
 		results.totalParsed = 0;
-		$.post(TORRENT9_URL+'/search_torrent/', {champ_recherche: results.query}).done(function(datas) {
+		var options = {
+			uri: TORRENT9_URL,
+			formData: {torrentSearch: results.query}
+		};
+		cloudscraper.post(options).done(function(datas) {
 				console.log(datas)
 				try {
 						var mlist=$('.cust-table tr',datas).get()

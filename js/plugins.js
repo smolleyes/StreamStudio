@@ -2,7 +2,7 @@ var engines = [];
 const tp = require('torrent-search-api')
 var excludedPlugins = ['mega', 'mega-files', 'vimeo', 'mega-search','grooveshark','omgtorrent','tproject','songza','thepiratebay','cpasbien','t411'];
 var pluginsDir;
-var pluginsList = ['twitch','songza','cpasbien','thepiratebay','torrent-project','mp3stream','torrent9','global'];
+var pluginsList = ['twitch','songza','cpasbien','thepiratebay','torrent-project','oxtorrent','mp3stream','torrent9','global'];
 
 $(document).on('change','.pluginGlobalCheckBox',function(e){
     console.log(this.name + ' ' + this.value + ' ' + this.checked);
@@ -76,7 +76,7 @@ function loadTorrentEngines(cb) {
     if (settings.torrentEnginesEnabled) {
         loadGlobalSearchEngines();
         cb({success:true})
-    } 
+    }
 }
 
 function checkRev() {

@@ -323,6 +323,10 @@ var htmlContent =
 <input class="pluginCheckBox" type="checkbox" id="torrent-project" name="torrent-project"> \
 </div> \
 <div class="ItemCheckbox left"> \
+<label for="oxtorrent">Oxtorrent</label> \
+<input class="pluginCheckBox" type="checkbox" id="oxtorrent" name="oxtorrent"> \
+</div> \
+<div class="ItemCheckbox left"> \
 <label for="torrent9">Torrent9</label> \
 <input class="pluginCheckBox" type="checkbox" id="torrent9" name="torrent9"> \
 </div> \
@@ -1806,7 +1810,7 @@ function onKeyPress(key) {
   } else if (key.key === 'F10') {
     key.preventDefault();
     win.showDevTools();
-  } 
+  }
 }
 
 function update_searchOptions() {

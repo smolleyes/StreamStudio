@@ -697,7 +697,7 @@ function launchPlay() {
 	var needTranscoding = ['hls','m3u8','manifest']
 	var engineWithoutTranscoding = ['mp3stream']
 	var engineWithTranscoding = ['shoutcast','twitch']
-	var engineWithFFmpegCheck = ['torrent9','t411','torrent-project']
+	var engineWithFFmpegCheck = ['torrent9','t411','torrent-project','oxtorrent']
 	var needFFmpegCheck = false;
 	transcodeAudioOnly = false;
 	transcodeVideoOnly = false;
@@ -723,7 +723,7 @@ function launchPlay() {
 	} //else if(!upnpToggleOn && engine && obj.name == 'StreamStudio' && !playFromFile && engineWithoutTranscoding.indexOf(engine_name) == -1 && engineWithTranscoding.indexOf(engine_name) !== -1 || currentMedia.title.toLowerCase().match(/(.avi$|dts|x265|hevc|ac3)/) !== null) {
 	//	transcoderEnabled = true;
 		// force by extension
-	//} 
+	//}
 	else if(!upnpToggleOn && obj.name == 'StreamStudio' && path.extname(currentMedia.title) !== "" && carray.includes(path.extname(currentMedia.title)) || needTranscoding.indexOf(currentMedia.link) !== -1 ) {
 		transcoderEnabled = true;
 	} else {
@@ -1138,7 +1138,7 @@ function updateProgressBar() {
 			//console.log('DECODE PAS LA VIDEOOOOO')
 			transcoderEnabled = true;
 			transcodeVideoOnly = true;
-		} 
+		}
 	}
 	// check if we need transcoding after first seconds
 	if(transcoderEnabled && currentMedia.link.indexOf('http://'+ipaddress+':8887/?file=') == -1) {
@@ -1186,9 +1186,9 @@ function updateProgressBar() {
 				duree = state.playing.duration
 				if(duree.toString().indexOf('NaN') == -1) {
 					var percentage = ((100 / duree) * (current));
-					$('.mejs-time-current').width(state.playing.currentPct+'%');	
+					$('.mejs-time-current').width(state.playing.currentPct+'%');
 				}
-				$('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))	
+				$('.mejs-currenttime, .mejs-currenttime-sub').text(mejs.Utility.secondsToTimeCode(state.playing.currentTime))
 			} else {
 				var percentage = ((100 / duree) * current);
 				//$('.mejs-currenttime').text(mejs.Utility.secondsToTimeCode(current))
