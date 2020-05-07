@@ -9,12 +9,12 @@ function initCpbSearch(results,cb) {
 		results.totalParsed = 0;
 		var options = {
 			uri: TORRENT9_URL,
-			formData: {torrentSearch: results.query}
+			formData: {torrentSearch: results.name}
 		};
-		cloudscraper.post(options).done(function(datas) {
+		$.get(TORRENT9_URL+"/recherche/"+encodeURIComponent(results.name)).done(function(datas) {
 				console.log(datas)
 				try {
-						var mlist=$('.cust-table tr',datas).get()
+						var mlist=$('.table-hover tr',datas).get().slice(1)
 						try {
 							results.totalResults = parseInt($($('small',datas)[0]).text().match(/\d{1,5}/)[0]);
 							results.basePath = path.dirname($($('.pagination li',datas).not(".active")[0]).find('a').attr('href'))
@@ -57,7 +57,8 @@ function hasHeader(header, headers) {
 function parseDatas(list, results,cb) {
 
 	try {
-		Iterator.iterate(list).forEach(function (item,i) {
+		Iterator.iterate(list).forEach(function (item, i) {
+			console.log(item)
 			try {
 				var video = {};
 				video.torrentLink = TORRENT9_URL+$(item).find('a')[0].href.replace(/.*?\/torrent/,'torrent')

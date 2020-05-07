@@ -1,6 +1,6 @@
-var VERSION = "4.3";
+var VERSION = "4.5";
 
-var TORRENT9_URL = 'https://www.torrent9.nz/';
+var TORRENT9_URL = 'https://www.oxtorrent.com/';
 
 process.setMaxListeners(0);
 var path = require('path');
