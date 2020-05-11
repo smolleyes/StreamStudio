@@ -139,7 +139,7 @@ $(document).on('click', '.openTorrent', function(e) {
     } else {
         $.get(obj.torrentLink).done(function (res) {
             console.log(res)
-            var torrent = TORRENT9_URL + $('.btn-download', res).find('a')[0].href.replace(/chrome.*?\/telecharger/, 'telecharger')
+            var torrent = TORRENT9_URL + $('.btn-download', res).find('a')[0].href.replace(/chrome.*?\/(telecharger|get_torrent)/, "$1")
             console.log('torrent link:', torrent)
             getAuthTorrent(torrent, true, false, null);
             currentMedia.torrentLink = torrent;
