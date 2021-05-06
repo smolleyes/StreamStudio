@@ -45,7 +45,7 @@
     "torrent-parser": "^1.2.0",
     "torrent-search-api": "^1.0.25",
     "ua-device-type": "^0.0.4",
-    "underscore": "^1.8.3",
+    "underscore": "^1.12.1",
     "upnp-client": "^0.0.1",
     "upnp-mediarenderer-client": "^1.2.4",
     "upnpserver": "^3.0.2",
